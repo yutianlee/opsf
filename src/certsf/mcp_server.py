@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .functions.airy import airy
+from .functions.airy import ai, airy, bi
 from .functions.bessel import besselj
 from .functions.gamma import gamma, loggamma, rgamma
 from .functions.parabolic_cylinder import pbdv
@@ -22,6 +22,14 @@ def special_rgamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = Fa
 
 def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return airy(z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_ai(z: str, derivative: int = 0, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return ai(z, derivative=derivative, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_bi(z: str, derivative: int = 0, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return bi(z, derivative=derivative, dps=dps, mode=mode, certify=certify).to_dict()
 
 
 def special_besselj(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -45,6 +53,8 @@ def build_server():
     server.tool()(special_loggamma)
     server.tool()(special_rgamma)
     server.tool()(special_airy)
+    server.tool()(special_ai)
+    server.tool()(special_bi)
     server.tool()(special_besselj)
     server.tool()(special_pbdv)
     return server

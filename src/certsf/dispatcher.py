@@ -10,7 +10,7 @@ from .backends import arb_backend, mpmath_backend, scipy_backend
 Mode = str
 
 _VALID_MODES = {"auto", "fast", "high_precision", "certified"}
-_VALID_FUNCTIONS = {"gamma", "loggamma", "rgamma", "airy", "besselj", "pbdv"}
+_VALID_FUNCTIONS = {"gamma", "loggamma", "rgamma", "airy", "ai", "bi", "besselj", "pbdv"}
 
 
 def dispatch(

@@ -47,6 +47,30 @@ def scipy_airy(z, *, dps: int = 50):
     return _fast_result("airy", value, requested)
 
 
+def scipy_ai(z, derivative: int = 0, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    derivative = _validate_airy_derivative(derivative)
+    values = special.airy(scipy_number(z))
+    return _fast_result(
+        _airy_component_function("ai", derivative),
+        number_to_string(values[derivative], digits=float_digits(requested)),
+        requested,
+        diagnostics={"mode": "fast", "component": "ai", "derivative": derivative},
+    )
+
+
+def scipy_bi(z, derivative: int = 0, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    derivative = _validate_airy_derivative(derivative)
+    values = special.airy(scipy_number(z))
+    return _fast_result(
+        _airy_component_function("bi", derivative),
+        number_to_string(values[2 + derivative], digits=float_digits(requested)),
+        requested,
+        diagnostics={"mode": "fast", "component": "bi", "derivative": derivative},
+    )
+
+
 def scipy_besselj(v, z, *, dps: int = 50):
     requested = ensure_dps(dps)
     value = special.jv(scipy_number(v), scipy_number(z))
@@ -65,7 +89,7 @@ def scipy_pbdv(v, x, *, dps: int = 50):
     return _fast_result("pbdv", payload, requested)
 
 
-def _fast_result(function: str, value: str, requested_dps: int):
+def _fast_result(function: str, value: str, requested_dps: int, diagnostics=None):
     return make_result(
         function=function,
         value=value,
@@ -76,5 +100,16 @@ def _fast_result(function: str, value: str, requested_dps: int):
         backend="scipy",
         requested_dps=requested_dps,
         working_dps=16,
-        diagnostics={"mode": "fast"},
+        diagnostics={"mode": "fast"} if diagnostics is None else diagnostics,
     )
+
+
+def _validate_airy_derivative(derivative: int) -> int:
+    derivative = int(derivative)
+    if derivative not in {0, 1}:
+        raise ValueError("Airy component wrappers support derivative=0 or derivative=1")
+    return derivative
+
+
+def _airy_component_function(component: str, derivative: int) -> str:
+    return component if derivative == 0 else f"{component}p"

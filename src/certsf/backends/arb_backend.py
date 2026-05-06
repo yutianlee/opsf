@@ -36,7 +36,9 @@ def arb_airy(z, *, dps: int = 50):
     except ImportError as exc:
         return _unavailable("airy", requested, str(exc))
     try:
-        ai, aip, bi, bip = _make_ball(z).airy()
+        argument = _make_ball(z)
+        domain = "real" if isinstance(argument, flint.arb) else "complex"
+        ai, aip, bi, bip = argument.airy()
         values = {
             "ai": _ball_value_string(ai, flint),
             "aip": _ball_value_string(aip, flint),
@@ -64,12 +66,25 @@ def arb_airy(z, *, dps: int = 50):
             backend="python-flint",
             requested_dps=requested,
             working_dps=_bits_to_dps(bits),
-            diagnostics={"mode": "certified", "working_precision_bits": bits},
+            diagnostics={
+                "mode": "certified",
+                "working_precision_bits": bits,
+                "domain": domain,
+                "certificate_scope": "phase3_real_airy" if domain == "real" else "arb_complex_airy",
+            },
         )
     except Exception as exc:  # pragma: no cover - depends on optional backend domains
         return _unavailable("airy", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
     finally:
         flint.ctx.prec = old_prec
+
+
+def arb_ai(z, derivative: int = 0, *, dps: int = 50):
+    return _arb_airy_component("ai", z, derivative, dps=dps)
+
+
+def arb_bi(z, derivative: int = 0, *, dps: int = 50):
+    return _arb_airy_component("bi", z, derivative, dps=dps)
 
 
 def arb_besselj(v, z, *, dps: int = 50):
@@ -108,6 +123,49 @@ def _with_flint(function: str, dps: int, evaluate):
         return _certified_result(function, value, requested, bits, flint)
     except Exception as exc:  # pragma: no cover - depends on optional backend domains
         return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def _arb_airy_component(component: str, z, derivative: int, *, dps: int):
+    requested = ensure_dps(dps)
+    derivative = _validate_airy_derivative(derivative)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(_airy_component_function(component, derivative), requested, str(exc))
+    try:
+        argument = _make_ball(z)
+        domain = "real" if isinstance(argument, flint.arb) else "complex"
+        values = argument.airy()
+        index = derivative if component == "ai" else 2 + derivative
+        result = _certified_result(_airy_component_function(component, derivative), values[index], requested, bits, flint)
+        if result.certified:
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update(
+                {
+                    "component": component,
+                    "derivative": derivative,
+                    "domain": domain,
+                    "certificate_scope": "phase3_real_airy" if domain == "real" else "arb_complex_airy",
+                }
+            )
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method=result.method,
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        return result
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(_airy_component_function(component, derivative), requested, f"{_PHASE1_UNAVAILABLE} {exc}")
     finally:
         flint.ctx.prec = old_prec
 
@@ -204,6 +262,17 @@ def _is_real_nonpositive(value: Any) -> bool:
         return Decimal(str(value)) <= 0
     except (InvalidOperation, ValueError):
         return False
+
+
+def _validate_airy_derivative(derivative: int) -> int:
+    derivative = int(derivative)
+    if derivative not in {0, 1}:
+        raise ValueError("Airy component wrappers support derivative=0 or derivative=1")
+    return derivative
+
+
+def _airy_component_function(component: str, derivative: int) -> str:
+    return component if derivative == 0 else f"{component}p"
 
 
 def _parse_complex_text(text: str) -> tuple[str, str]:
