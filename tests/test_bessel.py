@@ -1,7 +1,10 @@
 from math import isclose
 
-from certsf import besselj
+import pytest
 
+from certsf import besseli, besselj, besselk, bessely
+
+mp = pytest.importorskip("mpmath")
 
 def test_besselj_fast():
     result = besselj(2.5, 4.0, mode="fast")
@@ -24,3 +27,81 @@ def test_besselj_certified_returns_bounds_or_clean_failure():
         assert result.value.startswith("0.44088497455734116552")
     else:
         assert "error" in result.diagnostics
+
+
+def test_bessel_family_fast_and_high_precision():
+    cases = [
+        (besselj, 2, 4.0, 0.3641281458520728),
+        (bessely, 2, 4.0, 0.21590359460361497),
+        (besseli, 2, 4.0, 6.422189375284105),
+        (besselk, 2, 4.0, 0.017401425529487237),
+    ]
+    for function, order, x, expected in cases:
+        fast = function(order, x, mode="fast")
+        high_precision = function(str(order), str(x), dps=60, mode="high_precision")
+        assert fast.backend == "scipy"
+        assert high_precision.backend == "mpmath"
+        assert isclose(float(fast.value), expected, rel_tol=1e-14)
+        assert isclose(float(high_precision.value), expected, rel_tol=1e-14)
+
+
+@pytest.mark.parametrize(
+    ("function", "reference"),
+    [
+        (besselj, lambda n, x: mp.besselj(n, x)),
+        (bessely, lambda n, x: mp.bessely(n, x)),
+        (besseli, lambda n, x: mp.besseli(n, x)),
+        (besselk, lambda n, x: mp.besselk(n, x)),
+    ],
+)
+@pytest.mark.parametrize(("order", "x"), [(0, "1.25"), (2, "4.0"), (3, "5.5")])
+def test_certified_integer_real_bessel_covers_mpmath(function, reference, order, x):
+    result = function(str(order), x, dps=70, mode="certified")
+    assert result.backend == "python-flint"
+    if not result.certified:
+        pytest.skip(result.diagnostics.get("error", "certified backend unavailable"))
+
+    value = float(result.value)
+    bound = float(result.abs_error_bound)
+    expected = float(reference(order, mp.mpf(x)))
+    assert result.diagnostics["order"] == order
+    assert result.diagnostics["domain"] == "real"
+    assert result.diagnostics["order_domain"] == "integer"
+    assert result.diagnostics["certificate_scope"] == "phase4_integer_real_bessel"
+    assert abs(value - expected) <= max(bound, 1e-65)
+
+
+def test_certified_besselj_three_term_recurrence():
+    x = "3.75"
+    n = 2
+    jm = besselj(n - 1, x, dps=80, mode="certified")
+    jn = besselj(n, x, dps=80, mode="certified")
+    jp = besselj(n + 1, x, dps=80, mode="certified")
+    if not all(result.certified for result in [jm, jn, jp]):
+        pytest.skip("certified backend unavailable")
+
+    x_float = float(x)
+    residual = float(jm.value) + float(jp.value) - (2 * n / x_float) * float(jn.value)
+    propagated = (
+        float(jm.abs_error_bound)
+        + abs(2 * n / x_float) * float(jn.abs_error_bound)
+        + float(jp.abs_error_bound)
+    )
+    assert abs(residual) <= max(propagated, 1e-14)
+
+
+def test_certified_bessel_phase4_scope_rejects_noninteger_order():
+    result = bessely("2.5", "4.0", dps=50, mode="certified")
+    assert result.backend == "python-flint"
+    assert not result.certified
+    assert result.value == ""
+    assert "integer order" in result.diagnostics["error"]
+
+
+def test_mcp_bessel_family_wrappers_return_dicts():
+    from certsf.mcp_server import special_besseli, special_besselj, special_besselk, special_bessely
+
+    assert special_besselj("2", "4.0", dps=40, mode="certified")["function"] == "besselj"
+    assert special_bessely("2", "4.0", dps=40, mode="certified")["function"] == "bessely"
+    assert special_besseli("2", "4.0", dps=40, mode="certified")["function"] == "besseli"
+    assert special_besselk("2", "4.0", dps=40, mode="certified")["function"] == "besselk"

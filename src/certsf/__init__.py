@@ -1,7 +1,7 @@
 """Certified special-function wrappers."""
 
 from .functions.airy import ai, airyai, airy, airybi, bi
-from .functions.bessel import besselj
+from .functions.bessel import besseli, besselj, besselk, bessely
 from .functions.gamma import gamma, loggamma, rgamma
 from .functions.parabolic_cylinder import pbdv
 from .result import SFResult
@@ -13,7 +13,10 @@ __all__ = [
     "airy",
     "airybi",
     "bi",
+    "besseli",
     "besselj",
+    "besselk",
+    "bessely",
     "gamma",
     "loggamma",
     "rgamma",

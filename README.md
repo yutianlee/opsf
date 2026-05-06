@@ -5,7 +5,7 @@
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, pbdv
+from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -54,3 +54,17 @@ The Airy API includes:
 
 For real arguments in certified mode, these functions use Arb ball arithmetic
 and report component-level absolute and relative error bounds.
+
+## Phase 4 integer-order Bessel family
+
+The Bessel API includes:
+
+- `besselj(n, x)` for \(J_n(x)\)
+- `bessely(n, x)` for \(Y_n(x)\)
+- `besseli(n, x)` for \(I_n(x)\)
+- `besselk(n, x)` for \(K_n(x)\)
+
+For integer order and real arguments in certified mode, these functions use
+Arb ball arithmetic and report `certificate_scope="phase4_integer_real_bessel"`
+in diagnostics. Non-integer certified Bessel requests return a clean
+non-certified failure in Phase 4.

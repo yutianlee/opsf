@@ -78,6 +78,27 @@ def mpmath_besselj(v, z, *, dps: int = 50):
         return _mp_result("besselj", _mp_string(value, requested), requested, working)
 
 
+def mpmath_bessely(v, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.bessely(_mp_number(v), _mp_number(z))
+        return _mp_result("bessely", _mp_string(value, requested), requested, working)
+
+
+def mpmath_besseli(v, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.besseli(_mp_number(v), _mp_number(z))
+        return _mp_result("besseli", _mp_string(value, requested), requested, working)
+
+
+def mpmath_besselk(v, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.besselk(_mp_number(v), _mp_number(z))
+        return _mp_result("besselk", _mp_string(value, requested), requested, working)
+
+
 def mpmath_pbdv(v, x, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

@@ -88,23 +88,19 @@ def arb_bi(z, derivative: int = 0, *, dps: int = 50):
 
 
 def arb_besselj(v, z, *, dps: int = 50):
-    requested = ensure_dps(dps)
-    try:
-        flint, old_prec, bits = _enter_flint_context(requested)
-    except ImportError as exc:
-        return _unavailable("besselj", requested, str(exc))
-    try:
-        order = _make_ball(v)
-        argument = _make_ball(z)
-        if isinstance(order, flint.acb) or isinstance(argument, flint.acb):
-            order = flint.acb(order)
-            argument = flint.acb(argument)
-        value = argument.bessel_j(order)
-        return _certified_result("besselj", value, requested, bits, flint)
-    except Exception as exc:  # pragma: no cover - depends on optional backend domains
-        return _unavailable("besselj", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
-    finally:
-        flint.ctx.prec = old_prec
+    return _arb_bessel("besselj", "bessel_j", v, z, dps=dps)
+
+
+def arb_bessely(v, z, *, dps: int = 50):
+    return _arb_bessel("bessely", "bessel_y", v, z, dps=dps)
+
+
+def arb_besseli(v, z, *, dps: int = 50):
+    return _arb_bessel("besseli", "bessel_i", v, z, dps=dps)
+
+
+def arb_besselk(v, z, *, dps: int = 50):
+    return _arb_bessel("besselk", "bessel_k", v, z, dps=dps)
 
 
 def arb_pbdv(v, x, *, dps: int = 50):
@@ -166,6 +162,52 @@ def _arb_airy_component(component: str, z, derivative: int, *, dps: int):
         return result
     except Exception as exc:  # pragma: no cover - depends on optional backend domains
         return _unavailable(_airy_component_function(component, derivative), requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def _arb_bessel(function: str, method_name: str, v, z, *, dps: int):
+    requested = ensure_dps(dps)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(function, requested, str(exc))
+    try:
+        order_value = _integer_order_value(v)
+        if order_value is None:
+            return _unavailable(function, requested, "Phase 4 certified Bessel supports integer order only.")
+        argument = _make_ball(z)
+        if not isinstance(argument, flint.arb):
+            return _unavailable(function, requested, "Phase 4 certified Bessel supports real arguments only.")
+        order = _make_ball(v)
+        value = getattr(argument, method_name)(order)
+        result = _certified_result(function, value, requested, bits, flint)
+        if result.certified:
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update(
+                {
+                    "order": order_value,
+                    "domain": "real",
+                    "order_domain": "integer",
+                    "certificate_scope": "phase4_integer_real_bessel",
+                }
+            )
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method=result.method,
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        return result
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}")
     finally:
         flint.ctx.prec = old_prec
 
@@ -262,6 +304,34 @@ def _is_real_nonpositive(value: Any) -> bool:
         return Decimal(str(value)) <= 0
     except (InvalidOperation, ValueError):
         return False
+
+
+def _is_integer_order(value: Any) -> bool:
+    return _integer_order_value(value) is not None
+
+
+def _integer_order_value(value: Any) -> int | None:
+    try:
+        if isinstance(value, complex):
+            if value.imag != 0:
+                return None
+            value = repr(value.real)
+        if isinstance(value, str):
+            text = value.strip().replace("i", "j")
+            if "j" in text.lower():
+                real, imag = _parse_complex_text(text)
+                if Decimal(imag) != 0:
+                    return None
+                value = real
+            else:
+                value = text
+        decimal = Decimal(str(value))
+        integral = decimal.to_integral_value()
+        if decimal != integral:
+            return None
+        return int(integral)
+    except (InvalidOperation, ValueError):
+        return None
 
 
 def _validate_airy_derivative(derivative: int) -> int:
