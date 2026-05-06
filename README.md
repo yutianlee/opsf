@@ -5,7 +5,8 @@
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv, pcfd, pcfu
+from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk
+from certsf import pbdv, pcfd, pcfu, pcfv, pcfw
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -102,5 +103,18 @@ and real or complex arguments:
 
 These results report
 `certificate_scope="phase7_hypergeometric_parabolic_cylinder"` in diagnostics.
-Certified `pcfv` and `pcfw` still return clean non-certified failures until
-their connection formulas are validated.
+
+## Phase 8 parabolic-cylinder connections
+
+Certified mode now also covers the remaining parabolic-cylinder connection
+functions for real parameters:
+
+- `pcfv(a, z)` uses the DLMF connection formula through `pcfu`, supporting real
+  or complex arguments.
+- `pcfw(a, x)` uses the real-argument DLMF 12.14 connection formula through
+  rotated `pcfu` values.
+
+These results report
+`certificate_scope="phase8_parabolic_cylinder_connections"` in diagnostics.
+Certified `pcfw` returns a clean non-certified failure for complex arguments
+until a complex-domain definition and validation target are selected.

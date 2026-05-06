@@ -72,6 +72,10 @@ def test_parabolic_cylinder_family_high_precision_complex(function, reference):
         (pcfu, "2.5", "1.25", mp.pcfu, "pcfu_1f1_global"),
         (pcfu, "2.5", "-1.25", mp.pcfu, "pcfu_1f1_global"),
         (pcfu, "2.5", "1.25+0.5j", mp.pcfu, "pcfu_1f1_global"),
+        (pcfv, "2.5", "1.25", mp.pcfv, "pcfv_dlmf_connection"),
+        (pcfv, "2.5", "1.25+0.5j", mp.pcfv, "pcfv_dlmf_connection"),
+        (pcfw, "2.5", "1.25", mp.pcfw, "pcfw_dlmf_12_14_real_connection"),
+        (pcfw, "2.5", "-1.25", mp.pcfw, "pcfw_dlmf_12_14_real_connection"),
     ],
 )
 def test_certified_parabolic_cylinder_core_covers_mpmath(function, parameter, z, reference, formula):
@@ -82,8 +86,14 @@ def test_certified_parabolic_cylinder_core_covers_mpmath(function, parameter, z,
 
     value = _complex_value(result.value)
     bound = float(result.abs_error_bound)
-    expected = complex(reference(mp.mpf(parameter), _mp_number(z)))
-    assert result.diagnostics["certificate_scope"] == "phase7_hypergeometric_parabolic_cylinder"
+    with mp.workdps(90):
+        expected = complex(reference(mp.mpf(parameter), _mp_number(z)))
+    expected_scope = (
+        "phase8_parabolic_cylinder_connections"
+        if function in {pcfv, pcfw}
+        else "phase7_hypergeometric_parabolic_cylinder"
+    )
+    assert result.diagnostics["certificate_scope"] == expected_scope
     assert result.diagnostics["parameter"] == parameter
     assert result.diagnostics["parameter_domain"] == "real"
     assert result.diagnostics["formula"] == formula
@@ -118,14 +128,12 @@ def test_certified_parabolic_cylinder_rejects_complex_parameter():
     assert "real parameters" in result.diagnostics["error"]
 
 
-@pytest.mark.parametrize("function", [pcfv, pcfw])
-def test_parabolic_cylinder_certified_remaining_functions_are_clean_failures(function):
-    result = function("2.5", "1.25", dps=50, mode="certified")
+def test_certified_pcfw_rejects_complex_argument():
+    result = pcfw("2.5", "1.25+0.5j", dps=50, mode="certified")
     assert result.backend == "python-flint"
     assert not result.certified
     assert result.value == ""
-    assert "pcfu, pcfd, and pbdv" in result.diagnostics["error"]
-    assert "validated connection formulas" in result.diagnostics["error"]
+    assert "real arguments" in result.diagnostics["error"]
 
 
 def test_mcp_parabolic_cylinder_family_wrappers_return_dicts():
