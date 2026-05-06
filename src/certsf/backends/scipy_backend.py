@@ -27,6 +27,12 @@ def scipy_loggamma(z, *, dps: int = 50):
     return _fast_result("loggamma", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_rgamma(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.rgamma(scipy_number(z))
+    return _fast_result("rgamma", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

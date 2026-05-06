@@ -21,6 +21,13 @@ def mpmath_loggamma(z, *, dps: int = 50):
         return _mp_result("loggamma", _mp_string(value, requested), requested, working)
 
 
+def mpmath_rgamma(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.rgamma(_mp_number(z))
+        return _mp_result("rgamma", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):
