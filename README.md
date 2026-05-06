@@ -5,7 +5,7 @@
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, loggamma, rgamma, airy, besselj, pbdv
+from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, pbdv
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -43,3 +43,14 @@ The gamma-family API includes:
 certified mode it returns a rigorous zero at gamma poles, while `gamma` and
 `loggamma` return clean non-certified failures when the requested value is not
 finite.
+
+## Phase 3 Airy family
+
+The Airy API includes:
+
+- `airy(z)` returning Ai, Ai', Bi, and Bi' in one JSON payload
+- `ai(z, derivative=0)` and `ai(z, derivative=1)`
+- `bi(z, derivative=0)` and `bi(z, derivative=1)`
+
+For real arguments in certified mode, these functions use Arb ball arithmetic
+and report component-level absolute and relative error bounds.

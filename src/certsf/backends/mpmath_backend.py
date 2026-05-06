@@ -43,6 +43,34 @@ def mpmath_airy(z, *, dps: int = 50):
         return _mp_result("airy", value, requested, working)
 
 
+def mpmath_ai(z, derivative: int = 0, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    derivative = _validate_airy_derivative(derivative)
+    with mp.workdps(working):
+        value = mp.airyai(_mp_number(z), derivative=derivative)
+        return _mp_result(
+            _airy_component_function("ai", derivative),
+            _mp_string(value, requested),
+            requested,
+            working,
+            diagnostics=_airy_component_diagnostics("ai", derivative),
+        )
+
+
+def mpmath_bi(z, derivative: int = 0, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    derivative = _validate_airy_derivative(derivative)
+    with mp.workdps(working):
+        value = mp.airybi(_mp_number(z), derivative=derivative)
+        return _mp_result(
+            _airy_component_function("bi", derivative),
+            _mp_string(value, requested),
+            requested,
+            working,
+            diagnostics=_airy_component_diagnostics("bi", derivative),
+        )
+
+
 def mpmath_besselj(v, z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):
@@ -87,7 +115,14 @@ def _mp_string(value, requested_dps: int) -> str:
     return mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False)
 
 
-def _mp_result(function: str, value: str, requested_dps: int, working_dps: int):
+def _mp_result(
+    function: str,
+    value: str,
+    requested_dps: int,
+    working_dps: int,
+    diagnostics=None,
+):
+    default_diagnostics = {"mode": "high_precision", "warning": UNCERTIFIED_WARNING}
     return make_result(
         function=function,
         value=value,
@@ -98,5 +133,25 @@ def _mp_result(function: str, value: str, requested_dps: int, working_dps: int):
         backend="mpmath",
         requested_dps=requested_dps,
         working_dps=working_dps,
-        diagnostics={"mode": "high_precision", "warning": UNCERTIFIED_WARNING},
+        diagnostics=default_diagnostics if diagnostics is None else diagnostics,
     )
+
+
+def _validate_airy_derivative(derivative: int) -> int:
+    derivative = int(derivative)
+    if derivative not in {0, 1}:
+        raise ValueError("Airy component wrappers support derivative=0 or derivative=1")
+    return derivative
+
+
+def _airy_component_function(component: str, derivative: int) -> str:
+    return component if derivative == 0 else f"{component}p"
+
+
+def _airy_component_diagnostics(component: str, derivative: int):
+    return {
+        "mode": "high_precision",
+        "component": component,
+        "derivative": derivative,
+        "warning": UNCERTIFIED_WARNING,
+    }

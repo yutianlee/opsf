@@ -1,8 +1,19 @@
 """Public special-function wrappers."""
 
-from .airy import airy
+from .airy import ai, airyai, airy, airybi, bi
 from .bessel import besselj
 from .gamma import gamma, loggamma, rgamma
 from .parabolic_cylinder import pbdv
 
-__all__ = ["airy", "besselj", "gamma", "loggamma", "rgamma", "pbdv"]
+__all__ = [
+    "ai",
+    "airyai",
+    "airy",
+    "airybi",
+    "bi",
+    "besselj",
+    "gamma",
+    "loggamma",
+    "rgamma",
+    "pbdv",
+]
