@@ -173,23 +173,29 @@ def _arb_bessel(function: str, method_name: str, v, z, *, dps: int):
     except ImportError as exc:
         return _unavailable(function, requested, str(exc))
     try:
-        order_value = _integer_order_value(v)
-        if order_value is None:
-            return _unavailable(function, requested, "Phase 4 certified Bessel supports integer order only.")
+        order_text = _real_order_text(v)
+        if order_text is None:
+            return _unavailable(function, requested, "Phase 5 certified Bessel supports real order only.")
         argument = _make_ball(z)
-        if not isinstance(argument, flint.arb):
-            return _unavailable(function, requested, "Phase 4 certified Bessel supports real arguments only.")
-        order = _make_ball(v)
-        value = getattr(argument, method_name)(order)
+        argument_domain = "real" if isinstance(argument, flint.arb) else "complex"
+        order = flint.arb(order_text)
+        order_argument = flint.acb(order) if isinstance(argument, flint.acb) else order
+        value = getattr(argument, method_name)(order_argument)
         result = _certified_result(function, value, requested, bits, flint)
         if result.certified:
+            order_domain = "integer" if _is_integral_decimal_text(order_text) else "real"
+            certificate_scope = (
+                "phase4_integer_real_bessel"
+                if argument_domain == "real" and order_domain == "integer"
+                else "phase5_real_order_complex_bessel"
+            )
             diagnostics = dict(result.diagnostics)
             diagnostics.update(
                 {
-                    "order": order_value,
-                    "domain": "real",
-                    "order_domain": "integer",
-                    "certificate_scope": "phase4_integer_real_bessel",
+                    "order": _order_diagnostic_value(order_text),
+                    "domain": argument_domain,
+                    "order_domain": order_domain,
+                    "certificate_scope": certificate_scope,
                 }
             )
             return make_result(
@@ -307,10 +313,11 @@ def _is_real_nonpositive(value: Any) -> bool:
 
 
 def _is_integer_order(value: Any) -> bool:
-    return _integer_order_value(value) is not None
+    order_text = _real_order_text(value)
+    return order_text is not None and _is_integral_decimal_text(order_text)
 
 
-def _integer_order_value(value: Any) -> int | None:
+def _real_order_text(value: Any) -> str | None:
     try:
         if isinstance(value, complex):
             if value.imag != 0:
@@ -326,12 +333,22 @@ def _integer_order_value(value: Any) -> int | None:
             else:
                 value = text
         decimal = Decimal(str(value))
-        integral = decimal.to_integral_value()
-        if decimal != integral:
+        if not decimal.is_finite():
             return None
-        return int(integral)
+        return format(decimal, "f")
     except (InvalidOperation, ValueError):
         return None
+
+
+def _is_integral_decimal_text(value: str) -> bool:
+    decimal = Decimal(value)
+    return decimal == decimal.to_integral_value()
+
+
+def _order_diagnostic_value(value: str):
+    if _is_integral_decimal_text(value):
+        return int(Decimal(value))
+    return value
 
 
 def _validate_airy_derivative(derivative: int) -> int:
