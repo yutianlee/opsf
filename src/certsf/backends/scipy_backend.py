@@ -77,6 +77,24 @@ def scipy_besselj(v, z, *, dps: int = 50):
     return _fast_result("besselj", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_bessely(v, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.yv(scipy_number(v), scipy_number(z))
+    return _fast_result("bessely", number_to_string(value, digits=float_digits(requested)), requested)
+
+
+def scipy_besseli(v, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.iv(scipy_number(v), scipy_number(z))
+    return _fast_result("besseli", number_to_string(value, digits=float_digits(requested)), requested)
+
+
+def scipy_besselk(v, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.kv(scipy_number(v), scipy_number(z))
+    return _fast_result("besselk", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_pbdv(v, x, *, dps: int = 50):
     requested = ensure_dps(dps)
     value, derivative = special.pbdv(scipy_real(v), scipy_real(x))

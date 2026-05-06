@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from .functions.airy import ai, airy, bi
-from .functions.bessel import besselj
+from .functions.bessel import besseli, besselj, besselk, bessely
 from .functions.gamma import gamma, loggamma, rgamma
 from .functions.parabolic_cylinder import pbdv
 
@@ -36,6 +36,18 @@ def special_besselj(v: str, z: str, dps: int = 50, mode: str = "auto", certify: 
     return besselj(v, z, dps=dps, mode=mode, certify=certify).to_dict()
 
 
+def special_bessely(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return bessely(v, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_besseli(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return besseli(v, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_besselk(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return besselk(v, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
 def special_pbdv(v: str, x: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return pbdv(v, x, dps=dps, mode=mode, certify=certify).to_dict()
 
@@ -56,6 +68,9 @@ def build_server():
     server.tool()(special_ai)
     server.tool()(special_bi)
     server.tool()(special_besselj)
+    server.tool()(special_bessely)
+    server.tool()(special_besseli)
+    server.tool()(special_besselk)
     server.tool()(special_pbdv)
     return server
 
