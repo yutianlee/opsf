@@ -13,10 +13,8 @@ _PHASE1_UNAVAILABLE = "Certified backend unavailable for this function/domain in
 _NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
-_PHASE7_PCF_UNSUPPORTED = (
-    "Phase 7 certified parabolic-cylinder supports pcfu, pcfd, and pbdv. "
-    "Certified pcfv/pcfw need validated connection formulas."
-)
+_PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
+_PHASE8_PCFW_REAL_ARGUMENT_ONLY = "Phase 8 certified pcfw supports real arguments only."
 
 
 def arb_gamma(z, *, dps: int = 50):
@@ -166,13 +164,11 @@ def arb_pcfu(a, z, *, dps: int = 50):
 
 
 def arb_pcfv(a, z, *, dps: int = 50):
-    requested = ensure_dps(dps)
-    return _unavailable("pcfv", requested, _PHASE7_PCF_UNSUPPORTED)
+    return _arb_parabolic_cylinder("pcfv", a, z, dps=dps)
 
 
 def arb_pcfw(a, z, *, dps: int = 50):
-    requested = ensure_dps(dps)
-    return _unavailable("pcfw", requested, _PHASE7_PCF_UNSUPPORTED)
+    return _arb_parabolic_cylinder("pcfw", a, z, dps=dps)
 
 
 def _with_flint(function: str, dps: int, evaluate):
@@ -296,13 +292,25 @@ def _arb_parabolic_cylinder(function: str, parameter, z, *, dps: int):
         if parameter_text is None:
             return _unavailable(function, requested, _PHASE7_PCF_REAL_PARAMETER_ONLY)
         parameter_ball = flint.arb(parameter_text)
-        argument = _make_ball(z)
+        if function == "pcfw":
+            argument_text = _real_order_text(z)
+            if argument_text is None:
+                return _unavailable(function, requested, _PHASE8_PCFW_REAL_ARGUMENT_ONLY)
+            argument = flint.arb(argument_text)
+        else:
+            argument = _make_ball(z)
         if function == "pcfu":
             value = _arb_pcfu_value(parameter_ball, argument, flint)
         elif function == "pcfd":
             value = _arb_pcfd_value(parameter_ball, argument, flint)
+        elif function == "pcfv":
+            value = _arb_pcfv_value(parameter_ball, argument, flint)
+        elif function == "pcfw":
+            value = _arb_pcfw_value(parameter_ball, argument, flint)
         else:  # pragma: no cover - guarded by public wrappers
             raise ValueError(f"unsupported parabolic-cylinder function: {function}")
+        if function in {"pcfv", "pcfw"} and isinstance(argument, flint.arb) and isinstance(value, flint.acb):
+            value = value.real
         result = _certified_result(function, value, requested, bits, flint)
         if result.certified:
             diagnostics = _parabolic_cylinder_diagnostics(function, parameter_text, argument, bits, flint)
@@ -330,6 +338,19 @@ def _arb_pcfd_value(order, argument, flint):
     return _arb_pcfu_value(-order - flint.arb("0.5"), argument, flint)
 
 
+def _arb_pcfv_value(parameter, argument, flint):
+    half = flint.arb("0.5")
+    one_quarter = flint.arb("0.25")
+    two = flint.arb(2)
+    pi = flint.arb.pi()
+    imaginary_unit = flint.acb(0, 1)
+    complex_argument = flint.acb(argument) if isinstance(argument, flint.arb) else argument
+    term1 = -imaginary_unit * (half - parameter).rgamma() * _arb_pcfu_value(parameter, complex_argument, flint)
+    phase = (-imaginary_unit * pi * (parameter / 2 - one_quarter)).exp()
+    term2 = (two / pi).sqrt() * phase * _arb_pcfu_value(-parameter, imaginary_unit * complex_argument, flint)
+    return term1 + term2
+
+
 def _arb_pcfu_value(parameter, argument, flint):
     one_quarter = flint.arb("0.25")
     half = flint.arb("0.5")
@@ -346,16 +367,45 @@ def _arb_pcfu_value(parameter, argument, flint):
     return (z2 / 4).exp() * (u0 * even_part + derivative0 * argument * odd_part)
 
 
+def _arb_pcfw_value(parameter, argument, flint):
+    half = flint.arb("0.5")
+    pi = flint.arb.pi()
+    imaginary_unit = flint.acb(0, 1)
+    complex_argument = flint.acb(argument)
+    phi2 = ((half + imaginary_unit * parameter).lgamma() - (half - imaginary_unit * parameter).lgamma()) / (
+        2 * imaginary_unit
+    )
+    rho = pi / 8 + phi2 / 2
+    exp_pi_a = (pi * parameter).exp()
+    k = 1 / ((1 + (2 * pi * parameter).exp()).sqrt() + exp_pi_a)
+    coefficient = (k / 2).sqrt() * (pi * parameter / 4).exp()
+    argument_minus = complex_argument * (-imaginary_unit * pi / 4).exp()
+    argument_plus = complex_argument * (imaginary_unit * pi / 4).exp()
+    return coefficient * (imaginary_unit * rho).exp() * _arb_pcfu_value(
+        imaginary_unit * parameter, argument_minus, flint
+    ) + coefficient * (-imaginary_unit * rho).exp() * _arb_pcfu_value(
+        -imaginary_unit * parameter, argument_plus, flint
+    )
+
+
 def _parabolic_cylinder_diagnostics(function: str, parameter_text: str, argument, bits: int, flint):
     parameter_domain = "integer" if _is_integral_decimal_text(parameter_text) else "real"
+    formula = {
+        "pcfu": "pcfu_1f1_global",
+        "pcfd": "pcfd_via_pcfu",
+        "pbdv": "pcfd_via_pcfu",
+        "pcfv": "pcfv_dlmf_connection",
+        "pcfw": "pcfw_dlmf_12_14_real_connection",
+    }[function]
+    certificate_scope = _PHASE8_PCF_SCOPE if function in {"pcfv", "pcfw"} else _PHASE7_PCF_SCOPE
     return {
         "mode": "certified",
         "working_precision_bits": bits,
         "domain": "real" if isinstance(argument, flint.arb) else "complex",
         "parameter": _order_diagnostic_value(parameter_text),
         "parameter_domain": parameter_domain,
-        "formula": "pcfu_1f1_global" if function == "pcfu" else "pcfd_via_pcfu",
-        "certificate_scope": _PHASE7_PCF_SCOPE,
+        "formula": formula,
+        "certificate_scope": certificate_scope,
     }
 
 
