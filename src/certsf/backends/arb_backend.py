@@ -11,9 +11,11 @@ from ._common import ensure_dps, json_string, make_result
 
 _PHASE1_UNAVAILABLE = "Certified backend unavailable for this function/domain in Phase 1."
 _NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
-_PHASE6_PCF_UNAVAILABLE = (
-    "Certified parabolic-cylinder backend is not available until the Arb "
-    "hypergeometric or ODE enclosure path is validated."
+_PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
+_PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
+_PHASE7_PCF_UNSUPPORTED = (
+    "Phase 7 certified parabolic-cylinder supports pcfu, pcfd, and pbdv. "
+    "Certified pcfv/pcfw need validated connection formulas."
 )
 
 
@@ -109,27 +111,68 @@ def arb_besselk(v, z, *, dps: int = 50):
 
 def arb_pbdv(v, x, *, dps: int = 50):
     requested = ensure_dps(dps)
-    return _unavailable("pbdv", requested, _PHASE6_PCF_UNAVAILABLE)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable("pbdv", requested, str(exc))
+    try:
+        order_text = _real_order_text(v)
+        if order_text is None:
+            return _unavailable("pbdv", requested, _PHASE7_PCF_REAL_PARAMETER_ONLY)
+        order = flint.arb(order_text)
+        argument = _make_ball(x)
+        value = _arb_pcfd_value(order, argument, flint)
+        derivative = argument / 2 * value - _arb_pcfd_value(order + 1, argument, flint)
+        if not _is_finite_ball(value, flint) or not _is_finite_ball(derivative, flint):
+            return _unavailable("pbdv", requested, _NONFINITE_RESULT)
+
+        values = {
+            "value": _ball_value_string(value, flint),
+            "derivative": _ball_value_string(derivative, flint),
+        }
+        abs_errors = {
+            "value": _ball_abs_error_string(value),
+            "derivative": _ball_abs_error_string(derivative),
+        }
+        rel_errors = {
+            key: error
+            for key, ball in {"value": value, "derivative": derivative}.items()
+            if (error := _ball_rel_error_string(ball)) is not None
+        }
+        return make_result(
+            function="pbdv",
+            value=json_string(values),
+            abs_error_bound=json_string(abs_errors),
+            rel_error_bound=json.dumps(rel_errors, sort_keys=True) if rel_errors else None,
+            certified=True,
+            method="arb_hypergeometric",
+            backend="python-flint",
+            requested_dps=requested,
+            working_dps=_bits_to_dps(bits),
+            diagnostics=_parabolic_cylinder_diagnostics("pbdv", order_text, argument, bits, flint),
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable("pbdv", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
 
 
 def arb_pcfd(v, z, *, dps: int = 50):
-    requested = ensure_dps(dps)
-    return _unavailable("pcfd", requested, _PHASE6_PCF_UNAVAILABLE)
+    return _arb_parabolic_cylinder("pcfd", v, z, dps=dps)
 
 
 def arb_pcfu(a, z, *, dps: int = 50):
-    requested = ensure_dps(dps)
-    return _unavailable("pcfu", requested, _PHASE6_PCF_UNAVAILABLE)
+    return _arb_parabolic_cylinder("pcfu", a, z, dps=dps)
 
 
 def arb_pcfv(a, z, *, dps: int = 50):
     requested = ensure_dps(dps)
-    return _unavailable("pcfv", requested, _PHASE6_PCF_UNAVAILABLE)
+    return _unavailable("pcfv", requested, _PHASE7_PCF_UNSUPPORTED)
 
 
 def arb_pcfw(a, z, *, dps: int = 50):
     requested = ensure_dps(dps)
-    return _unavailable("pcfw", requested, _PHASE6_PCF_UNAVAILABLE)
+    return _unavailable("pcfw", requested, _PHASE7_PCF_UNSUPPORTED)
 
 
 def _with_flint(function: str, dps: int, evaluate):
@@ -240,6 +283,80 @@ def _arb_bessel(function: str, method_name: str, v, z, *, dps: int):
         return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}")
     finally:
         flint.ctx.prec = old_prec
+
+
+def _arb_parabolic_cylinder(function: str, parameter, z, *, dps: int):
+    requested = ensure_dps(dps)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(function, requested, str(exc))
+    try:
+        parameter_text = _real_order_text(parameter)
+        if parameter_text is None:
+            return _unavailable(function, requested, _PHASE7_PCF_REAL_PARAMETER_ONLY)
+        parameter_ball = flint.arb(parameter_text)
+        argument = _make_ball(z)
+        if function == "pcfu":
+            value = _arb_pcfu_value(parameter_ball, argument, flint)
+        elif function == "pcfd":
+            value = _arb_pcfd_value(parameter_ball, argument, flint)
+        else:  # pragma: no cover - guarded by public wrappers
+            raise ValueError(f"unsupported parabolic-cylinder function: {function}")
+        result = _certified_result(function, value, requested, bits, flint)
+        if result.certified:
+            diagnostics = _parabolic_cylinder_diagnostics(function, parameter_text, argument, bits, flint)
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method="arb_hypergeometric",
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        return result
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def _arb_pcfd_value(order, argument, flint):
+    return _arb_pcfu_value(-order - flint.arb("0.5"), argument, flint)
+
+
+def _arb_pcfu_value(parameter, argument, flint):
+    one_quarter = flint.arb("0.25")
+    half = flint.arb("0.5")
+    three_quarters = flint.arb("0.75")
+    three_halves = flint.arb("1.5")
+    two = flint.arb(2)
+    sqrt_pi = flint.arb.pi().sqrt()
+    z2 = argument * argument
+
+    u0 = sqrt_pi * two ** (-parameter / 2 - one_quarter) * (parameter / 2 + three_quarters).rgamma()
+    derivative0 = -sqrt_pi * two ** (-parameter / 2 + one_quarter) * (parameter / 2 + one_quarter).rgamma()
+    even_part = (-z2 / 2).hypgeom_1f1(-parameter / 2 + one_quarter, half)
+    odd_part = (-z2 / 2).hypgeom_1f1(-parameter / 2 + three_quarters, three_halves)
+    return (z2 / 4).exp() * (u0 * even_part + derivative0 * argument * odd_part)
+
+
+def _parabolic_cylinder_diagnostics(function: str, parameter_text: str, argument, bits: int, flint):
+    parameter_domain = "integer" if _is_integral_decimal_text(parameter_text) else "real"
+    return {
+        "mode": "certified",
+        "working_precision_bits": bits,
+        "domain": "real" if isinstance(argument, flint.arb) else "complex",
+        "parameter": _order_diagnostic_value(parameter_text),
+        "parameter_domain": parameter_domain,
+        "formula": "pcfu_1f1_global" if function == "pcfu" else "pcfd_via_pcfu",
+        "certificate_scope": _PHASE7_PCF_SCOPE,
+    }
 
 
 def _enter_flint_context(requested_dps: int):
