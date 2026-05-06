@@ -64,14 +64,68 @@ def test_parabolic_cylinder_family_high_precision_complex(function, reference):
     assert abs(_complex_value(result.value) - expected) < 1e-14
 
 
-@pytest.mark.parametrize("function", [pbdv, pcfd, pcfu, pcfv, pcfw])
-def test_parabolic_cylinder_certified_is_clean_phase6_failure(function):
+@pytest.mark.parametrize(
+    ("function", "parameter", "z", "reference", "formula"),
+    [
+        (pcfd, "2.5", "1.25", mp.pcfd, "pcfd_via_pcfu"),
+        (pcfd, "2.5", "1.25+0.5j", mp.pcfd, "pcfd_via_pcfu"),
+        (pcfu, "2.5", "1.25", mp.pcfu, "pcfu_1f1_global"),
+        (pcfu, "2.5", "-1.25", mp.pcfu, "pcfu_1f1_global"),
+        (pcfu, "2.5", "1.25+0.5j", mp.pcfu, "pcfu_1f1_global"),
+    ],
+)
+def test_certified_parabolic_cylinder_core_covers_mpmath(function, parameter, z, reference, formula):
+    result = function(parameter, z, dps=70, mode="certified")
+    assert result.backend == "python-flint"
+    if not result.certified:
+        pytest.skip(result.diagnostics.get("error", "certified backend unavailable"))
+
+    value = _complex_value(result.value)
+    bound = float(result.abs_error_bound)
+    expected = complex(reference(mp.mpf(parameter), _mp_number(z)))
+    assert result.diagnostics["certificate_scope"] == "phase7_hypergeometric_parabolic_cylinder"
+    assert result.diagnostics["parameter"] == parameter
+    assert result.diagnostics["parameter_domain"] == "real"
+    assert result.diagnostics["formula"] == formula
+    assert abs(value - expected) <= max(bound, 1e-65)
+
+
+def test_certified_pbdv_returns_value_and_derivative_bounds():
+    result = pbdv("2.5", "1.25", dps=70, mode="certified")
+    assert result.backend == "python-flint"
+    if not result.certified:
+        pytest.skip(result.diagnostics.get("error", "certified backend unavailable"))
+
+    values = json.loads(result.value)
+    bounds = json.loads(result.abs_error_bound)
+    z = mp.mpf("1.25")
+    expected_value = mp.pcfd(mp.mpf("2.5"), z)
+    expected_derivative = (z / 2) * expected_value - mp.pcfd(mp.mpf("3.5"), z)
+    assert result.diagnostics["certificate_scope"] == "phase7_hypergeometric_parabolic_cylinder"
+    assert set(values) == {"value", "derivative"}
+    assert set(bounds) == {"value", "derivative"}
+    assert abs(float(values["value"]) - float(expected_value)) <= max(float(bounds["value"]), 1e-65)
+    assert abs(float(values["derivative"]) - float(expected_derivative)) <= max(float(bounds["derivative"]), 1e-65)
+
+
+def test_certified_parabolic_cylinder_rejects_complex_parameter():
+    result = pcfu("2.5+1j", "1.25", dps=50, mode="certified")
+    assert result.backend == "python-flint"
+    assert not result.certified
+    assert result.value == ""
+    if "python-flint is not installed" in result.diagnostics["error"]:
+        pytest.skip(result.diagnostics["error"])
+    assert "real parameters" in result.diagnostics["error"]
+
+
+@pytest.mark.parametrize("function", [pcfv, pcfw])
+def test_parabolic_cylinder_certified_remaining_functions_are_clean_failures(function):
     result = function("2.5", "1.25", dps=50, mode="certified")
     assert result.backend == "python-flint"
     assert not result.certified
     assert result.value == ""
-    assert "Certified parabolic-cylinder backend" in result.diagnostics["error"]
-    assert "hypergeometric or ODE enclosure path" in result.diagnostics["error"]
+    assert "pcfu, pcfd, and pbdv" in result.diagnostics["error"]
+    assert "validated connection formulas" in result.diagnostics["error"]
 
 
 def test_mcp_parabolic_cylinder_family_wrappers_return_dicts():
@@ -86,3 +140,11 @@ def test_mcp_parabolic_cylinder_family_wrappers_return_dicts():
 
 def _complex_value(value):
     return complex(str(value).strip().strip("()").replace(" ", ""))
+
+
+def _mp_number(value):
+    text = str(value).replace("i", "j")
+    if "j" in text.lower():
+        parsed = complex(text)
+        return mp.mpc(parsed.real, parsed.imag)
+    return mp.mpf(text)

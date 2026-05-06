@@ -1,11 +1,11 @@
 # certsf
 
-`certsf` is a Phase 1 special-functions package skeleton. It exposes a stable
+`certsf` is a phase-built certified special-functions package. It exposes a stable
 `SFResult` return object, thin wrappers over SciPy, mpmath, and python-flint
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv, pcfd
+from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv, pcfd, pcfu
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -17,9 +17,9 @@ print(r.method)
 print(r.diagnostics)
 ```
 
-Phase 1 intentionally avoids custom Taylor, asymptotic, recurrence, and ODE
-algorithms. The goal is to prove the wrapper architecture and diagnostics
-contract before adding deeper certified methods.
+The initial phase intentionally avoided custom Taylor, asymptotic, recurrence,
+and ODE algorithms. That kept the wrapper architecture and diagnostics contract
+small before the later certified-method phases expanded coverage.
 
 ## Modes
 
@@ -87,5 +87,20 @@ The parabolic-cylinder API includes:
 
 Fast real-valued mode delegates to SciPy where SciPy exposes the convention
 directly or through a parameter translation. High-precision mode delegates to
-mpmath and supports complex arguments. Certified mode currently returns a clean
-failure until the Arb hypergeometric or ODE enclosure path is validated.
+mpmath and supports complex arguments.
+
+## Phase 7 certified parabolic-cylinder core
+
+Certified mode now covers the core parabolic-cylinder path for real parameters
+and real or complex arguments:
+
+- `pcfu(a, z)` uses Arb ball arithmetic with the global confluent
+  hypergeometric `1F1` representation.
+- `pcfd(v, z)` uses the identity \(D_v(z)=U(-v-\frac{1}{2}, z)\).
+- `pbdv(v, x)` returns certified balls for \(D_v(x)\) and
+  \(D_v'(x)=\frac{x}{2}D_v(x)-D_{v+1}(x)\).
+
+These results report
+`certificate_scope="phase7_hypergeometric_parabolic_cylinder"` in diagnostics.
+Certified `pcfv` and `pcfw` still return clean non-certified failures until
+their connection formulas are validated.
