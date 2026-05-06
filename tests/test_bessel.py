@@ -45,6 +45,16 @@ def test_bessel_family_fast_and_high_precision():
         assert isclose(float(high_precision.value), expected, rel_tol=1e-14)
 
 
+def test_bessel_family_fast_and_high_precision_complex_arguments():
+    z = "4.0+1.25j"
+    for function in [besselj, bessely, besseli, besselk]:
+        fast = function("2.5", z, mode="fast")
+        high_precision = function("2.5", z, dps=60, mode="high_precision")
+        assert fast.backend == "scipy"
+        assert high_precision.backend == "mpmath"
+        assert abs(_complex_value(fast.value) - _complex_value(high_precision.value)) < 1e-12
+
+
 @pytest.mark.parametrize(
     ("function", "reference"),
     [
@@ -71,6 +81,37 @@ def test_certified_integer_real_bessel_covers_mpmath(function, reference, order,
     assert abs(value - expected) <= max(bound, 1e-65)
 
 
+@pytest.mark.parametrize(
+    ("function", "reference"),
+    [
+        (besselj, lambda n, x: mp.besselj(n, x)),
+        (bessely, lambda n, x: mp.bessely(n, x)),
+        (besseli, lambda n, x: mp.besseli(n, x)),
+        (besselk, lambda n, x: mp.besselk(n, x)),
+    ],
+)
+@pytest.mark.parametrize(("order", "z"), [("2.5", "4.0"), ("2.5", "4.0+1.25j"), ("2", "4.0+1.25j")])
+def test_certified_real_order_complex_bessel_covers_mpmath(function, reference, order, z):
+    result = function(order, z, dps=70, mode="certified")
+    assert result.backend == "python-flint"
+    if not result.certified:
+        pytest.skip(result.diagnostics.get("error", "certified backend unavailable"))
+
+    value = _complex_value(result.value)
+    bound = float(result.abs_error_bound)
+    expected = complex(reference(mp.mpf(order), _mp_number(z)))
+    assert result.diagnostics["order"] == (int(order) if "." not in order else order)
+    assert result.diagnostics["order_domain"] in {"integer", "real"}
+    assert result.diagnostics["certificate_scope"] in {
+        "phase4_integer_real_bessel",
+        "phase5_real_order_complex_bessel",
+    }
+    if "j" in z:
+        assert result.diagnostics["domain"] == "complex"
+        assert result.diagnostics["certificate_scope"] == "phase5_real_order_complex_bessel"
+    assert abs(value - expected) <= max(bound, 1e-65)
+
+
 def test_certified_besselj_three_term_recurrence():
     x = "3.75"
     n = 2
@@ -90,12 +131,12 @@ def test_certified_besselj_three_term_recurrence():
     assert abs(residual) <= max(propagated, 1e-14)
 
 
-def test_certified_bessel_phase4_scope_rejects_noninteger_order():
-    result = bessely("2.5", "4.0", dps=50, mode="certified")
+def test_certified_bessel_phase5_scope_rejects_complex_order():
+    result = bessely("2.5+1j", "4.0", dps=50, mode="certified")
     assert result.backend == "python-flint"
     assert not result.certified
     assert result.value == ""
-    assert "integer order" in result.diagnostics["error"]
+    assert "real order" in result.diagnostics["error"]
 
 
 def test_mcp_bessel_family_wrappers_return_dicts():
@@ -105,3 +146,15 @@ def test_mcp_bessel_family_wrappers_return_dicts():
     assert special_bessely("2", "4.0", dps=40, mode="certified")["function"] == "bessely"
     assert special_besseli("2", "4.0", dps=40, mode="certified")["function"] == "besseli"
     assert special_besselk("2", "4.0", dps=40, mode="certified")["function"] == "besselk"
+
+
+def _mp_number(value):
+    text = str(value).replace("i", "j")
+    if "j" in text.lower():
+        parsed = complex(text)
+        return mp.mpc(parsed.real, parsed.imag)
+    return mp.mpf(text)
+
+
+def _complex_value(value):
+    return complex(str(value).strip().strip("()").replace(" ", ""))

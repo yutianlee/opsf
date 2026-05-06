@@ -64,7 +64,13 @@ The Bessel API includes:
 - `besseli(n, x)` for \(I_n(x)\)
 - `besselk(n, x)` for \(K_n(x)\)
 
-For integer order and real arguments in certified mode, these functions use
-Arb ball arithmetic and report `certificate_scope="phase4_integer_real_bessel"`
-in diagnostics. Non-integer certified Bessel requests return a clean
-non-certified failure in Phase 4.
+Phase 4 established certified Arb support for integer order and real arguments,
+reported with `certificate_scope="phase4_integer_real_bessel"` in diagnostics.
+
+## Phase 5 real-order and complex Bessel support
+
+Certified Bessel support now accepts real-valued order and real or complex
+arguments. Expanded Phase 5 cases report
+`certificate_scope="phase5_real_order_complex_bessel"` in diagnostics. Complex
+order is still outside the certified scope and returns a clean non-certified
+failure.
