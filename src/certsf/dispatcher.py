@@ -21,6 +21,10 @@ _VALID_FUNCTIONS = {
     "bessely",
     "besseli",
     "besselk",
+    "pcfd",
+    "pcfu",
+    "pcfv",
+    "pcfw",
     "pbdv",
 }
 

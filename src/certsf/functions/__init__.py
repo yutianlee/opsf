@@ -3,7 +3,7 @@
 from .airy import ai, airyai, airy, airybi, bi
 from .bessel import besseli, besselj, besselk, bessely
 from .gamma import gamma, loggamma, rgamma
-from .parabolic_cylinder import pbdv
+from .parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
 __all__ = [
     "ai",
@@ -19,4 +19,8 @@ __all__ = [
     "loggamma",
     "rgamma",
     "pbdv",
+    "pcfd",
+    "pcfu",
+    "pcfv",
+    "pcfw",
 ]
