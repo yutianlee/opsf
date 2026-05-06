@@ -97,14 +97,53 @@ def scipy_besselk(v, z, *, dps: int = 50):
 
 def scipy_pbdv(v, x, *, dps: int = 50):
     requested = ensure_dps(dps)
-    value, derivative = special.pbdv(scipy_real(v), scipy_real(x))
-    payload = json_string(
-        {
-            "value": number_to_string(value, digits=float_digits(requested)),
-            "derivative": number_to_string(derivative, digits=float_digits(requested)),
-        }
-    )
-    return _fast_result("pbdv", payload, requested)
+    try:
+        value, derivative = special.pbdv(scipy_real(v), scipy_real(x))
+        payload = json_string(
+            {
+                "value": number_to_string(value, digits=float_digits(requested)),
+                "derivative": number_to_string(derivative, digits=float_digits(requested)),
+            }
+        )
+        return _fast_result("pbdv", payload, requested)
+    except (TypeError, ValueError) as exc:
+        return _fast_unavailable("pbdv", requested, f"SciPy pbdv fast backend requires real inputs. {exc}")
+
+
+def scipy_pcfd(v, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        value = special.pbdv(scipy_real(v), scipy_real(z))[0]
+        return _fast_result("pcfd", number_to_string(value, digits=float_digits(requested)), requested)
+    except (TypeError, ValueError) as exc:
+        return _fast_unavailable("pcfd", requested, f"SciPy pcfd fast backend requires real inputs. {exc}")
+
+
+def scipy_pcfu(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        value = special.pbdv(-scipy_real(a) - 0.5, scipy_real(z))[0]
+        return _fast_result("pcfu", number_to_string(value, digits=float_digits(requested)), requested)
+    except (TypeError, ValueError) as exc:
+        return _fast_unavailable("pcfu", requested, f"SciPy pcfu fast backend requires real inputs. {exc}")
+
+
+def scipy_pcfv(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        value = special.pbvv(-scipy_real(a) - 0.5, scipy_real(z))[0]
+        return _fast_result("pcfv", number_to_string(value, digits=float_digits(requested)), requested)
+    except (TypeError, ValueError) as exc:
+        return _fast_unavailable("pcfv", requested, f"SciPy pcfv fast backend requires real inputs. {exc}")
+
+
+def scipy_pcfw(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        value = special.pbwa(scipy_real(a), scipy_real(z))[0]
+        return _fast_result("pcfw", number_to_string(value, digits=float_digits(requested)), requested)
+    except (TypeError, ValueError) as exc:
+        return _fast_unavailable("pcfw", requested, f"SciPy pcfw fast backend requires real inputs. {exc}")
 
 
 def _fast_result(function: str, value: str, requested_dps: int, diagnostics=None):
@@ -119,6 +158,21 @@ def _fast_result(function: str, value: str, requested_dps: int, diagnostics=None
         requested_dps=requested_dps,
         working_dps=16,
         diagnostics={"mode": "fast"} if diagnostics is None else diagnostics,
+    )
+
+
+def _fast_unavailable(function: str, requested_dps: int, message: str):
+    return make_result(
+        function=function,
+        value="",
+        abs_error_bound=None,
+        rel_error_bound=None,
+        certified=False,
+        method="scipy.special",
+        backend="scipy",
+        requested_dps=requested_dps,
+        working_dps=16,
+        diagnostics={"mode": "fast", "error": message},
     )
 
 

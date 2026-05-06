@@ -5,7 +5,7 @@ from __future__ import annotations
 from .functions.airy import ai, airy, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
 from .functions.gamma import gamma, loggamma, rgamma
-from .functions.parabolic_cylinder import pbdv
+from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
 
 def special_gamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -52,6 +52,22 @@ def special_pbdv(v: str, x: str, dps: int = 50, mode: str = "auto", certify: boo
     return pbdv(v, x, dps=dps, mode=mode, certify=certify).to_dict()
 
 
+def special_pcfd(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return pcfd(v, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_pcfu(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return pcfu(a, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_pcfv(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return pcfv(a, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_pcfw(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return pcfw(a, z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
 def build_server():
     """Build a FastMCP server when the optional MCP SDK is installed."""
 
@@ -72,6 +88,10 @@ def build_server():
     server.tool()(special_besseli)
     server.tool()(special_besselk)
     server.tool()(special_pbdv)
+    server.tool()(special_pcfd)
+    server.tool()(special_pcfu)
+    server.tool()(special_pcfv)
+    server.tool()(special_pcfw)
     return server
 
 

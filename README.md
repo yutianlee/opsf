@@ -5,7 +5,7 @@
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv
+from certsf import gamma, loggamma, rgamma, airy, ai, bi, besselj, bessely, besseli, besselk, pbdv, pcfd
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -74,3 +74,18 @@ arguments. Expanded Phase 5 cases report
 `certificate_scope="phase5_real_order_complex_bessel"` in diagnostics. Complex
 order is still outside the certified scope and returns a clean non-certified
 failure.
+
+## Phase 6 parabolic-cylinder family
+
+The parabolic-cylinder API includes:
+
+- `pbdv(v, x)` returning \(D_v(x)\) and its derivative in one JSON payload
+- `pcfd(v, z)` for \(D_v(z)\)
+- `pcfu(a, z)` for \(U(a,z)\)
+- `pcfv(a, z)` for \(V(a,z)\)
+- `pcfw(a, z)` for \(W(a,z)\)
+
+Fast real-valued mode delegates to SciPy where SciPy exposes the convention
+directly or through a parameter translation. High-precision mode delegates to
+mpmath and supports complex arguments. Certified mode currently returns a clean
+failure until the Arb hypergeometric or ODE enclosure path is validated.

@@ -11,6 +11,10 @@ from ._common import ensure_dps, json_string, make_result
 
 _PHASE1_UNAVAILABLE = "Certified backend unavailable for this function/domain in Phase 1."
 _NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
+_PHASE6_PCF_UNAVAILABLE = (
+    "Certified parabolic-cylinder backend is not available until the Arb "
+    "hypergeometric or ODE enclosure path is validated."
+)
 
 
 def arb_gamma(z, *, dps: int = 50):
@@ -105,7 +109,27 @@ def arb_besselk(v, z, *, dps: int = 50):
 
 def arb_pbdv(v, x, *, dps: int = 50):
     requested = ensure_dps(dps)
-    return _unavailable("pbdv", requested, _PHASE1_UNAVAILABLE)
+    return _unavailable("pbdv", requested, _PHASE6_PCF_UNAVAILABLE)
+
+
+def arb_pcfd(v, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    return _unavailable("pcfd", requested, _PHASE6_PCF_UNAVAILABLE)
+
+
+def arb_pcfu(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    return _unavailable("pcfu", requested, _PHASE6_PCF_UNAVAILABLE)
+
+
+def arb_pcfv(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    return _unavailable("pcfv", requested, _PHASE6_PCF_UNAVAILABLE)
+
+
+def arb_pcfw(a, z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    return _unavailable("pcfw", requested, _PHASE6_PCF_UNAVAILABLE)
 
 
 def _with_flint(function: str, dps: int, evaluate):

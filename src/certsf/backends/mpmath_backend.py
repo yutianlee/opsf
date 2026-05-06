@@ -105,7 +105,7 @@ def mpmath_pbdv(v, x, *, dps: int = 50):
         vv = _mp_number(v)
         xx = _mp_number(x)
         value = mp.pcfd(vv, xx)
-        derivative = mp.diff(lambda t: mp.pcfd(vv, t), xx)
+        derivative = (xx / 2) * value - mp.pcfd(vv + 1, xx)
         payload = json_string(
             {
                 "value": _mp_string(value, requested),
@@ -113,6 +113,34 @@ def mpmath_pbdv(v, x, *, dps: int = 50):
             }
         )
         return _mp_result("pbdv", payload, requested, working)
+
+
+def mpmath_pcfd(v, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.pcfd(_mp_number(v), _mp_number(z))
+        return _mp_result("pcfd", _mp_string(value, requested), requested, working)
+
+
+def mpmath_pcfu(a, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.pcfu(_mp_number(a), _mp_number(z))
+        return _mp_result("pcfu", _mp_string(value, requested), requested, working)
+
+
+def mpmath_pcfv(a, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.pcfv(_mp_number(a), _mp_number(z))
+        return _mp_result("pcfv", _mp_string(value, requested), requested, working)
+
+
+def mpmath_pcfw(a, z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.pcfw(_mp_number(a), _mp_number(z))
+        return _mp_result("pcfw", _mp_string(value, requested), requested, working)
 
 
 def _precisions(dps: int) -> tuple[int, int]:
