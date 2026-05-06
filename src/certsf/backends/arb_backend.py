@@ -10,6 +10,7 @@ from typing import Any
 from ._common import ensure_dps, json_string, make_result
 
 _PHASE1_UNAVAILABLE = "Certified backend unavailable for this function/domain in Phase 1."
+_NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
 
 
 def arb_gamma(z, *, dps: int = 50):
@@ -17,7 +18,15 @@ def arb_gamma(z, *, dps: int = 50):
 
 
 def arb_loggamma(z, *, dps: int = 50):
-    return _with_flint("loggamma", dps, lambda: _make_ball(z).lgamma())
+    return _with_flint(
+        "loggamma",
+        dps,
+        lambda: _make_ball(z, force_complex=_is_real_nonpositive(z)).lgamma(),
+    )
+
+
+def arb_rgamma(z, *, dps: int = 50):
+    return _with_flint("rgamma", dps, lambda: _make_ball(z).rgamma())
 
 
 def arb_airy(z, *, dps: int = 50):
@@ -114,23 +123,31 @@ def _enter_flint_context(requested_dps: int):
     return flint, old_prec, bits
 
 
-def _make_ball(value: Any):
+def _make_ball(value: Any, *, force_complex: bool = False):
     from flint import acb, arb
 
     if isinstance(value, (arb, acb)):
+        if force_complex and isinstance(value, arb):
+            return acb(value)
         return value
     if isinstance(value, complex):
         return acb(str(value.real), str(value.imag))
     if isinstance(value, str):
         text = value.strip().replace("i", "j")
         if "j" in text.lower():
-            parsed = complex(text)
-            return acb(str(parsed.real), str(parsed.imag))
+            real, imag = _parse_complex_text(text)
+            return acb(real, imag)
+        if force_complex:
+            return acb(text, "0")
         return arb(text)
+    if force_complex:
+        return acb(str(value), "0")
     return arb(str(value))
 
 
 def _certified_result(function: str, value, requested_dps: int, bits: int, flint):
+    if not _is_finite_ball(value, flint):
+        return _unavailable(function, requested_dps, _NONFINITE_RESULT)
     return make_result(
         function=function,
         value=_ball_value_string(value, flint),
@@ -166,6 +183,57 @@ def _dps_to_bits(dps: int) -> int:
 
 def _bits_to_dps(bits: int) -> int:
     return math.floor(bits / math.log2(10))
+
+
+def _is_finite_ball(value, flint) -> bool:
+    if isinstance(value, flint.acb):
+        return bool(value.is_finite())
+    return bool(value.is_finite())
+
+
+def _is_real_nonpositive(value: Any) -> bool:
+    try:
+        if isinstance(value, complex):
+            return value.imag == 0 and value.real <= 0
+        if isinstance(value, str):
+            text = value.strip().replace("i", "j")
+            if "j" in text.lower():
+                real, imag = _parse_complex_text(text)
+                return Decimal(imag) == 0 and Decimal(real) <= 0
+            return Decimal(text) <= 0
+        return Decimal(str(value)) <= 0
+    except (InvalidOperation, ValueError):
+        return False
+
+
+def _parse_complex_text(text: str) -> tuple[str, str]:
+    body = text.replace(" ", "").replace("i", "j")
+    if not body.lower().endswith("j"):
+        return body, "0"
+    body = body[:-1]
+    if body in {"", "+"}:
+        return "0", "1"
+    if body == "-":
+        return "0", "-1"
+
+    split_at = None
+    for index in range(len(body) - 1, 0, -1):
+        if body[index] in "+-" and body[index - 1] not in "eE":
+            split_at = index
+            break
+    if split_at is None:
+        return "0", _normalize_imaginary_component(body)
+    real = body[:split_at]
+    imag = _normalize_imaginary_component(body[split_at:])
+    return real, imag
+
+
+def _normalize_imaginary_component(value: str) -> str:
+    if value in {"", "+"}:
+        return "1"
+    if value == "-":
+        return "-1"
+    return value
 
 
 def _ball_value_string(value, flint) -> str:

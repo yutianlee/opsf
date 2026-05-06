@@ -5,7 +5,7 @@
 where available, plus an optional MCP-facing wrapper module.
 
 ```python
-from certsf import gamma, airy, besselj, pbdv
+from certsf import gamma, loggamma, rgamma, airy, besselj, pbdv
 
 r = gamma(3.2, dps=50, mode="auto", certify=True)
 
@@ -28,5 +28,18 @@ contract before adding deeper certified methods.
 - `mode="certified"` uses `python-flint` / Arb when implemented.
 - `mode="auto"` chooses `certified` when `certify=True`, otherwise `fast`.
 
-Certified mode returns clean non-certified failures for Phase 1 gaps instead
-of silently falling back to mpmath and calling the result certified.
+Certified mode returns clean non-certified failures for unsupported domains
+instead of silently falling back to mpmath and calling the result certified.
+
+## Phase 2 gamma family
+
+The gamma-family API includes:
+
+- `gamma(z)`
+- `loggamma(z)` on the principal branch
+- `rgamma(z) = 1 / gamma(z)`
+
+`rgamma` is the preferred building block near non-positive integer poles. In
+certified mode it returns a rigorous zero at gamma poles, while `gamma` and
+`loggamma` return clean non-certified failures when the requested value is not
+finite.

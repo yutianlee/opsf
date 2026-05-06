@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .functions.airy import airy
 from .functions.bessel import besselj
-from .functions.gamma import gamma, loggamma
+from .functions.gamma import gamma, loggamma, rgamma
 from .functions.parabolic_cylinder import pbdv
 
 
@@ -14,6 +14,10 @@ def special_gamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = Fal
 
 def special_loggamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return loggamma(z, dps=dps, mode=mode, certify=certify).to_dict()
+
+
+def special_rgamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return rgamma(z, dps=dps, mode=mode, certify=certify).to_dict()
 
 
 def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -39,6 +43,7 @@ def build_server():
     server = FastMCP("certsf")
     server.tool()(special_gamma)
     server.tool()(special_loggamma)
+    server.tool()(special_rgamma)
     server.tool()(special_airy)
     server.tool()(special_besselj)
     server.tool()(special_pbdv)
