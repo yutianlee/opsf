@@ -145,9 +145,10 @@ Tests covering the identity:
   branch-side samples using certified balls rather than reference values.
 
 Audit note:
-complex branch-side recurrence coverage is now part of the first-pass audit.
-The wrapper remains `experimental_formula` until the formula-backed family is
-explicitly promoted in a later release.
+complex branch-side recurrence coverage is now part of the first-pass audit,
+including v0.1.x branch-side residual grids in
+`tests/test_v01x_audit_issues.py`. The wrapper remains `experimental_formula`
+until the formula-backed family is explicitly promoted in a later release.
 
 Status:
 experimental_formula.
@@ -250,8 +251,11 @@ Tests covering the identity:
 
 Audit note:
 the public certified domain advertises real parameters and real or complex
-arguments for `pbdv`; the wider derivative residual grid is now part of the
-first-pass audit.
+arguments for `pbdv`. The `x` name is retained for SciPy compatibility, while
+the certified formula layer treats it as the documented argument and allows
+complex values; use `pcfd(v, z)` when only the complex `D_v(z)` value is needed.
+The wider derivative residual grid and v0.1.x domain-policy tests are now part
+of the audit.
 
 Status:
 experimental_formula.
@@ -307,7 +311,8 @@ Tests covering the identity:
 
 Audit note:
 branch-side connection-formula and independent recurrence coverage are now part
-of the first-pass audit.
+of the first-pass audit, with v0.1.x branch-side grids covering both the
+connection formula and an independent recurrence residual.
 
 Status:
 experimental_formula.
@@ -376,8 +381,9 @@ Tests covering the identity:
 
 Audit note:
 connection round-trip, phase-continuity, and real-variable residual coverage are
-now part of the first-pass audit. Complex `x` remains outside the certified
-`pcfw` domain.
+now part of the first-pass audit. The v0.1.x audit grid extends real-variable
+residual checks across both signs of `x` and adds a wider `phi2` continuity
+grid. Complex `x` remains outside the certified `pcfw` domain.
 
 Status:
 experimental_formula.

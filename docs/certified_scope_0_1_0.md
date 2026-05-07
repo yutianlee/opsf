@@ -50,6 +50,9 @@ for `ai` and `bi`, not additional certified functions.
 - The parabolic-cylinder family remains an experimental certified formula layer:
   Arb encloses the implemented documented formula, but formula/domain audit work
   remains visible before broadening claims.
+- Certified `pbdv(v, x)` keeps SciPy's real-variable argument name, but the
+  certified formula layer accepts complex arguments for the value and derivative
+  pair. Use `pcfd(v, z)` when only the complex `D_v(z)` value is needed.
 - MCP is a thin experimental interface over the Python API. It does not expand
   the mathematical support surface.
 - Custom Taylor, asymptotic, or non-Arb certification methods are outside the

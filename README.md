@@ -185,6 +185,11 @@ or complex arguments. Certified `pcfw` currently supports real parameters and
 real arguments; complex arguments return a clean non-certified failure until a
 validated complex-domain target is selected.
 
+For `pbdv`, the argument name `x` follows SciPy's real-variable naming, but the
+certified formula layer intentionally accepts complex arguments for the
+`D_v(x)` value and derivative pair. Use `pcfd(v, z)` when only the complex
+`D_v(z)` value is needed.
+
 The parabolic-cylinder family is an experimental certified formula layer: Arb
 encloses the implemented documented formula, while formula/domain audit remains
 visible before broadening the claim.
