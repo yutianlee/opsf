@@ -18,6 +18,27 @@ claim wording is guarded by [`docs/release_claims.md`](docs/release_claims.md).
 
 ## Installation
 
+From PyPI:
+
+```bash
+python -m pip install --pre certsf
+```
+
+For certified Arb-backed mode:
+
+```bash
+python -m pip install --pre "certsf[certified]"
+```
+
+For MCP tooling plus certified mode:
+
+```bash
+python -m pip install --pre "certsf[mcp,certified]"
+```
+
+`certsf` is currently published as an alpha prerelease. Use `--pre` unless
+installing an exact version such as `certsf==0.1.0a1`.
+
 For local development:
 
 ```powershell
