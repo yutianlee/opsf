@@ -148,6 +148,13 @@ def test_mcp_parabolic_cylinder_family_wrappers_return_dicts():
     assert special_pcfw("2.5", "1.25", dps=40, mode="high_precision")["function"] == "pcfw"
 
 
+def test_mcp_pbdv_returns_nested_component_payloads():
+    from certsf.mcp_server import special_pbdv
+
+    payload = special_pbdv("2.5", "1.25", dps=40, mode="high_precision")
+    assert set(payload["value"]) == {"value", "derivative"}
+
+
 def _complex_value(value):
     return complex(str(value).strip().strip("()").replace(" ", ""))
 

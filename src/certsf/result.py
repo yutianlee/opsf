@@ -28,6 +28,39 @@ class SFResult:
 
         return asdict(self)
 
+    def to_mcp_dict(self) -> dict[str, Any]:
+        """Return a JSON-friendly dictionary with nested component payloads."""
+
+        payload = self.to_dict()
+        payload["value"] = _json_object_or_original(self.value)
+        payload["abs_error_bound"] = _json_object_or_original(self.abs_error_bound)
+        payload["rel_error_bound"] = _json_object_or_original(self.rel_error_bound)
+        return payload
+
+    def value_as_dict(self) -> dict[str, str]:
+        """Decode a multi-component ``value`` JSON string."""
+
+        return _require_json_object(self.value, "value")
+
+    def abs_error_bound_as_dict(self) -> dict[str, str] | None:
+        """Decode multi-component absolute error bounds when present."""
+
+        if self.abs_error_bound is None:
+            return None
+        return _require_json_object(self.abs_error_bound, "abs_error_bound")
+
+    def rel_error_bound_as_dict(self) -> dict[str, str] | None:
+        """Decode multi-component relative error bounds when present."""
+
+        if self.rel_error_bound is None:
+            return None
+        return _require_json_object(self.rel_error_bound, "rel_error_bound")
+
+    def component(self, name: str) -> str:
+        """Return one named component from a multi-component value."""
+
+        return self.value_as_dict()[name]
+
     def to_json(self, **kwargs: Any) -> str:
         """Serialize the result to JSON."""
 
@@ -79,3 +112,23 @@ class SFResult:
             f"backend={self.backend!r}, "
             f"method={self.method!r})"
         )
+
+
+def _json_object_or_original(value: str | None) -> Any:
+    if value is None:
+        return None
+    try:
+        decoded = json.loads(value)
+    except (TypeError, json.JSONDecodeError):
+        return value
+    return decoded if isinstance(decoded, dict) else value
+
+
+def _require_json_object(value: str, field: str) -> dict[str, str]:
+    try:
+        decoded = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"{field} is not a JSON object string") from exc
+    if not isinstance(decoded, dict):
+        raise ValueError(f"{field} is not a JSON object string")
+    return {str(key): str(item) for key, item in decoded.items()}

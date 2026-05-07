@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use certsf in research, please cite it using this metadata."
+title: "certsf: Certified special-function wrappers with explicit diagnostics"
+version: 0.1.0
+date-released: 2026-05-07
+authors:
+  - family-names: Lee
+    given-names: Yutian
+repository-code: "https://github.com/yutianlee/certsf"
+license: MIT

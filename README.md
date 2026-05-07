@@ -7,6 +7,9 @@ The public API is intentionally small: every function returns an `SFResult`
 object with the computed value, backend metadata, certification status, optional
 error bounds, and diagnostics explaining how the result was produced.
 
+The certification scope and formula audit trail live in
+[`docs/certification.md`](docs/certification.md).
+
 ## Installation
 
 For local development:
@@ -76,7 +79,12 @@ silently fall back to mpmath and call the value certified.
   complex arguments, but is still non-certified.
 - `mode="certified"` uses `python-flint` / Arb when a validated enclosure path
   exists.
-- `mode="auto"` chooses certified mode when `certify=True`, otherwise fast mode.
+- `mode="auto"` chooses certified mode when `certify=True`, otherwise fast mode
+  for `dps <= 15` and high-precision mode for larger `dps` requests.
+
+Fast mode is double precision. If you request more than 15 digits while forcing
+`mode="fast"`, the result reports `working_dps=16` and includes a diagnostic
+warning that the requested digits are not guaranteed.
 
 Use `mode="certified"` when the error bound matters. Use `high_precision` when
 you need more digits but not a rigorous certificate.
@@ -149,25 +157,28 @@ validated complex-domain target is selected.
 
 ## Multi-Component Values
 
-Functions such as `airy` and `pbdv` return JSON strings:
+Functions such as `airy` and `pbdv` keep backward-compatible JSON strings in
+`SFResult.value`, and provide helpers for Python callers:
 
 ```python
-import json
 from certsf import pbdv
 
 result = pbdv("2.5", "1.25", dps=60, mode="certified")
-values = json.loads(result.value)
-bounds = json.loads(result.abs_error_bound)
+values = result.value_as_dict()
+bounds = result.abs_error_bound_as_dict()
 
 print(values["value"])
 print(values["derivative"])
 print(bounds["value"])
 print(bounds["derivative"])
+print(result.component("value"))
 ```
 
 ## MCP Wrapper
 
 `certsf.mcp_server` exposes thin MCP-facing wrappers around the same public API.
+MCP payloads decode multi-component values and bounds as nested JSON objects
+instead of JSON-encoded strings.
 Install the optional MCP dependency before running the server:
 
 ```powershell
@@ -185,3 +196,10 @@ python -m pytest
 
 The tests exercise the SciPy, mpmath, and Arb-backed paths when the optional
 dependencies are installed.
+
+The repository also includes:
+
+- `examples/basic_usage.py` for a short end-to-end usage example.
+- `benchmarks/bench_gamma.py`, `benchmarks/bench_airy.py`,
+  `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
+  JSON-lines timing smoke benchmarks.

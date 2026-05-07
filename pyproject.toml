@@ -8,10 +8,37 @@ version = "0.1.0"
 description = "Certified special-function wrappers with explicit diagnostics."
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
+authors = [
+    { name = "Yutian Lee" },
+]
+keywords = [
+    "arb",
+    "interval-arithmetic",
+    "mpmath",
+    "scientific-computing",
+    "special-functions",
+    "validated-numerics",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
 dependencies = [
     "mpmath>=1.3",
     "scipy>=1.10",
 ]
+
+[project.urls]
+Homepage = "https://github.com/yutianlee/certsf"
+Repository = "https://github.com/yutianlee/certsf"
+Issues = "https://github.com/yutianlee/certsf/issues"
 
 [project.optional-dependencies]
 certified = [

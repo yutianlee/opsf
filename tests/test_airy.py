@@ -114,3 +114,10 @@ def test_mcp_airy_component_wrappers_return_dicts():
     bi_payload = special_bi("1.0", derivative=1, dps=40, mode="certified")
     assert ai_payload["function"] == "ai"
     assert bi_payload["function"] == "bip"
+
+
+def test_mcp_airy_returns_nested_component_payloads():
+    from certsf.mcp_server import special_airy
+
+    payload = special_airy("1.0", dps=40, mode="high_precision")
+    assert set(payload["value"]) == {"ai", "aip", "bi", "bip"}
