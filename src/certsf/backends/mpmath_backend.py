@@ -186,7 +186,7 @@ def _parse_complex_text(text: str) -> tuple[str, str]:
 
 
 def _mp_string(value, requested_dps: int) -> str:
-    return mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False)
+    return str(mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False))
 
 
 def _mp_result(
