@@ -455,7 +455,11 @@ def _certified_result(function: str, value, requested_dps: int, bits: int, flint
         backend="python-flint",
         requested_dps=requested_dps,
         working_dps=_bits_to_dps(bits),
-        diagnostics={"mode": "certified", "working_precision_bits": bits},
+        diagnostics={
+            "mode": "certified",
+            "working_precision_bits": bits,
+            "certificate_scope": "direct_arb_primitive",
+        },
     )
 
 

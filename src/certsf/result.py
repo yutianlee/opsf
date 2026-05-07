@@ -64,7 +64,7 @@ class SFResult:
     def to_json(self, **kwargs: Any) -> str:
         """Serialize the result to JSON."""
 
-        options = {"sort_keys": True}
+        options: dict[str, Any] = {"sort_keys": True}
         options.update(kwargs)
         return json.dumps(self.to_dict(), **options)
 

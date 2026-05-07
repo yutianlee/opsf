@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "certsf"
-version = "0.1.0"
+version = "0.1.0a1"
 description = "Certified special-function wrappers with explicit diagnostics."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -51,12 +51,28 @@ test = [
     "pytest>=8",
 ]
 dev = [
+    "build>=1.2",
     "mcp>=1.0",
+    "mypy>=1.10",
     "pytest>=8",
     "python-flint>=0.6",
+    "ruff>=0.6",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src/certsf"]
+check_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true

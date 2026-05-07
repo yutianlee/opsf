@@ -7,8 +7,8 @@ The public API is intentionally small: every function returns an `SFResult`
 object with the computed value, backend metadata, certification status, optional
 error bounds, and diagnostics explaining how the result was produced.
 
-The certification scope and formula audit trail live in
-[`docs/certification.md`](docs/certification.md).
+The certification scope lives in [`docs/certification.md`](docs/certification.md);
+the formula audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
 
 ## Installation
 
@@ -89,10 +89,11 @@ warning that the requested digits are not guaranteed.
 Use `mode="certified"` when the error bound matters. Use `high_precision` when
 you need more digits but not a rigorous certificate.
 
-The dispatcher uses an explicit backend method registry for every concrete
-mode. Adding a public wrapper requires registering its SciPy, mpmath, and Arb
-methods together; tests verify the registry, public API, and MCP tool list stay
-in sync.
+The dispatcher uses an explicit `MethodSpec` registry for every concrete mode.
+Each registered method records its backend, callable, certification intent,
+domain note, and certificate scope. Adding a public wrapper requires registering
+its SciPy, mpmath, and Arb methods together; tests verify the registry, public
+API, and MCP tool list stay in sync.
 
 ## Supported Functions
 

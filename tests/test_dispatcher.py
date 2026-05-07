@@ -3,22 +3,47 @@ import pytest
 import certsf
 from certsf import mcp_server
 from certsf.dispatcher import (
-    _METHOD_REGISTRY,
+    REGISTRY,
+    MethodSpec,
     _VALID_FUNCTIONS,
     available_functions,
+    available_methods,
     available_modes,
     dispatch,
 )
 
 
-def test_dispatcher_method_registry_covers_every_mode():
-    expected_modes = {"fast", "high_precision", "certified"}
+def test_dispatcher_registry_covers_every_function_and_mode():
+    expected_modes = ("fast", "high_precision", "certified")
 
-    assert set(_METHOD_REGISTRY) == expected_modes
-    assert _VALID_FUNCTIONS
-    for methods in _METHOD_REGISTRY.values():
-        assert set(methods) == _VALID_FUNCTIONS
-        assert all(callable(method) for method in methods.values())
+    assert tuple(REGISTRY) == available_functions()
+    assert set(REGISTRY) == _VALID_FUNCTIONS
+    for function, methods in REGISTRY.items():
+        assert tuple(methods) == expected_modes
+        for mode, method in methods.items():
+            assert isinstance(method, MethodSpec)
+            assert method.function == function
+            assert method.mode == mode
+            assert callable(method.callable)
+            assert method.backend
+            assert method.domain
+            if mode == "certified":
+                assert method.certified is True
+                assert method.backend == "python-flint"
+                assert method.certificate_scope is not None
+            else:
+                assert method.certified is False
+                assert method.certificate_scope is None
+
+
+def test_available_methods_exposes_auditable_method_specs_in_dispatch_order():
+    methods = available_methods()
+
+    assert len(methods) == len(available_functions()) * 3
+    assert methods[0] == REGISTRY["gamma"]["fast"]
+    assert methods[1] == REGISTRY["gamma"]["high_precision"]
+    assert methods[2] == REGISTRY["gamma"]["certified"]
+    assert methods[-1] == REGISTRY["pbdv"]["certified"]
 
 
 def test_dispatcher_registry_matches_public_api_and_mcp_tools():

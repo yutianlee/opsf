@@ -57,7 +57,7 @@ pole behavior, principal-branch checks on the negative real axis, and
 comparison against mpmath away from singularities.
 
 Certificate scope:
-direct Arb primitive, recorded through `method="arb_ball"`.
+`direct_arb_primitive`, recorded through `method="arb_ball"`.
 
 ## Airy Family
 
@@ -150,6 +150,7 @@ domain.
 Formula transformations:
 `pcfu` uses a hypergeometric representation. `pcfd` and `pbdv` are reduced
 through `pcfu` relations. `pcfv` and `pcfw` use connection formulas.
+The detailed audit trail is maintained in [`formula_audit.md`](formula_audit.md).
 
 Known exclusions:
 complex parameters and complex `pcfw` arguments are clean failures.
