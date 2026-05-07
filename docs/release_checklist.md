@@ -13,7 +13,7 @@ remains experimental until the formula audit is complete.
 - [ ] `examples/basic_usage.py` works.
 - [ ] `examples/certified_vs_high_precision.py` works.
 - [ ] MCP server imports and registers tools.
-- [ ] Certification docs reviewed.
+- [ ] Certification docs and family certification audits reviewed.
 - [ ] Formula audit reviewed for any changed formula path.
 - [ ] Unsupported certified domains fail cleanly.
 - [ ] `CHANGELOG.md` updated.

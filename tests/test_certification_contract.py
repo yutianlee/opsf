@@ -41,6 +41,9 @@ def test_every_certified_result_has_required_claim_metadata(function, args):
     assert result.backend == "python-flint"
     assert result.abs_error_bound is not None
     assert "certificate_scope" in result.diagnostics
+    assert "certificate_level" in result.diagnostics
+    assert "audit_status" in result.diagnostics
+    assert "certification_claim" in result.diagnostics
     assert result.value != ""
 
 

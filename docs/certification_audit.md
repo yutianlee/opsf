@@ -1,0 +1,75 @@
+# Certification Audit
+
+Last reviewed: 2026-05-07.
+
+This audit is the public map from a certified result to the evidence behind the
+claim. It covers every `certificate_scope` that the dispatcher can select in
+`mode="certified"`.
+
+Certified successes must include:
+
+- `diagnostics["certificate_scope"]`: the scope listed below.
+- `diagnostics["certificate_level"]`: either `direct_arb_primitive` or
+  `formula_audited_experimental`.
+- `diagnostics["audit_status"]`: either `audited_direct` or
+  `experimental_formula`.
+- `diagnostics["certification_claim"]`: concise wording for the level of claim.
+
+The two certificate levels mean:
+
+- `direct_arb_primitive`: the wrapper calls an Arb special-function primitive
+  for the documented target function, and repo tests cover representative domain,
+  branch, singularity, and result-contract behavior.
+- `formula_audited_experimental`: Arb rigorously encloses the implemented
+  formula, but at least one independent identity, branch, or domain review item
+  remains open in [`formula_audit.md`](formula_audit.md).
+
+Family-level checklists:
+
+- [`audit/gamma.md`](audit/gamma.md)
+- [`audit/airy.md`](audit/airy.md)
+- [`audit/bessel.md`](audit/bessel.md)
+- [`audit/parabolic_cylinder.md`](audit/parabolic_cylinder.md)
+
+## Scope Matrix
+
+| Certificate scope | Wrappers | Certificate level | Evidence | Exclusions |
+| --- | --- | --- | --- | --- |
+| `direct_arb_primitive` | `gamma`, `loggamma`, `rgamma` | `direct_arb_primitive` | Direct Arb gamma primitives; pole and reciprocal tests; principal `loggamma` branch-side tests | Non-finite `gamma` and `loggamma` targets at poles |
+| `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
+| `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
+| `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
+| `phase5_real_order_complex_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with real order and real or complex argument | `direct_arb_primitive` | Direct Arb Bessel primitives; real-order comparisons and branch-side checks for `K_v` | Complex order |
+| `phase7_hypergeometric_parabolic_cylinder` | `pcfu`, `pcfd`, `pbdv` | `formula_audited_experimental` | Arb `1F1`, reciprocal-gamma, and elementary formula paths; differential-equation and derivative-identity residual tests | Complex parameters; remaining complex branch-side audit items |
+| `phase8_parabolic_cylinder_connections` | `pcfv`, `pcfw` | `formula_audited_experimental` | Arb connection formulas layered on `pcfu`; connection-residual tests and real-domain comparisons | Complex parameters; complex `pcfw` arguments; remaining phase-continuity and branch audit items |
+
+## Claim Wording
+
+For `audited_direct` scopes, runtime diagnostics use:
+
+```text
+certified Arb enclosure of the documented direct Arb primitive
+```
+
+For `experimental_formula` scopes, runtime diagnostics use:
+
+```text
+certified Arb enclosure of the implemented documented formula; formula audit in progress
+```
+
+The second wording is deliberately narrower. It allows callers to rely on Arb's
+enclosure of the computed expression while preserving the fact that formula,
+branch, and domain audit work is still open.
+
+## Audit Gates
+
+Before broadening any certified claim:
+
+- Update the scope matrix and the family notes in [`certification.md`](certification.md).
+- Update formula-level source identities, branch notes, and open items in
+  [`formula_audit.md`](formula_audit.md) for formula-backed wrappers.
+- Keep unsupported certified domains as clean non-certified failures.
+- Add or update tests that freeze the runtime `certificate_scope`,
+  `certificate_level`, `audit_status`, `certification_claim`, and formula
+  diagnostics.
+- Run the base and certified test suites.

@@ -15,25 +15,29 @@ The current nontrivial formula layer is the parabolic-cylinder family in
 - The expression is the documented formula below on the documented domain.
 - The result includes a `diagnostics["formula"]` string and a
   `diagnostics["certificate_scope"]` string.
+- The result includes
+  `diagnostics["certificate_level"] = "formula_audited_experimental"`.
 
-Until the missing independent identity and branch audits are complete, describe
-these results as:
+Until the missing independent identity and branch audits are complete, runtime
+diagnostics describe these results as:
 
 > certified Arb enclosure of the implemented documented formula; formula audit
 > in progress
 
 Do not describe the parabolic-cylinder family as broadly certified beyond the
-domains and formulas listed here.
+domains and formulas listed here. The scope-level audit matrix lives in
+[`certification_audit.md`](certification_audit.md).
 
 ## Status Vocabulary
 
-- `audited`: source identity, domain, branch convention, and independent
-  identity/residual tests have all been reviewed.
-- `experimental`: the implementation has Arb enclosures and regression tests,
-  but at least one source, domain, branch, or independent identity audit item is
-  still open.
+- `audited_direct`: the wrapper delegates to a documented Arb special-function
+  primitive and has representative domain, branch, singularity, and contract
+  tests.
+- `experimental_formula`: the implementation has Arb enclosures and regression
+  tests for a documented formula, but at least one source, domain, branch, or
+  independent identity audit item is still open.
 
-All parabolic-cylinder formulas are currently `experimental`.
+All parabolic-cylinder formulas are currently `experimental_formula`.
 
 ## Reference Map
 
@@ -71,11 +75,11 @@ Contract tests:
 
 | Wrapper | Target | Formula diagnostic | Certificate scope | Status |
 | --- | --- | --- | --- | --- |
-| `pcfu(a,z)` | `U(a,z)` | `pcfu_1f1_global` | `phase7_hypergeometric_parabolic_cylinder` | experimental |
-| `pcfd(v,z)` | `D_v(z)` | `pcfd_via_pcfu` | `phase7_hypergeometric_parabolic_cylinder` | experimental |
-| `pbdv(v,x)` | `D_v(x)`, `D_v'(x)` | `pcfd_via_pcfu` | `phase7_hypergeometric_parabolic_cylinder` | experimental |
-| `pcfv(a,z)` | `V(a,z)` | `pcfv_dlmf_connection` | `phase8_parabolic_cylinder_connections` | experimental |
-| `pcfw(a,x)` | `W(a,x)` | `pcfw_dlmf_12_14_real_connection` | `phase8_parabolic_cylinder_connections` | experimental |
+| `pcfu(a,z)` | `U(a,z)` | `pcfu_1f1_global` | `phase7_hypergeometric_parabolic_cylinder` | experimental_formula |
+| `pcfd(v,z)` | `D_v(z)` | `pcfd_via_pcfu` | `phase7_hypergeometric_parabolic_cylinder` | experimental_formula |
+| `pbdv(v,x)` | `D_v(x)`, `D_v'(x)` | `pcfd_via_pcfu` | `phase7_hypergeometric_parabolic_cylinder` | experimental_formula |
+| `pcfv(a,z)` | `V(a,z)` | `pcfv_dlmf_connection` | `phase8_parabolic_cylinder_connections` | experimental_formula |
+| `pcfw(a,x)` | `W(a,x)` | `pcfw_dlmf_12_14_real_connection` | `phase8_parabolic_cylinder_connections` | experimental_formula |
 
 ## `pcfu(a, z)`
 
@@ -138,7 +142,7 @@ extend residual coverage to complex branch-side grids independent of mpmath
 comparisons.
 
 Status:
-experimental.
+experimental_formula.
 
 ## `pcfd(v, z)`
 
@@ -180,7 +184,7 @@ Open audit items:
 add recurrence or differential-equation residual tests for `D_v(z)` directly.
 
 Status:
-experimental.
+experimental_formula.
 
 ## `pbdv(v, x)`
 
@@ -231,7 +235,7 @@ extend derivative residual tests over a wider grid and clarify whether the publi
 certified domain should advertise complex arguments for `pbdv`.
 
 Status:
-experimental.
+experimental_formula.
 
 ## `pcfv(a, z)`
 
@@ -282,7 +286,7 @@ extend connection-formula tests to branch-side grids and add independent
 Wronskian or recurrence checks.
 
 Status:
-experimental.
+experimental_formula.
 
 ## `pcfw(a, x)`
 
@@ -342,4 +346,4 @@ add connection-formula round-trip tests, phase-continuity tests for `phi2`, and
 real-variable differential-equation residual tests.
 
 Status:
-experimental.
+experimental_formula.
