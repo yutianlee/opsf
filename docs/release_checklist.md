@@ -12,6 +12,9 @@ remains experimental until the formula audit is complete.
 - [ ] Certified install passes with `python-flint`.
 - [ ] `examples/basic_usage.py` works.
 - [ ] `examples/certified_vs_high_precision.py` works.
+- [ ] Release examples print full payloads:
+  `gamma_certified.py`, `airy_components.py`, `bessel_complex.py`,
+  `pcf_experimental.py`, and `mcp_payload.py`.
 - [ ] MCP server imports and registers tools.
 - [ ] Certification docs reviewed.
 - [ ] Formula audit reviewed for any changed formula path.
@@ -33,6 +36,11 @@ python -m pytest
 python -m build
 python examples/basic_usage.py
 python examples/certified_vs_high_precision.py
+python examples/gamma_certified.py
+python examples/airy_components.py
+python examples/bessel_complex.py
+python examples/pcf_experimental.py
+python examples/mcp_payload.py
 python -c "from certsf.mcp_server import build_server; build_server()"
 ```
 
