@@ -237,9 +237,13 @@ The repository also includes:
 - `docs/audit/` for family-level certification checklists.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.1.0.md` for alpha release notes and example commands.
 - `examples/basic_usage.py` for a short end-to-end usage example.
 - `examples/certified_vs_high_precision.py` for a compact comparison of
   high-precision and certified result diagnostics.
+- `examples/gamma_certified.py`, `examples/airy_components.py`,
+  `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
+  `examples/mcp_payload.py` for payload-first release examples.
 - `benchmarks/bench_gamma.py`, `benchmarks/bench_airy.py`,
   `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
   JSON-lines timing smoke benchmarks.
