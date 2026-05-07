@@ -205,7 +205,10 @@ dependencies are installed.
 
 The repository also includes:
 
+- `docs/release_checklist.md` for prerelease/release verification.
 - `examples/basic_usage.py` for a short end-to-end usage example.
+- `examples/certified_vs_high_precision.py` for a compact comparison of
+  high-precision and certified result diagnostics.
 - `benchmarks/bench_gamma.py`, `benchmarks/bench_airy.py`,
   `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
   JSON-lines timing smoke benchmarks.
