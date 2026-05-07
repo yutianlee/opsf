@@ -6,6 +6,7 @@ on:
 
 jobs:
   package-build:
+    name: tests / package-build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -20,6 +21,7 @@ jobs:
         run: python -m build
 
   lint-type:
+    name: tests / lint-type
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -36,6 +38,7 @@ jobs:
         run: python -m mypy
 
   pytest-certified:
+    name: tests / pytest-certified (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -53,6 +56,7 @@ jobs:
         run: python -m pytest
 
   pytest-base:
+    name: tests / pytest-base (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
