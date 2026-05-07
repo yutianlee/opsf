@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "certsf"
 version = "0.1.0a1"
-description = "Certified special-function wrappers with explicit diagnostics."
+description = "Alpha special-function wrappers with explicit certification diagnostics."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"

@@ -18,8 +18,8 @@ The current nontrivial formula layer is the parabolic-cylinder family in
 - The result includes
   `diagnostics["certificate_level"] = "formula_audited_experimental"`.
 
-Until the missing independent identity and branch audits are complete, runtime
-diagnostics describe these results as:
+Until a separate promotion review graduates the formula-backed family to a
+broader non-experimental claim, runtime diagnostics describe these results as:
 
 > certified Arb enclosure of the implemented documented formula; formula audit
 > in progress
@@ -34,8 +34,9 @@ domains and formulas listed here. The scope-level audit matrix lives in
   primitive and has representative domain, branch, singularity, and contract
   tests.
 - `experimental_formula`: the implementation has Arb enclosures and regression
-  tests for a documented formula, but at least one source, domain, branch, or
-  independent identity audit item is still open.
+  tests for documented formulas, including first-pass source, domain, branch,
+  and independent identity checks, but the formula-backed family has not been
+  promoted to a broad non-experimental certification claim.
 
 All parabolic-cylinder formulas are currently `experimental_formula`.
 
@@ -68,6 +69,9 @@ Contract tests:
 - `tests/test_certification_contract.py` freezes formula and scope diagnostics.
 - `tests/test_identity_residuals.py` checks selected identities and residuals
   without relying only on reference-value comparison.
+- `tests/test_certified_identities.py` checks certified ball residuals for
+  recurrences, connection formulas, and derivative identities with propagated
+  radii.
 - `tests/test_pbdv.py` compares current formula outputs against mpmath and
   checks domain rejections.
 
@@ -136,10 +140,14 @@ Tests covering the identity:
 - `test_high_precision_pcfu_satisfies_differential_equation_residual` checks
   the defining differential-equation residual with a high-precision five-point
   stencil.
+- `test_certified_pcfu_balls_imply_complex_branch_side_recurrence` checks the
+  `z U(a,z) - U(a-1,z) + (a+1/2) U(a+1,z) = 0` recurrence on complex
+  branch-side samples using certified balls rather than reference values.
 
-Open audit items:
-extend residual coverage to complex branch-side grids independent of mpmath
-comparisons.
+Audit note:
+complex branch-side recurrence coverage is now part of the first-pass audit.
+The wrapper remains `experimental_formula` until the formula-backed family is
+explicitly promoted in a later release.
 
 Status:
 experimental_formula.
@@ -179,9 +187,16 @@ Tests covering the identity:
   samples against mpmath.
 - `test_parabolic_cylinder_certified_results_keep_formula_audit_visible` checks
   formula and scope diagnostics.
+- `test_certified_pcfd_balls_imply_direct_recurrence` checks the direct
+  `D_(v+1)(z) - z D_v(z) + v D_(v-1)(z) = 0` recurrence on real and complex
+  samples.
+- `test_certified_parabolic_cylinder_balls_imply_differential_equation_residual`
+  checks a shifted recurrence form of the `D_v` differential-equation residual
+  on real and complex samples.
 
-Open audit items:
-add recurrence or differential-equation residual tests for `D_v(z)` directly.
+Audit note:
+direct `D_v` recurrence and shifted differential-equation residual coverage are
+now part of the first-pass audit.
 
 Status:
 experimental_formula.
@@ -208,9 +223,9 @@ identity that yields `D_v'(z) = z/2 * D_v(z) - D_(v+1)(z)`.
 Domain assumptions:
 
 - Certified mode accepts real `v`.
-- Certified mode currently accepts real or complex `x` through the shared
-  `pcfd` formula path, though the public name follows SciPy's real-argument
-  `pbdv` convention.
+- Certified mode accepts real or complex arguments through the shared `pcfd`
+  formula path. The parameter name `x` is kept for SciPy compatibility; in the
+  certified formula layer it is a documented argument and may be complex.
 - Complex `v` is rejected before formula evaluation.
 
 Branch convention:
@@ -225,14 +240,18 @@ Tests covering the identity:
   derivative component bounds against mpmath and the derivative identity.
 - `test_certified_pbdv_derivative_identity_encloses_zero` checks that the
   derivative identity residual is enclosed by propagated certified radii.
+- `test_certified_pbdv_derivative_relation_covers_wider_grid` checks the same
+  derivative identity over positive real, negative real, larger real, and
+  complex samples.
 - `test_mcp_pbdv_returns_nested_component_payloads` checks the component payload
   shape exposed to MCP.
 - `test_parabolic_cylinder_certified_results_keep_formula_audit_visible` checks
   formula and scope diagnostics.
 
-Open audit items:
-extend derivative residual tests over a wider grid and clarify whether the public
-certified domain should advertise complex arguments for `pbdv`.
+Audit note:
+the public certified domain advertises real parameters and real or complex
+arguments for `pbdv`; the wider derivative residual grid is now part of the
+first-pass audit.
 
 Status:
 experimental_formula.
@@ -280,10 +299,15 @@ Tests covering the identity:
 - `test_certified_parabolic_cylinder_connection_formula_encloses_zero` checks a
   `U(a,-z)`/`U(a,z)`/`V(a,z)` connection-formula residual with propagated
   certified radii.
+- `test_certified_pcfv_balls_imply_branch_side_connection_formula` extends that
+  connection-formula residual to complex branch-side samples.
+- `test_certified_pcfv_balls_imply_independent_recurrence` checks the
+  `z V(a,z) - V(a+1,z) + (a-1/2) V(a-1,z) = 0` recurrence independently of
+  reference-value comparison.
 
-Open audit items:
-extend connection-formula tests to branch-side grids and add independent
-Wronskian or recurrence checks.
+Audit note:
+branch-side connection-formula and independent recurrence coverage are now part
+of the first-pass audit.
 
 Status:
 experimental_formula.
@@ -340,10 +364,20 @@ Tests covering the identity:
   complex arguments.
 - `test_parabolic_cylinder_certified_results_keep_formula_audit_visible` checks
   formula and scope diagnostics.
+- `test_certified_pcfw_matches_connection_formula_round_trip` checks both
+  `W(a,x)` and `W(a,-x)` against the DLMF 12.14.4 connection formulas built from
+  `U(ia, x exp(-pi i/4))` and `U(-ia, x exp(pi i/4))`.
+- `test_pcfw_phi2_principal_loggamma_phase_is_locally_continuous` checks local
+  continuity and odd symmetry of the principal-loggamma `phi2` calculation used
+  by the connection formula.
+- `test_certified_pcfw_satisfies_real_variable_differential_equation_residual`
+  checks the real-variable residual `W''(a,x) + (x^2/4 - a) W(a,x) = 0` on
+  representative real grids.
 
-Open audit items:
-add connection-formula round-trip tests, phase-continuity tests for `phi2`, and
-real-variable differential-equation residual tests.
+Audit note:
+connection round-trip, phase-continuity, and real-variable residual coverage are
+now part of the first-pass audit. Complex `x` remains outside the certified
+`pcfw` domain.
 
 Status:
 experimental_formula.

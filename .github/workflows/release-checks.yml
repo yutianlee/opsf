@@ -41,3 +41,5 @@ jobs:
         run: ruff check .
       - name: Run pyright
         run: pyright src --pythonpath "$(which python)"
+      - name: Check release claims
+        run: python -m pytest tests/test_release_claims.py

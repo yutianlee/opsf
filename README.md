@@ -1,7 +1,8 @@
 # certsf
 
-`certsf` provides special-function wrappers with explicit diagnostics and, where
-available, rigorous Arb ball enclosures through `python-flint`.
+`certsf` provides alpha special-function wrappers with explicit certification
+diagnostics and, where available, rigorous Arb ball enclosures through
+`python-flint`.
 
 The public API is intentionally small: every function returns an `SFResult`
 object with the computed value, backend metadata, certification status, optional
@@ -12,7 +13,8 @@ the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
 the 0.1.0 certified support matrix lives in
 [`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the formula
-audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
+audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md). Release
+claim wording is guarded by [`docs/release_claims.md`](docs/release_claims.md).
 
 ## Installation
 
@@ -232,6 +234,7 @@ dependencies are installed.
 The repository also includes:
 
 - `docs/release_checklist.md` for prerelease/release verification.
+- `docs/release_claims.md` for conservative alpha release claim wording.
 - `docs/certification_audit.md` for scope-level certification evidence and
   remaining audit gates.
 - `docs/audit/` for family-level certification checklists.

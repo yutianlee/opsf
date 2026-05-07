@@ -21,8 +21,9 @@ The two certificate levels mean:
   for the documented target function, and repo tests cover representative domain,
   branch, singularity, and result-contract behavior.
 - `formula_audited_experimental`: Arb rigorously encloses the implemented
-  formula, but at least one independent identity, branch, or domain review item
-  remains open in [`formula_audit.md`](formula_audit.md).
+  formula, and repo tests cover the documented first-pass identities, branches,
+  and domains, but the formula-backed family has not been promoted to a broad
+  non-experimental certification claim.
 
 Family-level checklists:
 
@@ -40,8 +41,8 @@ Family-level checklists:
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
 | `phase5_real_order_complex_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with real order and real or complex argument | `direct_arb_primitive` | Direct Arb Bessel primitives; real-order comparisons and branch-side checks for `K_v` | Complex order |
-| `phase7_hypergeometric_parabolic_cylinder` | `pcfu`, `pcfd`, `pbdv` | `formula_audited_experimental` | Arb `1F1`, reciprocal-gamma, and elementary formula paths; differential-equation and derivative-identity residual tests | Complex parameters; remaining complex branch-side audit items |
-| `phase8_parabolic_cylinder_connections` | `pcfv`, `pcfw` | `formula_audited_experimental` | Arb connection formulas layered on `pcfu`; connection-residual tests and real-domain comparisons | Complex parameters; complex `pcfw` arguments; remaining phase-continuity and branch audit items |
+| `phase7_hypergeometric_parabolic_cylinder` | `pcfu`, `pcfd`, `pbdv` | `formula_audited_experimental` | Arb `1F1`, reciprocal-gamma, and elementary formula paths; branch-side recurrence checks, direct `D_v` recurrence checks, and derivative-identity residual grids | Complex parameters; broader non-experimental formula graduation |
+| `phase8_parabolic_cylinder_connections` | `pcfv`, `pcfw` | `formula_audited_experimental` | Arb connection formulas layered on `pcfu`; branch-side `U`/`V` connection checks, `V` recurrence checks, `W` connection round-trip checks, `phi2` phase-continuity checks, and real-domain residual tests | Complex parameters; complex `pcfw` arguments; broader non-experimental formula graduation |
 
 ## Claim Wording
 
@@ -58,8 +59,9 @@ certified Arb enclosure of the implemented documented formula; formula audit in 
 ```
 
 The second wording is deliberately narrower. It allows callers to rely on Arb's
-enclosure of the computed expression while preserving the fact that formula,
-branch, and domain audit work is still open.
+enclosure of the computed expression while preserving the fact that
+formula-backed scopes require an explicit promotion review before any broader
+non-experimental claim.
 
 ## Audit Gates
 

@@ -17,6 +17,7 @@ remains experimental until the formula audit is complete.
   `pcf_experimental.py`, and `mcp_payload.py`.
 - [ ] MCP server imports and registers tools.
 - [ ] Certification docs and family certification audits reviewed.
+- [ ] Release-claim guardrails reviewed; package metadata and release copy keep alpha/formula-audit wording.
 - [ ] Frozen 0.1.0 certified scope reviewed; no new public special-function wrappers added.
 - [ ] Formula audit reviewed for any changed formula path.
 - [ ] Unsupported certified domains fail cleanly.
@@ -37,6 +38,7 @@ python -m ruff check src tests examples
 python -m mypy
 python -m pyright src
 python -m pytest
+python -m pytest tests/test_release_claims.py
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py

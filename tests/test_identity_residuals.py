@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from certsf import ai, besseli, besselj, besselk, bessely, gamma, pbdv, pcfd, pcfu, pcfv, rgamma
+from certsf import ai, besseli, besselj, besselk, bessely, gamma, pbdv, pcfd, pcfu, pcfv, pcfw, rgamma
 
 mp = pytest.importorskip("mpmath")
 mp.mp.dps = 100
@@ -153,6 +153,67 @@ def test_certified_parabolic_cylinder_connection_formula_encloses_zero():
     _assert_encloses_zero(residual, bound)
 
 
+@pytest.mark.parametrize(
+    ("parameter_text", "x_text"),
+    [
+        pytest.param("0.7", "1.1", id="positive-parameter"),
+        pytest.param("-1.25", "0.85", id="negative-parameter"),
+    ],
+)
+def test_certified_pcfw_matches_connection_formula_round_trip(parameter_text, x_text):
+    parameter = mp.mpf(parameter_text)
+    x = mp.mpf(x_text)
+    positive = pcfw(parameter_text, x_text, dps=90, mode="certified")
+    negative = pcfw(parameter_text, _mp_text(-x), dps=90, mode="certified")
+    _require_certified(positive, negative)
+
+    expected_positive = _pcfw_connection_formula(parameter, x, negative=False)
+    expected_negative = _pcfw_connection_formula(parameter, x, negative=True)
+    assert abs(_value(positive) - expected_positive) <= max(_radius(positive), mp.mpf("1e-85"))
+    assert abs(_value(negative) - expected_negative) <= max(_radius(negative), mp.mpf("1e-85"))
+
+
+def test_pcfw_phi2_principal_loggamma_phase_is_locally_continuous():
+    delta = mp.mpf("1e-6")
+    for center in (mp.mpf("-2.5"), mp.mpf("-0.25"), mp.mpf("0"), mp.mpf("0.7"), mp.mpf("2.5")):
+        center_phase = _pcfw_phi2(center)
+        assert abs(_pcfw_phi2(center + delta) - center_phase) < mp.mpf("1e-5")
+        assert abs(_pcfw_phi2(center - delta) - center_phase) < mp.mpf("1e-5")
+        assert abs(center_phase + _pcfw_phi2(-center)) < mp.mpf("1e-80")
+
+
+@pytest.mark.parametrize(
+    ("parameter_text", "x_text"),
+    [
+        pytest.param("0.7", "0.85", id="inner-positive-parameter"),
+        pytest.param("0.7", "2.2", id="outer-positive-parameter"),
+        pytest.param("-1.25", "0.85", id="inner-negative-parameter"),
+        pytest.param("-1.25", "2.2", id="outer-negative-parameter"),
+    ],
+)
+def test_certified_pcfw_satisfies_real_variable_differential_equation_residual(parameter_text, x_text):
+    parameter = mp.mpf(parameter_text)
+    x = mp.mpf(x_text)
+    h = mp.mpf("1e-3")
+    results = {
+        offset: pcfw(parameter_text, _mp_text(x + offset * h), dps=90, mode="certified")
+        for offset in (-2, -1, 0, 1, 2)
+    }
+    _require_certified(*results.values())
+
+    values = {offset: _value(result) for offset, result in results.items()}
+    second_derivative = (
+        -values[2]
+        + 16 * values[1]
+        - 30 * values[0]
+        + 16 * values[-1]
+        - values[-2]
+    ) / (12 * h * h)
+    residual = second_derivative + (x * x / 4 - parameter) * values[0]
+
+    assert abs(residual) < mp.mpf("1e-12")
+
+
 def _require_certified(*results):
     for result in results:
         if not result.certified:
@@ -202,3 +263,38 @@ def _normalize_imaginary_component(value: str) -> str:
     if value == "-":
         return "-1"
     return value
+
+
+def _pcfw_connection_formula(parameter, x, *, negative: bool):
+    imaginary_unit = mp.j
+    phi2 = _pcfw_phi2(parameter)
+    rho = mp.pi / 8 + phi2 / 2
+    k = 1 / (mp.sqrt(1 + mp.exp(2 * mp.pi * parameter)) + mp.exp(mp.pi * parameter))
+    term_positive = mp.exp(imaginary_unit * rho) * mp.pcfu(
+        imaginary_unit * parameter,
+        x * mp.exp(-imaginary_unit * mp.pi / 4),
+    )
+    term_negative = mp.exp(-imaginary_unit * rho) * mp.pcfu(
+        -imaginary_unit * parameter,
+        x * mp.exp(imaginary_unit * mp.pi / 4),
+    )
+    if negative:
+        return (
+            -imaginary_unit
+            / mp.sqrt(2 * k)
+            * mp.exp(mp.pi * parameter / 4)
+            * (term_positive - term_negative)
+        )
+    return mp.sqrt(k / 2) * mp.exp(mp.pi * parameter / 4) * (term_positive + term_negative)
+
+
+def _pcfw_phi2(parameter):
+    imaginary_unit = mp.j
+    return (
+        mp.loggamma(mp.mpf("0.5") + imaginary_unit * parameter)
+        - mp.loggamma(mp.mpf("0.5") - imaginary_unit * parameter)
+    ) / (2 * imaginary_unit)
+
+
+def _mp_text(value, digits: int = 50) -> str:
+    return mp.nstr(value, digits)

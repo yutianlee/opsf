@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from certsf import ai, besselj, besseli, besselk, bessely, bi, gamma, pbdv, pcfd, pcfu, rgamma
+from certsf import ai, besselj, besseli, besselk, bessely, bi, gamma, pbdv, pcfd, pcfu, pcfv, rgamma
 
 mp = pytest.importorskip("mpmath")
 mp.mp.dps = 120
@@ -115,12 +115,133 @@ def test_certified_parabolic_cylinder_balls_imply_u_d_connection():
     _assert_contains_zero(_sub(_ball(d_result), _ball(u_result)))
 
 
-def test_certified_parabolic_cylinder_balls_imply_differential_equation_residual():
-    order = mp.mpf("0.7")
-    z = mp.mpf("1.1")
-    d0_result = pcfd(str(order), str(z), dps=90, mode="certified")
-    d1_result = pcfd(str(order + 1), str(z), dps=90, mode="certified")
-    d2_result = pcfd(str(order + 2), str(z), dps=90, mode="certified")
+@pytest.mark.parametrize(
+    ("parameter_text", "z_text"),
+    [
+        pytest.param("0.7", "-1.1+1e-20j", id="upper-side-negative-real-axis"),
+        pytest.param("0.7", "-1.1-1e-20j", id="lower-side-negative-real-axis"),
+        pytest.param("-1.25", "0.25+2.0j", id="upper-imaginary-grid"),
+    ],
+)
+def test_certified_pcfu_balls_imply_complex_branch_side_recurrence(parameter_text, z_text):
+    parameter = mp.mpf(parameter_text)
+    z = _mp_number(z_text)
+    lower_result = pcfu(_mp_text(parameter - 1), z_text, dps=90, mode="certified")
+    center_result = pcfu(parameter_text, z_text, dps=90, mode="certified")
+    upper_result = pcfu(_mp_text(parameter + 1), z_text, dps=90, mode="certified")
+    _require_certified(lower_result, center_result, upper_result)
+
+    residual = _add(
+        _sub(_scale(z, _ball(center_result)), _ball(lower_result)),
+        _scale(parameter + mp.mpf("0.5"), _ball(upper_result)),
+    )
+    _assert_contains_zero(residual)
+
+
+@pytest.mark.parametrize(
+    ("order_text", "z_text"),
+    [
+        pytest.param("0.7", "-1.1+1e-20j", id="upper-side-negative-real-axis"),
+        pytest.param("2.5", "1.25+0.5j", id="moderate-complex"),
+        pytest.param("-1.25", "-0.25-1.75j", id="lower-complex-grid"),
+    ],
+)
+def test_certified_pcfd_balls_imply_direct_recurrence(order_text, z_text):
+    order = mp.mpf(order_text)
+    z = _mp_number(z_text)
+    lower_result = pcfd(_mp_text(order - 1), z_text, dps=90, mode="certified")
+    center_result = pcfd(order_text, z_text, dps=90, mode="certified")
+    upper_result = pcfd(_mp_text(order + 1), z_text, dps=90, mode="certified")
+    _require_certified(lower_result, center_result, upper_result)
+
+    residual = _add(_sub(_ball(upper_result), _scale(z, _ball(center_result))), _scale(order, _ball(lower_result)))
+    _assert_contains_zero(residual)
+
+
+@pytest.mark.parametrize(
+    ("order_text", "z_text"),
+    [
+        pytest.param("2.5", "1.25", id="positive-real"),
+        pytest.param("2.5", "-1.25", id="negative-real"),
+        pytest.param("0.7", "0.125+0.5j", id="small-complex"),
+        pytest.param("-1.25", "-0.25-1.75j", id="lower-complex-grid"),
+        pytest.param("4.0", "3.5", id="larger-real"),
+    ],
+)
+def test_certified_pbdv_derivative_relation_covers_wider_grid(order_text, z_text):
+    order = mp.mpf(order_text)
+    z = _mp_number(z_text)
+    result = pbdv(order_text, z_text, dps=90, mode="certified")
+    next_result = pcfd(_mp_text(order + 1), z_text, dps=90, mode="certified")
+    _require_certified(result, next_result)
+
+    residual = _sub(
+        _component_ball(result, "derivative"),
+        _sub(_scale(z / 2, _component_ball(result, "value")), _ball(next_result)),
+    )
+    _assert_contains_zero(residual)
+
+
+@pytest.mark.parametrize(
+    ("parameter_text", "z_text"),
+    [
+        pytest.param("0.7", "-1.1+1e-20j", id="upper-side-negative-real-axis"),
+        pytest.param("0.7", "-1.1-1e-20j", id="lower-side-negative-real-axis"),
+        pytest.param("-1.25", "0.25+2.0j", id="upper-imaginary-grid"),
+    ],
+)
+def test_certified_pcfv_balls_imply_branch_side_connection_formula(parameter_text, z_text):
+    parameter = mp.mpf(parameter_text)
+    z = _mp_number(z_text)
+    negative_z_text = _mp_text(-z)
+    u_negative = pcfu(parameter_text, negative_z_text, dps=90, mode="certified")
+    u_positive = pcfu(parameter_text, z_text, dps=90, mode="certified")
+    v_positive = pcfv(parameter_text, z_text, dps=90, mode="certified")
+    _require_certified(u_negative, u_positive, v_positive)
+
+    sine = mp.sin(mp.pi * parameter)
+    coefficient = mp.pi / mp.gamma(mp.mpf("0.5") + parameter)
+    residual = _add(_add(_ball(u_negative), _scale(sine, _ball(u_positive))), _scale(-coefficient, _ball(v_positive)))
+    _assert_contains_zero(residual)
+
+
+@pytest.mark.parametrize(
+    ("parameter_text", "z_text"),
+    [
+        pytest.param("0.7", "-1.1+1e-20j", id="upper-side-negative-real-axis"),
+        pytest.param("0.7", "-1.1-1e-20j", id="lower-side-negative-real-axis"),
+        pytest.param("-1.25", "0.25+2.0j", id="upper-imaginary-grid"),
+    ],
+)
+def test_certified_pcfv_balls_imply_independent_recurrence(parameter_text, z_text):
+    parameter = mp.mpf(parameter_text)
+    z = _mp_number(z_text)
+    lower_result = pcfv(_mp_text(parameter - 1), z_text, dps=90, mode="certified")
+    center_result = pcfv(parameter_text, z_text, dps=90, mode="certified")
+    upper_result = pcfv(_mp_text(parameter + 1), z_text, dps=90, mode="certified")
+    _require_certified(lower_result, center_result, upper_result)
+
+    residual = _add(
+        _sub(_scale(z, _ball(center_result)), _ball(upper_result)),
+        _scale(parameter - mp.mpf("0.5"), _ball(lower_result)),
+    )
+    _assert_contains_zero(residual)
+
+
+@pytest.mark.parametrize(
+    ("order_text", "z_text"),
+    [
+        pytest.param("0.7", "1.1", id="baseline-real"),
+        pytest.param("0.7", "1.1+0.5j", id="moderate-complex"),
+        pytest.param("-1.25", "-0.25-1.75j", id="lower-complex-grid"),
+    ],
+)
+def test_certified_parabolic_cylinder_balls_imply_differential_equation_residual(order_text, z_text):
+    order = mp.mpf(order_text)
+    z = _mp_number(z_text)
+    d0_result = pcfd(order_text, z_text, dps=90, mode="certified")
+    d1_result = pcfd(_mp_text(order + 1), z_text, dps=90, mode="certified")
+    d2_result = pcfd(_mp_text(order + 2), z_text, dps=90, mode="certified")
     _require_certified(d0_result, d1_result, d2_result)
 
     # This is the D_v differential-equation residual after substituting the
@@ -223,3 +344,10 @@ def _normalize_imaginary_component(value: str) -> str:
     if value == "-":
         return "-1"
     return value
+
+
+def _mp_text(value, digits: int = 50) -> str:
+    if isinstance(value, mp.mpc):
+        sign = "+" if mp.im(value) >= 0 else "-"
+        return f"{mp.nstr(mp.re(value), digits)}{sign}{mp.nstr(abs(mp.im(value)), digits)}j"
+    return mp.nstr(value, digits)

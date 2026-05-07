@@ -14,8 +14,9 @@ for formula-by-formula details.
 
 Accepted domain:
 Real parameters. `pcfu`, `pcfd`, `pbdv`, and `pcfv` accept real or complex
-arguments through the current documented formula paths. `pcfw` accepts real
-arguments only.
+arguments through the current documented formula paths; for `pbdv`, the public
+argument name `x` is retained for compatibility but the certified formula path
+documents complex arguments. `pcfw` accepts real arguments only.
 
 Excluded domain:
 Complex parameters; complex `pcfw` arguments; non-finite inputs; any formula
@@ -32,8 +33,11 @@ the documented real-parameter formula domains. Unsupported or non-finite cases
 must fail cleanly as non-certified results.
 
 Validation identities:
-Differential-equation residual checks for `U`, derivative relation for `D_v`,
-`D_v(z) = U(-v - 1/2,z)`, and selected `U`/`V` connection-formula residuals.
+Differential-equation residual checks for `U` and `W`, branch-side recurrences
+for `U`, direct recurrence and shifted differential-equation residual checks for
+`D_v`, derivative relation for `D_v`, `D_v(z) = U(-v - 1/2,z)`, branch-side
+`U`/`V` connection-formula residuals, independent `V` recurrence checks, `W`
+connection round-trips, and `phi2` phase-continuity checks.
 
 Reference equations:
 DLMF 12.2 for definitions and connections, DLMF 12.7 for hypergeometric local
@@ -41,9 +45,9 @@ solutions, DLMF 12.8 for recurrence and derivative identities, and DLMF 12.14
 for the `W(a,x)` connection formula.
 
 Known numerical risks:
-Branch continuation away from audited grids, phase continuity in `pcfw`, gamma
-factor cancellation, and relying on formula equivalence rather than a single Arb
-target-function primitive.
+Branch continuation away from audited grids, gamma factor cancellation, and
+relying on formula equivalence rather than a single Arb target-function
+primitive.
 
 Certification status:
 `certificate_level="formula_audited_experimental"`. Arb rigorously encloses the

@@ -7,6 +7,10 @@ diagnostics are part of the product: they explain whether a result is a plain
 numerical value, a direct Arb enclosure, or an experimental formula-backed
 enclosure.
 
+Release claim wording is intentionally guarded by
+[`release_claims.md`](release_claims.md): alpha release copy must not imply a
+completed global certification audit for formula-backed wrappers.
+
 ## Package Metadata
 
 - Build backend: hatchling.
