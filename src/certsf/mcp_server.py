@@ -68,6 +68,25 @@ def special_pcfw(a: str, z: str, dps: int = 50, mode: str = "auto", certify: boo
     return pcfw(a, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
 
 
+_MCP_TOOLS = (
+    special_gamma,
+    special_loggamma,
+    special_rgamma,
+    special_airy,
+    special_ai,
+    special_bi,
+    special_besselj,
+    special_bessely,
+    special_besseli,
+    special_besselk,
+    special_pbdv,
+    special_pcfd,
+    special_pcfu,
+    special_pcfv,
+    special_pcfw,
+)
+
+
 def build_server():
     """Build a FastMCP server when the optional MCP SDK is installed."""
 
@@ -77,21 +96,8 @@ def build_server():
         raise ImportError("Install certsf[mcp] to run the MCP server.") from exc
 
     server = FastMCP("certsf")
-    server.tool()(special_gamma)
-    server.tool()(special_loggamma)
-    server.tool()(special_rgamma)
-    server.tool()(special_airy)
-    server.tool()(special_ai)
-    server.tool()(special_bi)
-    server.tool()(special_besselj)
-    server.tool()(special_bessely)
-    server.tool()(special_besseli)
-    server.tool()(special_besselk)
-    server.tool()(special_pbdv)
-    server.tool()(special_pcfd)
-    server.tool()(special_pcfu)
-    server.tool()(special_pcfv)
-    server.tool()(special_pcfw)
+    for tool in _MCP_TOOLS:
+        server.tool()(tool)
     return server
 
 

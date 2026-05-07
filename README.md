@@ -89,6 +89,11 @@ warning that the requested digits are not guaranteed.
 Use `mode="certified"` when the error bound matters. Use `high_precision` when
 you need more digits but not a rigorous certificate.
 
+The dispatcher uses an explicit backend method registry for every concrete
+mode. Adding a public wrapper requires registering its SciPy, mpmath, and Arb
+methods together; tests verify the registry, public API, and MCP tool list stay
+in sync.
+
 ## Supported Functions
 
 ```python
