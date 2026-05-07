@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 import mpmath as mp
 
 from ._common import UNCERTIFIED_WARNING, ensure_dps, json_string, make_result
@@ -153,10 +155,10 @@ def _mp_number(value):
         text = value.strip().replace("i", "j")
         if "j" in text.lower():
             real, imag = _parse_complex_text(text)
-            return mp.mpc(mp.mpf(real), mp.mpf(imag))
+            return mp.mpc(cast(Any, mp.mpf(real)), cast(Any, mp.mpf(imag)))
         return mp.mpf(text)
     if isinstance(value, complex):
-        return mp.mpc(value.real, value.imag)
+        return mp.mpc(cast(Any, value.real), cast(Any, value.imag))
     return mp.mpf(value)
 
 
@@ -186,7 +188,7 @@ def _parse_complex_text(text: str) -> tuple[str, str]:
 
 
 def _mp_string(value, requested_dps: int) -> str:
-    return mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False)
+    return str(mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False))
 
 
 def _mp_result(

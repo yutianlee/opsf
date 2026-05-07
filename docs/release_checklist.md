@@ -20,7 +20,9 @@ remains experimental until the formula audit is complete.
 - [ ] `CHANGELOG.md` updated.
 - [ ] `CITATION.cff` version matches the release name.
 - [ ] `pyproject.toml` version uses the matching PEP 440 form.
+- [ ] `release-checks` workflow is green.
 - [ ] Package builds with `python -m build`.
+- [ ] Package metadata passes `python -m twine check dist/*`.
 - [ ] Wheel installs in a clean virtual environment.
 - [ ] GitHub release is marked prerelease for alpha tags.
 
@@ -30,8 +32,10 @@ remains experimental until the formula audit is complete.
 python -m pip install -e ".[dev]"
 python -m ruff check src tests examples
 python -m mypy
+python -m pyright src
 python -m pytest
 python -m build
+python -m twine check dist/*
 python examples/basic_usage.py
 python examples/certified_vs_high_precision.py
 python -c "from certsf.mcp_server import build_server; build_server()"
