@@ -1,6 +1,8 @@
 import re
 from pathlib import Path
 
+from certsf.dispatcher import available_methods
+
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_SHORT_SUMMARY = "Alpha special-function wrappers with explicit certification diagnostics."
@@ -50,7 +52,39 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcertified for every continuation\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) certified\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) broadly certified\b",
+    r"\bfully certified parabolic-cylinder\b",
+    r"\bproduction[- ]certified parabolic-cylinder\b",
+    r"\bcomplete certified parabolic-cylinder support\b",
 )
+README_SUPPORT_MATRIX = {
+    "gamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
+    "loggamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
+    "rgamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
+    "airy": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
+    "ai": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
+    "bi": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
+    "besselj": (
+        "`besselj`, `bessely`, `besseli`, `besselk`",
+        "alpha-certified where direct Arb primitive works; real-valued order only",
+    ),
+    "bessely": (
+        "`besselj`, `bessely`, `besseli`, `besselk`",
+        "alpha-certified where direct Arb primitive works; real-valued order only",
+    ),
+    "besseli": (
+        "`besselj`, `bessely`, `besseli`, `besselk`",
+        "alpha-certified where direct Arb primitive works; real-valued order only",
+    ),
+    "besselk": (
+        "`besselj`, `bessely`, `besseli`, `besselk`",
+        "alpha-certified where direct Arb primitive works; real-valued order only",
+    ),
+    "pcfd": ("`pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv`", "experimental certified formula layer"),
+    "pcfu": ("`pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv`", "experimental certified formula layer"),
+    "pcfv": ("`pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv`", "experimental certified formula layer"),
+    "pcfw": ("`pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv`", "experimental certified formula layer"),
+    "pbdv": ("`pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv`", "experimental certified formula layer"),
+}
 
 
 def test_package_and_citation_metadata_use_conservative_alpha_summary():
@@ -81,6 +115,21 @@ def test_release_status_matrices_keep_conservative_claims():
         assert row in release_notes_text
     for row in SCOPE_STATUS_ROWS:
         assert row in scope_text
+
+
+def test_readme_support_matrix_matches_dispatcher_certified_methods():
+    readme_text = _read("README.md")
+    certified_functions = [
+        method.function
+        for method in available_methods()
+        if method.mode == "certified" and method.certified
+    ]
+
+    assert set(certified_functions) == set(README_SUPPORT_MATRIX)
+    for function in certified_functions:
+        wrappers, status = README_SUPPORT_MATRIX[function]
+        row = f"| {wrappers} | {status} |"
+        assert row in readme_text, f"README support matrix is missing {function}: {row}"
 
 
 def test_parabolic_cylinder_release_claim_remains_experimental():
