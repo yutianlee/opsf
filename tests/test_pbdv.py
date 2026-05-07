@@ -133,6 +133,8 @@ def test_certified_pcfw_rejects_complex_argument():
     assert result.backend == "python-flint"
     assert not result.certified
     assert result.value == ""
+    if "python-flint is not installed" in result.diagnostics["error"]:
+        pytest.skip(result.diagnostics["error"])
     assert "real arguments" in result.diagnostics["error"]
 
 

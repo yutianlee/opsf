@@ -146,6 +146,8 @@ def test_certified_bessel_phase5_scope_rejects_complex_order():
     assert result.backend == "python-flint"
     assert not result.certified
     assert result.value == ""
+    if "python-flint is not installed" in result.diagnostics["error"]:
+        pytest.skip(result.diagnostics["error"])
     assert "real order" in result.diagnostics["error"]
 
 

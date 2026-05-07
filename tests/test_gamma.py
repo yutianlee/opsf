@@ -84,6 +84,8 @@ def test_certified_gamma_at_poles_is_clean_failure():
     result = gamma("0", dps=50, mode="certified")
     assert not result.certified
     assert result.value == ""
+    if "python-flint is not installed" in result.diagnostics["error"]:
+        pytest.skip(result.diagnostics["error"])
     assert "non-finite" in result.diagnostics["error"]
 
 
@@ -103,6 +105,8 @@ def test_certified_loggamma_pole_is_clean_failure():
     result = loggamma("-2", dps=50, mode="certified")
     assert not result.certified
     assert result.value == ""
+    if "python-flint is not installed" in result.diagnostics["error"]:
+        pytest.skip(result.diagnostics["error"])
     assert "non-finite" in result.diagnostics["error"]
 
 
