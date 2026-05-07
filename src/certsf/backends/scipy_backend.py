@@ -14,6 +14,9 @@ from ._common import (
     scipy_real,
 )
 
+_FAST_EFFECTIVE_DPS = 16
+_FAST_DPS_WARNING = "mode='fast' uses double precision; requested dps is not guaranteed"
+
 
 def scipy_gamma(z, *, dps: int = 50):
     requested = ensure_dps(dps)
@@ -147,6 +150,7 @@ def scipy_pcfw(a, z, *, dps: int = 50):
 
 
 def _fast_result(function: str, value: str, requested_dps: int, diagnostics=None):
+    diagnostics = _fast_diagnostics(requested_dps, diagnostics)
     return make_result(
         function=function,
         value=value,
@@ -156,8 +160,8 @@ def _fast_result(function: str, value: str, requested_dps: int, diagnostics=None
         method="scipy.special",
         backend="scipy",
         requested_dps=requested_dps,
-        working_dps=16,
-        diagnostics={"mode": "fast"} if diagnostics is None else diagnostics,
+        working_dps=_FAST_EFFECTIVE_DPS,
+        diagnostics=diagnostics,
     )
 
 
@@ -171,9 +175,22 @@ def _fast_unavailable(function: str, requested_dps: int, message: str):
         method="scipy.special",
         backend="scipy",
         requested_dps=requested_dps,
-        working_dps=16,
-        diagnostics={"mode": "fast", "error": message},
+        working_dps=_FAST_EFFECTIVE_DPS,
+        diagnostics=_fast_diagnostics(requested_dps, {"error": message}),
     )
+
+
+def _fast_diagnostics(requested_dps: int, extra=None):
+    diagnostics = {
+        "mode": "fast",
+        "requested_dps": requested_dps,
+        "effective_dps": _FAST_EFFECTIVE_DPS,
+    }
+    if requested_dps > 15:
+        diagnostics["warning"] = _FAST_DPS_WARNING
+    if extra is not None:
+        diagnostics.update(extra)
+    return diagnostics
 
 
 def _validate_airy_derivative(derivative: int) -> int:

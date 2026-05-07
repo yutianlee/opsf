@@ -40,17 +40,19 @@ def dispatch(
 
     if function not in _VALID_FUNCTIONS:
         raise ValueError(f"unknown special function: {function!r}")
-    selected_mode = _select_mode(mode, certify)
+    selected_mode = _select_mode(mode, certify, dps)
     backend_function = _backend_function(function, selected_mode)
     return backend_function(*args, dps=dps)
 
 
-def _select_mode(mode: Mode, certify: bool) -> Mode:
+def _select_mode(mode: Mode, certify: bool, dps: int) -> Mode:
     if mode not in _VALID_MODES:
         valid = ", ".join(sorted(_VALID_MODES))
         raise ValueError(f"mode must be one of: {valid}")
     if mode == "auto":
-        return "certified" if certify else "fast"
+        if certify:
+            return "certified"
+        return "fast" if int(dps) <= 15 else "high_precision"
     return mode
 
 

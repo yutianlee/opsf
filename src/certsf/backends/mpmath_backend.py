@@ -152,12 +152,37 @@ def _mp_number(value):
     if isinstance(value, str):
         text = value.strip().replace("i", "j")
         if "j" in text.lower():
-            parsed = complex(text)
-            return mp.mpc(parsed.real, parsed.imag)
+            real, imag = _parse_complex_text(text)
+            return mp.mpc(mp.mpf(real), mp.mpf(imag))
         return mp.mpf(text)
     if isinstance(value, complex):
         return mp.mpc(value.real, value.imag)
     return mp.mpf(value)
+
+
+def _parse_complex_text(text: str) -> tuple[str, str]:
+    text = text.strip()
+    if text.startswith("(") and text.endswith(")"):
+        text = text[1:-1].strip()
+    if not text.lower().endswith("j"):
+        raise ValueError(f"complex string must end with 'j': {text!r}")
+
+    body = text[:-1].strip()
+    split_at = None
+    for index in range(1, len(body)):
+        if body[index] in "+-" and body[index - 1].lower() != "e":
+            split_at = index
+    if split_at is None:
+        real = "0"
+        imag = body
+    else:
+        real = body[:split_at]
+        imag = body[split_at:]
+    if imag in {"", "+"}:
+        imag = "1"
+    elif imag == "-":
+        imag = "-1"
+    return real, imag
 
 
 def _mp_string(value, requested_dps: int) -> str:

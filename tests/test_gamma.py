@@ -33,6 +33,24 @@ def test_gamma_auto_certify_uses_certified_backend_when_available():
         assert "error" in result.diagnostics
 
 
+def test_gamma_auto_respects_requested_precision():
+    fast = gamma("3.2", dps=15, mode="auto")
+    high_precision = gamma("3.2", dps=70, mode="auto")
+    assert fast.backend == "scipy"
+    assert high_precision.backend == "mpmath"
+    assert high_precision.working_dps >= 70
+
+
+def test_gamma_fast_reports_double_precision_when_dps_is_higher():
+    result = gamma("3.2", dps=70, mode="fast")
+    assert result.backend == "scipy"
+    assert result.working_dps == 16
+    assert result.diagnostics["requested_dps"] == 70
+    assert result.diagnostics["effective_dps"] == 16
+    assert "double precision" in result.diagnostics["warning"]
+    assert len(result.value.replace(".", "").replace("-", "")) <= 17
+
+
 def test_loggamma_wrapper():
     result = loggamma(3.2, mode="fast")
     assert result.function == "loggamma"

@@ -31,7 +31,7 @@ def scipy_real(value: Any) -> float:
 
 
 def float_digits(dps: int) -> int:
-    return max(17, min(25, int(dps) + 2))
+    return 17
 
 
 def number_to_string(value: Any, *, digits: int = 17) -> str:

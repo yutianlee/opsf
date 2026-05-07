@@ -19,6 +19,16 @@ def test_besselj_high_precision():
     assert result.value.startswith("0.44088497455734116552")
 
 
+def test_mpmath_complex_string_parser_preserves_decimal_precision():
+    from certsf.backends.mpmath_backend import _mp_number
+
+    text = "1.2345678901234567890123456789+0.1000000000000000000000000001j"
+    with mp.workdps(90):
+        parsed = _mp_number(text)
+        assert parsed.real == mp.mpf("1.2345678901234567890123456789")
+        assert parsed.imag == mp.mpf("0.1000000000000000000000000001")
+
+
 def test_besselj_certified_returns_bounds_or_clean_failure():
     result = besselj("2.5", "4.0", dps=50, mode="certified")
     assert result.backend == "python-flint"
