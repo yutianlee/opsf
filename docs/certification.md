@@ -11,6 +11,8 @@ certified only when:
 The first layer is provided by `python-flint` / Arb. The second layer is a
 project-level responsibility: formulas, branch conventions, and exclusions
 must be documented and tested before a wrapper claims `certified=True`.
+The scope-by-scope audit is maintained in
+[`certification_audit.md`](certification_audit.md).
 
 ## Result Contract
 
@@ -21,6 +23,13 @@ Certified results set:
 - `method="arb_ball"` or a documented Arb formula method
 - `abs_error_bound` to a rigorous absolute radius
 - `diagnostics["certificate_scope"]` to one of the scopes below
+- `diagnostics["certificate_level"]` to `direct_arb_primitive` for direct Arb
+  primitive paths or `formula_audited_experimental` for formula-backed
+  certificates with open formula audit work
+- `diagnostics["audit_status"]` to `audited_direct` for direct Arb primitive
+  paths or `experimental_formula` for formula-backed paths with open audit work
+- `diagnostics["certification_claim"]` to the precise claim wording for that
+  audit status
 
 Unsupported certified domains return `certified=False`, `value=""`, and a
 diagnostic error. They must not fall back to a non-certified backend while

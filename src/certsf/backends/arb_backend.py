@@ -11,10 +11,18 @@ from ._common import ensure_dps, json_string, make_result
 
 _PHASE1_UNAVAILABLE = "Certified backend unavailable for this function/domain in Phase 1."
 _NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
+_DIRECT_ARB_CERTIFICATE_LEVEL = "direct_arb_primitive"
+_DIRECT_ARB_AUDIT_STATUS = "audited_direct"
+_DIRECT_ARB_CERTIFICATION_CLAIM = "certified Arb enclosure of the documented direct Arb primitive"
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
 _PHASE8_PCFW_REAL_ARGUMENT_ONLY = "Phase 8 certified pcfw supports real arguments only."
+_FORMULA_CERTIFICATE_LEVEL = "formula_audited_experimental"
+_FORMULA_AUDIT_STATUS = "experimental_formula"
+_FORMULA_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of the implemented documented formula; formula audit in progress"
+)
 
 
 def arb_gamma(z, *, dps: int = 50):
@@ -75,6 +83,9 @@ def arb_airy(z, *, dps: int = 50):
                 "working_precision_bits": bits,
                 "domain": domain,
                 "certificate_scope": "phase3_real_airy" if domain == "real" else "arb_complex_airy",
+                "certificate_level": _DIRECT_ARB_CERTIFICATE_LEVEL,
+                "audit_status": _DIRECT_ARB_AUDIT_STATUS,
+                "certification_claim": _DIRECT_ARB_CERTIFICATION_CLAIM,
             },
         )
     except Exception as exc:  # pragma: no cover - depends on optional backend domains
@@ -406,6 +417,9 @@ def _parabolic_cylinder_diagnostics(function: str, parameter_text: str, argument
         "parameter_domain": parameter_domain,
         "formula": formula,
         "certificate_scope": certificate_scope,
+        "certificate_level": _FORMULA_CERTIFICATE_LEVEL,
+        "audit_status": _FORMULA_AUDIT_STATUS,
+        "certification_claim": _FORMULA_CERTIFICATION_CLAIM,
     }
 
 
@@ -459,6 +473,9 @@ def _certified_result(function: str, value, requested_dps: int, bits: int, flint
             "mode": "certified",
             "working_precision_bits": bits,
             "certificate_scope": "direct_arb_primitive",
+            "certificate_level": _DIRECT_ARB_CERTIFICATE_LEVEL,
+            "audit_status": _DIRECT_ARB_AUDIT_STATUS,
+            "certification_claim": _DIRECT_ARB_CERTIFICATION_CLAIM,
         },
     )
 

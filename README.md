@@ -8,7 +8,9 @@ object with the computed value, backend metadata, certification status, optional
 error bounds, and diagnostics explaining how the result was produced.
 
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
-the formula audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
+the scope-by-scope audit lives in
+[`docs/certification_audit.md`](docs/certification_audit.md), and the formula
+audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
 
 ## Installation
 
@@ -71,6 +73,11 @@ Every wrapper returns an `SFResult` with these fields:
 Unsupported certified domains return a clean non-certified result with
 `value=""`, `certified=False`, and an explanatory diagnostics error. They do not
 silently fall back to mpmath and call the value certified.
+
+Certified successes also expose `diagnostics["certificate_level"]`,
+`diagnostics["audit_status"]`, and `diagnostics["certification_claim"]`, so
+callers can distinguish direct Arb primitive wrappers from formula-backed
+experimental claims.
 
 ## Choosing a Mode
 
@@ -206,6 +213,9 @@ dependencies are installed.
 The repository also includes:
 
 - `docs/release_checklist.md` for prerelease/release verification.
+- `docs/certification_audit.md` for scope-level certification evidence and
+  remaining audit gates.
+- `docs/audit/` for family-level certification checklists.
 - `examples/basic_usage.py` for a short end-to-end usage example.
 - `examples/certified_vs_high_precision.py` for a compact comparison of
   high-precision and certified result diagnostics.
