@@ -14,6 +14,7 @@ remains experimental until the formula audit is complete.
 - [ ] `examples/certified_vs_high_precision.py` works.
 - [ ] MCP server imports and registers tools.
 - [ ] Certification docs reviewed.
+- [ ] Frozen 0.1.0 certified scope reviewed; no new public special-function wrappers added.
 - [ ] Formula audit reviewed for any changed formula path.
 - [ ] Unsupported certified domains fail cleanly.
 - [ ] `CHANGELOG.md` updated.

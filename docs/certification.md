@@ -11,6 +11,22 @@ certified only when:
 The first layer is provided by `python-flint` / Arb. The second layer is a
 project-level responsibility: formulas, branch conventions, and exclusions
 must be documented and tested before a wrapper claims `certified=True`.
+The public certified surface for 0.1.0 is frozen in
+[`certified_scope_0_1_0.md`](certified_scope_0_1_0.md).
+
+## 0.1.0 Certified Scope Freeze
+
+The 0.1.0 alpha line will not add more public special-function wrappers. The
+frozen status matrix is:
+
+| Area | Release status |
+| --- | --- |
+| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |
+| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
+| `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
+| `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
+| MCP server | experimental tool interface |
+| Custom Taylor/asymptotic methods | not yet |
 
 ## Result Contract
 
