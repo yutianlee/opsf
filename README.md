@@ -9,7 +9,9 @@ error bounds, and diagnostics explaining how the result was produced.
 
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
 the scope-by-scope audit lives in
-[`docs/certification_audit.md`](docs/certification_audit.md), and the formula
+[`docs/certification_audit.md`](docs/certification_audit.md);
+the 0.1.0 certified support matrix lives in
+[`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the formula
 audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
 
 ## Installation
@@ -104,6 +106,19 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
+The 0.1.0 alpha public certified surface is frozen. No additional public
+special-function wrappers are planned before 0.1.0; the release work is focused
+on audit, validation, packaging, and documentation.
+
+| Area | Release status |
+| --- | --- |
+| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |
+| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
+| `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
+| `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
+| MCP server | experimental tool interface |
+| Custom Taylor/asymptotic methods | not yet |
+
 ```python
 from certsf import (
     gamma,
@@ -168,6 +183,10 @@ or complex arguments. Certified `pcfw` currently supports real parameters and
 real arguments; complex arguments return a clean non-certified failure until a
 validated complex-domain target is selected.
 
+The parabolic-cylinder family is an experimental certified formula layer: Arb
+encloses the implemented documented formula, while formula/domain audit remains
+visible before broadening the claim.
+
 ## Multi-Component Values
 
 Functions such as `airy` and `pbdv` keep backward-compatible JSON strings in
@@ -216,6 +235,8 @@ The repository also includes:
 - `docs/certification_audit.md` for scope-level certification evidence and
   remaining audit gates.
 - `docs/audit/` for family-level certification checklists.
+- `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
+  matrix.
 - `examples/basic_usage.py` for a short end-to-end usage example.
 - `examples/certified_vs_high_precision.py` for a compact comparison of
   high-precision and certified result diagnostics.
