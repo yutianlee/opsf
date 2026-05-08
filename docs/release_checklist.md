@@ -51,8 +51,25 @@ python examples/mcp_payload.py
 python -c "from certsf.mcp_server import build_server; build_server()"
 ```
 
-For an alpha tag, use a Git tag such as `v0.1.0-alpha.1` and a Python package
-version such as `0.1.0a1`.
+For an alpha tag, use a Git tag such as `v0.1.0-alpha.2` and a Python package
+version such as `0.1.0a2`.
+
+## v0.1.0-alpha.2 Checklist
+
+- [ ] `pyproject.toml` version is `0.1.0a2`.
+- [ ] `CITATION.cff` version is `0.1.0-alpha.2`.
+- [ ] `CHANGELOG.md` records post-release hardening since `v0.1.0-alpha.1`.
+- [ ] `docs/release-0.1.0-alpha.2.md` is reviewed.
+- [ ] README PyPI install instructions still use prerelease-aware commands.
+- [ ] No mathematical implementation changes are included.
+- [ ] No new public wrappers are included.
+- [ ] Release copy does not broaden certification claims.
+- [ ] Frozen 0.1.0 certified scope is unchanged.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.1.0-alpha.1 Snapshot
 
