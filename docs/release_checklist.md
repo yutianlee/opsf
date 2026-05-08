@@ -24,6 +24,7 @@ remains experimental until the formula audit is complete.
 - [ ] `CHANGELOG.md` updated.
 - [ ] `CITATION.cff` version matches the release name.
 - [ ] `pyproject.toml` version uses the matching PEP 440 form.
+- [ ] Tag/version parity check passes before any publishing workflow builds distributions.
 - [ ] `release-checks` workflow is green.
 - [ ] Package builds with `python -m build`.
 - [ ] Package metadata passes `python -m twine check dist/*`.
@@ -39,6 +40,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
+python scripts/check_release_version.py v0.1.0-alpha.2
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -54,6 +56,15 @@ python -c "from certsf.mcp_server import build_server; build_server()"
 For an alpha tag, use a Git tag such as `v0.1.0-alpha.2` and a Python package
 version such as `0.1.0a2`.
 
+## Publishing Workflows
+
+- TestPyPI publishing is manual-only through `publish-testpypi`; it keeps
+  `v0.1.0-alpha.2` as the default dispatch ref.
+- Real PyPI publishing runs from GitHub release/prerelease publication events
+  through `publish-pypi`.
+- Publishing workflows must pass the tag/version parity check before building:
+  `v0.1.0-alpha.2` maps to `0.1.0a2`, and `v0.1.0` maps to `0.1.0`.
+
 ## v0.1.0-alpha.2 Checklist
 
 - [ ] `pyproject.toml` version is `0.1.0a2`.
@@ -65,6 +76,7 @@ version such as `0.1.0a2`.
 - [ ] No new public wrappers are included.
 - [ ] Release copy does not broaden certification claims.
 - [ ] Frozen 0.1.0 certified scope is unchanged.
+- [ ] `python scripts/check_release_version.py v0.1.0-alpha.2` passes.
 - [ ] `python -m ruff check .` passes.
 - [ ] `python -m mypy` passes.
 - [ ] `python -m pytest` passes.
