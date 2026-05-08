@@ -1,0 +1,34 @@
+[
+  {
+    "function": "gamma",
+    "parameters": ["0.5"],
+    "expected_value": "1.77245385090551602729816748334114518279754945612238712821381",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "gamma(1/2)=sqrt(pi); decimal recorded from high-precision evaluation"
+  },
+  {
+    "function": "gamma",
+    "parameters": ["3.2"],
+    "expected_value": "2.42396547993536801209211236969059225781321007909891679339251",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular positive-real gamma value"
+  },
+  {
+    "function": "rgamma",
+    "parameters": ["0"],
+    "expected_value": "0.0",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "reciprocal gamma is zero at gamma poles"
+  },
+  {
+    "function": "loggamma",
+    "parameters": ["3.2"],
+    "expected_value": "0.885404827154908945953199430593570846533827220721272190440286",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "principal loggamma on the positive real axis"
+  }
+]

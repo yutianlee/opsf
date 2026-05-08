@@ -1,0 +1,34 @@
+[
+  {
+    "function": "besselj",
+    "parameters": ["0", "0"],
+    "expected_value": "1.0",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "J_0(0)=1"
+  },
+  {
+    "function": "besselj",
+    "parameters": ["2", "4.0"],
+    "expected_value": "0.364128145852072804214998058050060527611906975523535059916753",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "integer-order real Bessel J value"
+  },
+  {
+    "function": "besseli",
+    "parameters": ["1", "2.0"],
+    "expected_value": "1.59063685463732906338225442499966624795447815949553664713229",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "integer-order real modified Bessel I value"
+  },
+  {
+    "function": "besselk",
+    "parameters": ["0", "2.0"],
+    "expected_value": "0.11389387274953343565271957493248183299832662438880888289253",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "integer-order real modified Bessel K value"
+  }
+]

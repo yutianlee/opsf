@@ -1,6 +1,6 @@
 # Certification Audit
 
-Last reviewed: 2026-05-07.
+Last reviewed: 2026-05-08.
 
 This audit is the public map from a certified result to the evidence behind the
 claim. It covers every `certificate_scope` that the dispatcher can select in
@@ -31,6 +31,12 @@ Family-level checklists:
 - [`audit/airy.md`](audit/airy.md)
 - [`audit/bessel.md`](audit/bessel.md)
 - [`audit/parabolic_cylinder.md`](audit/parabolic_cylinder.md)
+
+Static external-reference fixtures in `tests/fixtures/external_reference/`
+provide an additional containment check for selected gamma, Airy, Bessel, and
+parabolic-cylinder values. This fixture coverage supplements the scope evidence
+below; it does not broaden any certificate level or promote
+`experimental_formula` scopes.
 
 ## Scope Matrix
 

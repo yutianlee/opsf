@@ -1,0 +1,54 @@
+[
+  {
+    "function": "ai",
+    "parameters": ["0"],
+    "expected_value": "0.355028053887817239260063186004183176397979174199177240583327",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "Ai(0) gamma-constant special value; decimal recorded from high-precision evaluation"
+  },
+  {
+    "function": "bi",
+    "parameters": ["0"],
+    "expected_value": "0.614926627446000735150922369093613553594728188648596505040879",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "Bi(0) gamma-constant special value; decimal recorded from high-precision evaluation"
+  },
+  {
+    "function": "airy",
+    "parameters": ["1.0"],
+    "component": "ai",
+    "expected_value": "0.135292416312881415524147423515466306174944142988330706009102",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "airy(1.0) ai component"
+  },
+  {
+    "function": "airy",
+    "parameters": ["1.0"],
+    "component": "aip",
+    "expected_value": "-0.1591474412967932127875002524972296865738892015116109694152",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "airy(1.0) aip component"
+  },
+  {
+    "function": "airy",
+    "parameters": ["1.0"],
+    "component": "bi",
+    "expected_value": "1.20742359495287125943637881702828699538534894464444253753862",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "airy(1.0) bi component"
+  },
+  {
+    "function": "airy",
+    "parameters": ["1.0"],
+    "component": "bip",
+    "expected_value": "0.93243593339277563295945145367443534426956537523862839549287",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "airy(1.0) bip component"
+  }
+]
