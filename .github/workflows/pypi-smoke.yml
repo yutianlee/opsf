@@ -33,10 +33,21 @@ jobs:
       - name: Smoke test import and calls
         run: |
           python - <<'PY'
+          import sysconfig
+          from pathlib import Path
+
           import certsf
           from certsf import ai, besselj, gamma, pcfu
 
+          certsf_path = Path(certsf.__file__).resolve()
+          install_paths = [
+              Path(sysconfig.get_paths()[key]).resolve()
+              for key in ("purelib", "platlib")
+          ]
+          assert any(certsf_path.is_relative_to(path) for path in install_paths), certsf_path
+
           print(certsf.__all__)
+          print(certsf_path)
           print(gamma("3.2", mode="fast").to_mcp_dict())
           print(ai("1.0", mode="high_precision", dps=60).to_mcp_dict())
           print(besselj("2", "4.0", mode="fast").to_mcp_dict())
@@ -59,4 +70,48 @@ jobs:
           for result in cases:
               print(result.to_mcp_dict())
               assert result.certified
+          PY
+
+  mcp-smoke:
+    name: pypi-smoke / ${{ matrix.python-version }} mcp-certified
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install MCP extra from PyPI
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.1.0a1' }}"
+
+      - name: MCP smoke test
+        run: |
+          python - <<'PY'
+          import sysconfig
+          from pathlib import Path
+
+          import certsf
+          from certsf.mcp_server import build_server, special_gamma
+
+          certsf_path = Path(certsf.__file__).resolve()
+          install_paths = [
+              Path(sysconfig.get_paths()[key]).resolve()
+              for key in ("purelib", "platlib")
+          ]
+          assert any(certsf_path.is_relative_to(path) for path in install_paths), certsf_path
+
+          result = special_gamma("3.2", mode="fast")
+
+          print(certsf_path)
+          print(build_server)
+          print(result)
+          assert callable(build_server)
+          assert isinstance(result, dict)
+          assert result["function"] == "gamma"
           PY
