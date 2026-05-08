@@ -31,6 +31,12 @@ def scipy_loggamma(z, *, dps: int = 50):
     return _fast_result("loggamma", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_loggamma_ratio(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.loggamma(scipy_number(a)) - special.loggamma(scipy_number(b))
+    return _fast_result("loggamma_ratio", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_rgamma(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     value = special.rgamma(scipy_number(z))

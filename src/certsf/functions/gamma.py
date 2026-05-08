@@ -13,6 +13,10 @@ def loggamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("loggamma", z, dps=dps, mode=mode, certify=certify)
 
 
+def loggamma_ratio(a, b, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("loggamma_ratio", a, b, dps=dps, mode=mode, certify=certify)
+
+
 def rgamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("rgamma", z, dps=dps, mode=mode, certify=certify)
 

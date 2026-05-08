@@ -21,12 +21,12 @@ certified surface remains archived in
 
 ## 0.2.0 Alpha Certified Scope
 
-The 0.2.0 alpha line adds `gamma_ratio(a, b)` as the only new public
-special-function wrapper. The current status matrix is:
+The 0.2.0 alpha line adds ratio-oriented gamma-family wrappers. The current
+status matrix is:
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -57,18 +57,22 @@ claiming certification.
 ## Gamma Family
 
 Function:
-`gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`
+`gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`,
+`loggamma_ratio(a, b)`
 
 Certified domain:
 real or complex inputs accepted by Arb for the corresponding primitive, with
 non-finite target values reported as clean failures. For `gamma_ratio(a, b)`,
 `Gamma(a)` must be finite; non-positive integer poles in `b` certify to zero
 through reciprocal gamma.
+For `loggamma_ratio(a, b)`, both `loggamma(a)` and `loggamma(b)` must be
+finite.
 
 Backend primitive:
 `arb/acb.gamma`, `arb/acb.lgamma`, and `arb/acb.rgamma`. The certified
 `gamma_ratio` backend evaluates `Gamma(a) * rgamma(b)` using Arb gamma
-primitives rather than dividing by `Gamma(b)`.
+primitives rather than dividing by `Gamma(b)`. The certified
+`loggamma_ratio` backend evaluates Arb `lgamma(a) - lgamma(b)`.
 
 Returned enclosure:
 Arb midpoint string plus absolute radius. `rgamma` returns an exact certified
@@ -77,25 +81,32 @@ zero at non-positive integer gamma poles when Arb reports that enclosure.
 `Gamma(a)` is finite and Arb reports the zero product.
 
 Branch convention:
-`loggamma` follows the principal branch used by Arb.
+`loggamma` follows the principal branch used by Arb. `loggamma_ratio` is the
+difference of principal `loggamma` values; for complex values this is not
+necessarily the same as the principal logarithm of `gamma_ratio`.
 
 Formula transformations:
 `gamma_ratio(a, b)` is evaluated as `Gamma(a) * rgamma(b)` for denominator-pole
 handling. The one-argument gamma-family wrappers use no formula transformation.
+`loggamma_ratio(a, b)` is evaluated as a direct difference of Arb principal
+`lgamma` values.
 
 Known exclusions:
 `gamma` and `loggamma` at poles return non-certified failures because the
 requested value is not finite. `gamma_ratio` returns a clean non-certified
 failure when `a` is a gamma pole, including the simultaneous pole case.
+`loggamma_ratio` returns clean non-certified failures when either argument is a
+gamma pole, including simultaneous pole cases.
 
 Validation tests:
 pole behavior, principal-branch checks on the negative real axis, gamma-ratio
-recurrence and composition identities, and comparison against mpmath away from
-singularities.
+recurrence and composition identities, loggamma-ratio branch and identity
+checks, and comparison against mpmath away from singularities.
 
 Certificate scope:
 `direct_arb_primitive` for `gamma`, `loggamma`, and `rgamma`; the narrow
-`direct_arb_gamma_ratio` scope for `gamma_ratio`, recorded through
+`direct_arb_gamma_ratio` scope for `gamma_ratio`; and the narrow
+`direct_arb_loggamma_ratio` scope for `loggamma_ratio`, recorded through
 `method="arb_ball"`.
 
 ## Airy Family
