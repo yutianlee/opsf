@@ -1,14 +1,19 @@
-# certsf 0.1.0 Alpha Release Notes
+# certsf 0.1.0 Release Notes
 
-`certsf` 0.1.0 is an alpha release for a small certified-dispatch API around
-special functions. The package returns `SFResult` payloads with values,
-backend metadata, certification status, error bounds, and diagnostics. The
-diagnostics are part of the product: they explain whether a result is a plain
-numerical value, a direct Arb enclosure, or an experimental formula-backed
-enclosure.
+`certsf` 0.1.0 is a conservative first non-prerelease package release for a
+small certified-dispatch API around special functions. It keeps the same frozen
+public API as `0.1.0-alpha.3`; there are no mathematical implementation changes,
+no public-wrapper expansion, and no certification-scope broadening from that
+prerelease.
+
+The package is still alpha-quality in scientific scope. It returns `SFResult`
+payloads with values, backend metadata, certification status, error bounds, and
+diagnostics. The diagnostics are part of the product: they explain whether a
+result is a plain numerical value, a direct Arb enclosure, or an experimental
+formula-backed enclosure.
 
 Release claim wording is intentionally guarded by
-[`release_claims.md`](release_claims.md): alpha release copy must not imply a
+[`release_claims.md`](release_claims.md): release copy must not imply a
 completed global certification audit for formula-backed wrappers.
 
 ## Package Metadata
@@ -34,9 +39,11 @@ completed global certification audit for formula-backed wrappers.
 | MCP server | experimental tool interface |
 | Custom Taylor/asymptotic methods | not yet |
 
-Unsupported certified domains return clean non-certified failures with
-`certified=False`, an empty value, and a diagnostic error. They must not silently
-fall back to a non-certified backend while claiming certification.
+Direct Arb primitive families are alpha-certified on documented
+finite-enclosure domains. Unsupported certified domains return clean
+non-certified failures with `certified=False`, an empty value, and a diagnostic
+error. They must not silently fall back to a non-certified backend while
+claiming certification.
 
 ## Certification Notes
 
@@ -47,7 +54,21 @@ The parabolic-cylinder family is different. Arb rigorously encloses the
 implemented documented formula, but formula and branch auditing remains in
 progress. Treat those certificates as experimental formula-layer certificates,
 not as a broad global certification claim for every continuation of the target
-functions.
+functions. The parabolic-cylinder wrappers remain `experimental_formula`.
+
+No custom Taylor or asymptotic methods are included yet.
+
+## Release Hardening
+
+This release includes the packaging and audit hardening added during the alpha
+cycle:
+
+- PyPI publishing guardrails, including tag/version parity checks.
+- Fresh-install PyPI smoke tests for base, certified, and MCP certified
+  installs.
+- Deterministic parabolic-cylinder formula-audit grids.
+- External-reference fixture containment tests that supplement, but do not
+  replace, formula and domain audit.
 
 ## Examples
 
@@ -74,12 +95,13 @@ When `python-flint` is unavailable, certified examples still return structured
 non-certified failure payloads. That behavior is intentional and part of the
 public contract.
 
-## Pre-Release Checks
+## Release Checks
 
 Before tagging 0.1.0, run:
 
 ```powershell
-python -m ruff check src tests examples
+python scripts/check_release_version.py v0.1.0
+python -m ruff check .
 python -m mypy
 python -m pytest
 python -m build

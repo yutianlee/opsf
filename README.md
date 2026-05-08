@@ -21,23 +21,23 @@ claim wording is guarded by [`docs/release_claims.md`](docs/release_claims.md).
 From PyPI:
 
 ```bash
-python -m pip install --pre certsf
+python -m pip install certsf
 ```
 
 For certified Arb-backed mode:
 
 ```bash
-python -m pip install --pre "certsf[certified]"
+python -m pip install "certsf[certified]"
 ```
 
 For MCP tooling plus certified mode:
 
 ```bash
-python -m pip install --pre "certsf[mcp,certified]"
+python -m pip install "certsf[mcp,certified]"
 ```
 
-`certsf` is currently published as an alpha prerelease. Use `--pre` unless
-installing an exact version such as `certsf==0.1.0a2`.
+Prerelease versions such as `0.1.0a3` require `--pre` unless installing an exact
+version, for example `certsf==0.1.0a3`.
 
 For local development:
 
@@ -129,9 +129,9 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.1.0 alpha public certified surface is frozen. No additional public
-special-function wrappers are planned before 0.1.0; the release work is focused
-on audit, validation, packaging, and documentation.
+The 0.1.0 public certified surface is frozen. No additional public
+special-function wrappers are included in 0.1.0; the release work remains
+focused on audit, validation, packaging, and documentation.
 
 | Area | Release status |
 | --- | --- |
@@ -266,7 +266,8 @@ The repository also includes:
 - `docs/audit/` for family-level certification checklists.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
-- `docs/release-0.1.0.md` for alpha release notes and example commands.
+- `docs/release-0.1.0.md` for conservative 0.1.0 release notes and example
+  commands.
 - `docs/release-0.1.0-alpha.2.md` for the v0.1.0-alpha.2 planning notes.
 - `examples/basic_usage.py` for a short end-to-end usage example.
 - `examples/certified_vs_high_precision.py` for a compact comparison of

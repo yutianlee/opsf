@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0 - 2026-05-08
+
+- Planned the first non-prerelease package release with the same frozen public
+  API as `0.1.0-alpha.3`.
+- No mathematical implementation changes from `0.1.0-alpha.3`, no
+  public-wrapper expansion, and no certification-claim broadening are included.
+- The parabolic-cylinder formula layer remains `experimental_formula`.
+- The release includes PyPI publishing guardrails, fresh-install smoke tests,
+  deterministic audit grids, and external-reference fixture containment tests.
+
 ## 0.1.0-alpha.3 - 2026-05-08
 
 - Added deterministic parabolic-cylinder formula-audit grids for recurrence,

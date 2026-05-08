@@ -40,7 +40,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.1.0-alpha.3
+python scripts/check_release_version.py v0.1.0
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -56,6 +56,8 @@ python -c "from certsf.mcp_server import build_server; build_server()"
 For an alpha tag, use a Git tag such as `v0.1.0-alpha.3` and a Python package
 version such as `0.1.0a3`.
 
+For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
+
 ## Publishing Workflows
 
 - TestPyPI publishing is manual-only through `publish-testpypi`; it keeps the
@@ -64,6 +66,35 @@ version such as `0.1.0a3`.
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.1.0 Checklist
+
+- [ ] `pyproject.toml` version is `0.1.0`.
+- [ ] `CITATION.cff` version is `0.1.0`.
+- [ ] `CHANGELOG.md` records the first non-prerelease package release.
+- [ ] `docs/release-0.1.0.md` is reviewed.
+- [ ] README PyPI install instructions use stable install commands, with a
+  short note that prereleases require `--pre`.
+- [ ] Publish workflow defaults point at `v0.1.0`.
+- [ ] PyPI smoke workflow still targets the latest actually published version
+  until `v0.1.0` is published.
+- [ ] GitHub release for `v0.1.0` is not marked prerelease.
+- [ ] No mathematical implementation changes from `0.1.0-alpha.3` are included.
+- [ ] No new public wrappers are included.
+- [ ] The same frozen public API as `0.1.0-alpha.3` is retained.
+- [ ] Release copy does not broaden certification claims.
+- [ ] Frozen 0.1.0 certified scope is unchanged.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] Direct Arb primitive families remain described as alpha-certified on
+  documented finite-enclosure domains.
+- [ ] Unsupported certified domains fail cleanly as non-certified results.
+- [ ] No custom Taylor/asymptotic methods are included.
+- [ ] `python scripts/check_release_version.py v0.1.0` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.1.0-alpha.3 Checklist
 
