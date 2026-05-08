@@ -8,9 +8,6 @@ on:
         required: true
         default: "v0.1.0-alpha.2"
 
-  release:
-    types: [published]
-
 permissions:
   contents: read
 
@@ -22,12 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.release.tag_name || inputs.ref || github.ref }}
+          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+
+      - name: Check release tag matches package version
+        run: python scripts/check_release_version.py "${{ inputs.ref }}"
 
       - name: Install build tools
         run: |
