@@ -37,7 +37,7 @@ python -m pip install --pre "certsf[mcp,certified]"
 ```
 
 `certsf` is currently published as an alpha prerelease. Use `--pre` unless
-installing an exact version such as `certsf==0.1.0a1`.
+installing an exact version such as `certsf==0.1.0a2`.
 
 For local development:
 
@@ -267,6 +267,7 @@ The repository also includes:
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
 - `docs/release-0.1.0.md` for alpha release notes and example commands.
+- `docs/release-0.1.0-alpha.2.md` for the v0.1.0-alpha.2 planning notes.
 - `examples/basic_usage.py` for a short end-to-end usage example.
 - `examples/certified_vs_high_precision.py` for a compact comparison of
   high-precision and certified result diagnostics.

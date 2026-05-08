@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0-alpha.2 - 2026-05-08
+
+- Added TestPyPI and PyPI trusted-publishing workflows, plus a PyPI smoke
+  workflow for fresh prerelease install verification.
+- Added release-claim guardrails, frozen-scope checks, branch-protection check
+  naming, and v0.1.x audit coverage to keep the 0.1.0 certified scope frozen.
+- Documented PyPI installation and the post-release verification evidence for
+  `v0.1.0-alpha.1`.
+- Hardened GitHub Actions compatibility and PyPI smoke workflow behavior without
+  changing mathematical implementations, adding public wrappers, or broadening
+  certification claims.
+
 ## 0.1.0-alpha.1 - 2026-05-07
 
 - Added special-function wrappers for gamma, Airy, Bessel, and parabolic-cylinder families, with the
