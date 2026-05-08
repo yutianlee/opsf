@@ -11,10 +11,13 @@ error bounds, and diagnostics explaining how the result was produced.
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
 the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
-the 0.1.0 certified support matrix lives in
-[`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the formula
-audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md). Release
-claim wording is guarded by [`docs/release_claims.md`](docs/release_claims.md).
+the current 0.2.0 alpha support matrix lives in
+[`docs/certified_scope_0_2_0.md`](docs/certified_scope_0_2_0.md). The frozen
+0.1.0 matrix remains archived in
+[`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the
+formula audit trail lives in [`docs/formula_audit.md`](docs/formula_audit.md).
+Release claim wording is guarded by
+[`docs/release_claims.md`](docs/release_claims.md).
 
 ## Installation
 
@@ -129,13 +132,12 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.1.0 public certified surface is frozen. No additional public
-special-function wrappers are included in 0.1.0; the release work remains
-focused on audit, validation, packaging, and documentation.
+The 0.2.0 alpha line adds `gamma_ratio(a, b)` to the gamma family while keeping
+the release wording conservative and the parabolic-cylinder claims unchanged.
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -147,6 +149,7 @@ from certsf import (
     gamma,
     loggamma,
     rgamma,
+    gamma_ratio,
     airy,
     ai,
     bi,
@@ -167,11 +170,18 @@ from certsf import (
 - `gamma(z)`
 - `loggamma(z)`, using the principal branch
 - `rgamma(z) = 1 / gamma(z)`
+- `gamma_ratio(a, b) = Gamma(a) / Gamma(b)`
 
 `rgamma` is the safest wrapper near non-positive integer gamma poles. In
 certified mode, `rgamma` returns a rigorous zero at poles, while `gamma` and
 `loggamma` return clean non-certified failures when the requested value is not
 finite.
+
+Certified `gamma_ratio(a, b)` evaluates `Gamma(a) * rgamma(b)`. This lets
+denominator poles certify to exact zero when `Gamma(a)` is finite, while
+numerator poles and simultaneous numerator/denominator poles return clean
+non-certified failures with pole diagnostics. See
+[`docs/gamma_ratio.md`](docs/gamma_ratio.md).
 
 ### Airy Family
 
@@ -264,6 +274,10 @@ The repository also includes:
 - `docs/certification_audit.md` for scope-level certification evidence and
   remaining audit gates.
 - `docs/audit/` for family-level certification checklists.
+- `docs/gamma_ratio.md` for gamma-ratio pole policy and certified-backend
+  rationale.
+- `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
+  support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
 - `docs/release-0.1.0.md` for conservative 0.1.0 release notes and example

@@ -1,0 +1,42 @@
+[
+  {
+    "function": "gamma_ratio",
+    "parameters": ["5", "3"],
+    "expected_value": "12.0",
+    "source": "DLMF gamma recurrence",
+    "digits": 60,
+    "note": "integer gamma ratio Gamma(5)/Gamma(3)"
+  },
+  {
+    "function": "gamma_ratio",
+    "parameters": ["0.5", "1"],
+    "expected_value": "1.77245385090551602729816748334114518279754945612238712821381",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "Gamma(1/2)/Gamma(1)=sqrt(pi)"
+  },
+  {
+    "function": "gamma_ratio",
+    "parameters": ["3.2", "1.2"],
+    "expected_value": "2.64",
+    "source": "DLMF gamma recurrence",
+    "digits": 60,
+    "note": "real noninteger recurrence product 2.2 * 1.2"
+  },
+  {
+    "function": "gamma_ratio",
+    "parameters": ["2.5+0.25j", "1.5-0.5j"],
+    "expected_value": "1.61791612123220024519893631084404661199790437245533296045075492907483306068+0.346658009463417521710958463060134652583327308828455937202938784763336949283j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex gamma ratio"
+  },
+  {
+    "function": "gamma_ratio",
+    "parameters": ["3.2", "0"],
+    "expected_value": "0.0",
+    "source": "DLMF gamma pole and reciprocal gamma zero",
+    "digits": 60,
+    "note": "denominator pole gives Gamma(3.2) * rgamma(0) = 0"
+  }
+]

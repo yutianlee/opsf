@@ -18,6 +18,7 @@ EXPECTED_PUBLIC_NAMES = (
     "besselk",
     "bessely",
     "gamma",
+    "gamma_ratio",
     "loggamma",
     "rgamma",
     "pbdv",
@@ -45,6 +46,7 @@ EXPECTED_MCP_TOOL_NAMES = (
     "special_gamma",
     "special_loggamma",
     "special_rgamma",
+    "special_gamma_ratio",
     "special_airy",
     "special_ai",
     "special_bi",
@@ -62,12 +64,13 @@ EXPECTED_MCP_TOOL_NAMES = (
 
 def test_review_public_imports_remain_clean():
     from certsf import SFResult as ImportedResult
-    from certsf import ai, airy, bi, gamma, loggamma, rgamma
+    from certsf import ai, airy, bi, gamma, gamma_ratio, loggamma, rgamma
     from certsf import besseli, besselj, besselk, bessely
     from certsf import pbdv, pcfd, pcfu, pcfv, pcfw
 
     imported_functions = (
         gamma,
+        gamma_ratio,
         loggamma,
         rgamma,
         airy,
@@ -100,6 +103,7 @@ def test_sfresult_fields_are_stable():
 def test_representative_public_calls_return_sfresult():
     cases = [
         (certsf.gamma, ("3.2",)),
+        (certsf.gamma_ratio, ("3.2", "1.2")),
         (certsf.loggamma, ("3.2",)),
         (certsf.rgamma, ("3.2",)),
         (certsf.airy, ("1.0",)),

@@ -7,6 +7,7 @@ SUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.gamma, ("3.2",), id="gamma"),
     pytest.param(certsf.loggamma, ("3.2",), id="loggamma"),
     pytest.param(certsf.rgamma, ("3.2",), id="rgamma"),
+    pytest.param(certsf.gamma_ratio, ("3.2", "1.2"), id="gamma_ratio"),
     pytest.param(certsf.airy, ("1.0",), id="airy"),
     pytest.param(certsf.ai, ("1.0",), id="ai"),
     pytest.param(certsf.bi, ("1.0",), id="bi"),
@@ -24,6 +25,8 @@ SUPPORTED_CERTIFIED_CASES = [
 
 UNSUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.gamma, ("0",), id="gamma-pole"),
+    pytest.param(certsf.gamma_ratio, ("0", "3.2"), id="gamma-ratio-numerator-pole"),
+    pytest.param(certsf.gamma_ratio, ("0", "0"), id="gamma-ratio-both-poles"),
     pytest.param(certsf.loggamma, ("-2",), id="loggamma-pole"),
     pytest.param(certsf.bessely, ("2.5+1j", "4.0"), id="bessel-complex-order"),
     pytest.param(certsf.pcfu, ("2.5+1j", "1.25"), id="pcf-complex-parameter"),
@@ -63,6 +66,16 @@ def test_gamma_family_records_direct_arb_primitive_scope():
             pytest.skip(result.diagnostics["error"])
 
         assert result.diagnostics["certificate_scope"] == "direct_arb_primitive"
+
+
+def test_gamma_ratio_records_narrow_direct_arb_scope():
+    result = certsf.gamma_ratio("3.2", "1.2", dps=50, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.diagnostics["certificate_scope"] == "direct_arb_gamma_ratio"
+    assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+    assert result.diagnostics["audit_status"] == "audited_direct"
 
 
 @pytest.mark.parametrize(

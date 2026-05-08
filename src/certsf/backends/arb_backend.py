@@ -14,6 +14,10 @@ _NONFINITE_RESULT = "Certified backend returned a non-finite enclosure."
 _DIRECT_ARB_CERTIFICATE_LEVEL = "direct_arb_primitive"
 _DIRECT_ARB_AUDIT_STATUS = "audited_direct"
 _DIRECT_ARB_CERTIFICATION_CLAIM = "certified Arb enclosure of the documented direct Arb primitive"
+_DIRECT_ARB_GAMMA_RATIO_SCOPE = "direct_arb_gamma_ratio"
+_DIRECT_ARB_GAMMA_RATIO_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of Gamma(a) * rgamma(b) using direct Arb gamma primitives"
+)
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -39,6 +43,73 @@ def arb_loggamma(z, *, dps: int = 50):
 
 def arb_rgamma(z, *, dps: int = 50):
     return _with_flint("rgamma", dps, lambda: _make_ball(z).rgamma())
+
+
+def arb_gamma_ratio(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    numerator_pole = _is_gamma_pole(a)
+    denominator_pole = _is_gamma_pole(b)
+    if numerator_pole:
+        if denominator_pole:
+            return _unavailable(
+                "gamma_ratio",
+                requested,
+                "gamma_ratio is undefined when both Gamma(a) and Gamma(b) have poles.",
+                diagnostics={
+                    "pole_case": "both_poles",
+                    "numerator_pole": True,
+                    "denominator_pole": True,
+                    "certificate_scope": _DIRECT_ARB_GAMMA_RATIO_SCOPE,
+                },
+            )
+        return _unavailable(
+            "gamma_ratio",
+            requested,
+            "gamma_ratio has a non-finite numerator because Gamma(a) has a pole.",
+            diagnostics={
+                "pole_case": "numerator_pole",
+                "numerator_pole": True,
+                "denominator_pole": False,
+                "certificate_scope": _DIRECT_ARB_GAMMA_RATIO_SCOPE,
+            },
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable("gamma_ratio", requested, str(exc))
+    try:
+        value = _make_ball(a).gamma() * _make_ball(b).rgamma()
+        result = _certified_result("gamma_ratio", value, requested, bits, flint)
+        if result.certified:
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update(
+                {
+                    "certificate_scope": _DIRECT_ARB_GAMMA_RATIO_SCOPE,
+                    "certification_claim": _DIRECT_ARB_GAMMA_RATIO_CERTIFICATION_CLAIM,
+                    "pole_case": "denominator_pole_zero" if denominator_pole else "regular",
+                    "numerator_pole": False,
+                    "denominator_pole": denominator_pole,
+                }
+            )
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method=result.method,
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        return result
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable("gamma_ratio", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
 
 
 def arb_airy(z, *, dps: int = 50):
@@ -480,7 +551,10 @@ def _certified_result(function: str, value, requested_dps: int, bits: int, flint
     )
 
 
-def _unavailable(function: str, requested_dps: int, message: str):
+def _unavailable(function: str, requested_dps: int, message: str, diagnostics=None):
+    result_diagnostics = {"error": message, "mode": "certified"}
+    if diagnostics is not None:
+        result_diagnostics.update(diagnostics)
     return make_result(
         function=function,
         value="",
@@ -491,7 +565,7 @@ def _unavailable(function: str, requested_dps: int, message: str):
         backend="python-flint",
         requested_dps=requested_dps,
         working_dps=requested_dps,
-        diagnostics={"error": message, "mode": "certified"},
+        diagnostics=result_diagnostics,
     )
 
 
@@ -527,6 +601,14 @@ def _is_real_nonpositive(value: Any) -> bool:
 def _is_integer_order(value: Any) -> bool:
     order_text = _real_order_text(value)
     return order_text is not None and _is_integral_decimal_text(order_text)
+
+
+def _is_gamma_pole(value: Any) -> bool:
+    real_text = _real_order_text(value)
+    if real_text is None:
+        return False
+    decimal = Decimal(real_text)
+    return decimal <= 0 and decimal == decimal.to_integral_value()
 
 
 def _real_order_text(value: Any) -> str | None:

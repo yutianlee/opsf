@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_SHORT_SUMMARY = "Alpha special-function wrappers with explicit certification diagnostics."
 REQUIRED_CITATION_TITLE = "certsf: Alpha special-function wrappers with explicit certification diagnostics"
 RELEASE_CLAIM_DOC = "docs/release_claims.md"
-RELEASE_STATUS_ROWS = (
+HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
@@ -19,7 +19,18 @@ RELEASE_STATUS_ROWS = (
     "| MCP server | experimental tool interface |",
     "| Custom Taylor/asymptotic methods | not yet |",
 )
-SCOPE_STATUS_ROWS = (
+CURRENT_RELEASE_STATUS_ROWS = (
+    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
+    (
+        "| `besselj`, `bessely`, `besseli`, `besselk` | "
+        "alpha-certified where direct Arb primitive works; real-valued order only |"
+    ),
+    "| `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |",
+    "| MCP server | experimental tool interface |",
+    "| Custom Taylor/asymptotic methods | not yet |",
+)
+HISTORICAL_0_1_0_SCOPE_ROWS = (
     "| Gamma family | `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
@@ -33,6 +44,20 @@ SCOPE_STATUS_ROWS = (
     "| MCP server | `certsf.mcp_server` tools for the frozen wrappers | experimental tool interface |",
     "| Custom Taylor/asymptotic methods | none | not yet |",
 )
+CURRENT_0_2_0_SCOPE_ROWS = (
+    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
+    (
+        "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "
+        "alpha-certified where direct Arb primitive works; real-valued order only |"
+    ),
+    (
+        "| Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | "
+        "experimental certified formula layer |"
+    ),
+    "| MCP server | `certsf.mcp_server` tools for the current wrappers | experimental tool interface |",
+    "| Custom Taylor/asymptotic methods | none | not yet |",
+)
 RELEASE_SURFACES = (
     "README.md",
     "CHANGELOG.md",
@@ -41,6 +66,7 @@ RELEASE_SURFACES = (
     "docs/certification.md",
     "docs/certification_audit.md",
     "docs/certified_scope_0_1_0.md",
+    "docs/certified_scope_0_2_0.md",
     "docs/formula_audit.md",
     RELEASE_CLAIM_DOC,
 )
@@ -57,9 +83,13 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcomplete certified parabolic-cylinder support\b",
 )
 README_SUPPORT_MATRIX = {
-    "gamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
-    "loggamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
-    "rgamma": ("`gamma`, `loggamma`, `rgamma`", "alpha-certified, direct Arb primitive"),
+    "gamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
+    "loggamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
+    "rgamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
+    "gamma_ratio": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`",
+        "alpha-certified, direct Arb gamma primitives",
+    ),
     "airy": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
     "ai": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
     "bi": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
@@ -107,14 +137,18 @@ def test_release_status_matrices_keep_conservative_claims():
     readme_text = _read("README.md")
     certification_text = _read("docs/certification.md")
     release_notes_text = _read("docs/release-0.1.0.md")
-    scope_text = _read("docs/certified_scope_0_1_0.md")
+    old_scope_text = _read("docs/certified_scope_0_1_0.md")
+    current_scope_text = _read("docs/certified_scope_0_2_0.md")
 
-    for row in RELEASE_STATUS_ROWS:
+    for row in CURRENT_RELEASE_STATUS_ROWS:
         assert row in readme_text
         assert row in certification_text
+    for row in HISTORICAL_0_1_0_RELEASE_STATUS_ROWS:
         assert row in release_notes_text
-    for row in SCOPE_STATUS_ROWS:
-        assert row in scope_text
+    for row in HISTORICAL_0_1_0_SCOPE_ROWS:
+        assert row in old_scope_text
+    for row in CURRENT_0_2_0_SCOPE_ROWS:
+        assert row in current_scope_text
 
 
 def test_readme_support_matrix_matches_dispatcher_certified_methods():
