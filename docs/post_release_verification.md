@@ -68,6 +68,10 @@ matrix job.
 After the successful smoke run, the scheduled/manual `pypi-smoke` workflow
 default was updated from `0.1.0` to `0.2.0a1`.
 
+A follow-up smoke-workflow update added `gamma_ratio` calls to the base,
+certified, and MCP-certified smoke paths so scheduled/manual PyPI verification
+covers the new public wrapper directly.
+
 ### Validation summary
 
 - `v0.2.0-alpha.1` tag points at clean `main` commit

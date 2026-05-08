@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf import ai, besselj, gamma, pcfu
+          from certsf import ai, besselj, gamma, gamma_ratio, pcfu
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -49,6 +49,7 @@ jobs:
           print(certsf.__all__)
           print(certsf_path)
           print(gamma("3.2", mode="fast").to_mcp_dict())
+          print(gamma_ratio("3.2", "1.2", mode="fast").to_mcp_dict())
           print(ai("1.0", mode="high_precision", dps=60).to_mcp_dict())
           print(besselj("2", "4.0", mode="fast").to_mcp_dict())
           print(pcfu("2.5", "1.25", mode="high_precision", dps=60).to_mcp_dict())
@@ -58,10 +59,11 @@ jobs:
         if: matrix.extras == '[certified]'
         run: |
           python - <<'PY'
-          from certsf import ai, besselj, gamma, pcfu
+          from certsf import ai, besselj, gamma, gamma_ratio, pcfu
 
           cases = [
               gamma("3.2", mode="certified", dps=50),
+              gamma_ratio("3.2", "1.2", mode="certified", dps=50),
               ai("1.0", mode="certified", dps=50),
               besselj("2", "4.0", mode="certified", dps=50),
               pcfu("2.5", "1.25", mode="certified", dps=50),
@@ -97,7 +99,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf.mcp_server import build_server, special_gamma
+          from certsf.mcp_server import build_server, special_gamma, special_gamma_ratio
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -107,11 +109,15 @@ jobs:
           assert any(certsf_path.is_relative_to(path) for path in install_paths), certsf_path
 
           result = special_gamma("3.2", mode="fast")
+          ratio_result = special_gamma_ratio("3.2", "1.2", mode="fast")
 
           print(certsf_path)
           print(build_server)
           print(result)
+          print(ratio_result)
           assert callable(build_server)
           assert isinstance(result, dict)
+          assert isinstance(ratio_result, dict)
           assert result["function"] == "gamma"
+          assert ratio_result["function"] == "gamma_ratio"
           PY
