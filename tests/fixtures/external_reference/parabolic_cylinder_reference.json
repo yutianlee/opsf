@@ -1,0 +1,144 @@
+[
+  {
+    "function": "pcfu",
+    "parameters": ["0", "0"],
+    "expected_value": "1.21628021425752028310521130562980267465947905454118139910341",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "U(0,0) local-value check"
+  },
+  {
+    "function": "pcfd",
+    "parameters": ["0", "0"],
+    "expected_value": "1.0",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "D_0(0)=1 special value"
+  },
+  {
+    "function": "pcfv",
+    "parameters": ["0", "0"],
+    "expected_value": "0.686212627559326157189284947971031818893306653774973214384534",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "V(0,0) connection-value check"
+  },
+  {
+    "function": "pcfw",
+    "parameters": ["0", "0"],
+    "expected_value": "1.02276567211316867161110339856464166150350843246268917768167",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "W(0,0) gamma-modulus special value"
+  },
+  {
+    "function": "pcfu",
+    "parameters": ["2.5", "1.25"],
+    "expected_value": "0.0785665818082196025329486664940304091980717887097868325325612",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "moderate positive-real U sample"
+  },
+  {
+    "function": "pcfd",
+    "parameters": ["2.5", "1.25"],
+    "expected_value": "-0.281076271698731720778453872134932061414376503625965553107786",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "moderate positive-real D sample"
+  },
+  {
+    "function": "pcfv",
+    "parameters": ["2.5", "1.25"],
+    "expected_value": "3.02169215840356796854230885138064649502819223505885820443453",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "moderate positive-real V sample"
+  },
+  {
+    "function": "pcfw",
+    "parameters": ["2.5", "1.25"],
+    "expected_value": "0.0893515700186005647821820654593687784333318775337164600819064",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "moderate positive-real W sample"
+  },
+  {
+    "function": "pcfu",
+    "parameters": ["0.7", "1.25+0.5j"],
+    "expected_value": "0.295650337099280334794343031124418611697455642647806254943491-0.197602913510180821074498377528209821312698395417100606403674j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "complex-argument U sample in certified domain"
+  },
+  {
+    "function": "pcfd",
+    "parameters": ["0.7", "1.25+0.5j"],
+    "expected_value": "0.918032845541856965345384742515625483172953952360492101223671-0.0669840902667437094139604696366944603470632527190398654626783j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "complex-argument D sample in certified domain"
+  },
+  {
+    "function": "pcfv",
+    "parameters": ["0.7", "1.25+0.5j"],
+    "expected_value": "1.02400446638465070893529996452505299461622323004528590372796+0.435230375255495109767036387679377026520629641815649641947526j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "complex-argument V sample in certified domain"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["0", "0"],
+    "component": "value",
+    "expected_value": "1.0",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(0,0) value component from D_v(z)"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["0", "0"],
+    "component": "derivative",
+    "expected_value": "0.0",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(0,0) derivative component from D_v derivative identity"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["2.5", "1.25"],
+    "component": "value",
+    "expected_value": "-0.281076271698731720778453872134932061414376503625965553107786",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(2.5,1.25) value component from D_v(z)"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["2.5", "1.25"],
+    "component": "derivative",
+    "expected_value": "2.01418601055004995142488604880225518912595909901927042158336",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(2.5,1.25) derivative component from D_v derivative identity"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["0.7", "1.25+0.5j"],
+    "component": "value",
+    "expected_value": "0.918032845541856965345384742515625483172953952360492101223671-0.0669840902667437094139604696366944603470632527190398654626783j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(0.7,1.25+0.5j) value component from D_v(z)"
+  },
+  {
+    "function": "pbdv",
+    "parameters": ["0.7", "1.25+0.5j"],
+    "component": "derivative",
+    "expected_value": "-0.188673213525799614215971104584774809173090342189127455520073-0.354098460915622636755293667990805902849153603457459823202868j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "pbdv(0.7,1.25+0.5j) derivative component from D_v derivative identity"
+  }
+]

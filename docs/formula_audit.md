@@ -76,8 +76,18 @@ Contract tests:
   per-wrapper audit grids for small real values, moderate real values,
   negative arguments where allowed, complex branch-side samples where allowed,
   near reciprocal-gamma cancellation points, and larger-argument stress cases.
+- `tests/test_external_reference_fixtures.py` checks certified balls against
+  static values in `tests/fixtures/external_reference/`, including selected
+  parabolic-cylinder real, moderate, and complex-argument samples.
 - `tests/test_pbdv.py` compares current formula outputs against mpmath and
   checks domain rejections.
+
+External reference fixtures:
+The static external-reference fixtures supplement the formula and domain audit
+by checking that certified enclosures contain independently recorded values
+with fixture precision accounted for. They do not replace recurrence,
+connection-formula, branch, or domain-policy residual tests, and they do not
+promote any parabolic-cylinder wrapper beyond `experimental_formula`.
 
 ## Summary Table
 
