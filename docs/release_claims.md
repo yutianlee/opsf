@@ -25,7 +25,7 @@ Release-facing support matrices must keep these status phrases:
 
 | Surface | Required wording |
 | --- | --- |
-| Gamma family | alpha-certified, direct Arb primitive |
+| Gamma family | alpha-certified, direct Arb gamma primitives |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -36,6 +36,9 @@ Release-facing support matrices must keep these status phrases:
 
 - Say that direct Arb primitive families are alpha-certified only on documented
   finite-enclosure domains.
+- Say that `gamma_ratio` is certified through the narrow
+  `Gamma(a) * rgamma(b)` Arb product, with denominator-pole zeros and
+  numerator-pole clean failures.
 - Say that Bessel certified mode is restricted to real-valued order.
 - Say that parabolic-cylinder certificates are experimental formula-layer
   certificates until the formula, branch, and domain audit issues are closed.

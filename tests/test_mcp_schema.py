@@ -20,6 +20,17 @@ def test_special_gamma_returns_json_object_payload():
     assert isinstance(payload["diagnostics"], dict)
 
 
+def test_special_gamma_ratio_returns_json_object_payload():
+    payload = mcp_server.special_gamma_ratio("3.2", "1.2", dps=50, mode="high_precision")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload["function"] == "gamma_ratio"
+    assert payload["certified"] is False
+    assert payload["backend"] == "mpmath"
+    assert isinstance(payload["diagnostics"], dict)
+
+
 @pytest.mark.parametrize(
     ("tool", "args", "expected_components"),
     [
@@ -69,4 +80,7 @@ def test_mcp_server_stays_thin_adapter_without_backend_logic():
     assert "import flint" not in source
     assert "import mpmath" not in source
     assert "import scipy" not in source
+    assert "mp.loggamma" not in source
+    assert "special.loggamma" not in source
+    assert ".rgamma()" not in source
     assert ".to_mcp_dict()" in source

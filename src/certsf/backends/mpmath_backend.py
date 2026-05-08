@@ -30,6 +30,13 @@ def mpmath_rgamma(z, *, dps: int = 50):
         return _mp_result("rgamma", _mp_string(value, requested), requested, working)
 
 
+def mpmath_gamma_ratio(a, b, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.exp(mp.loggamma(_mp_number(a)) - mp.loggamma(_mp_number(b)))
+        return _mp_result("gamma_ratio", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

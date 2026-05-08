@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 from scipy import special
 
 from ._common import (
@@ -34,6 +35,12 @@ def scipy_rgamma(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     value = special.rgamma(scipy_number(z))
     return _fast_result("rgamma", number_to_string(value, digits=float_digits(requested)), requested)
+
+
+def scipy_gamma_ratio(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = np.exp(special.loggamma(scipy_number(a)) - special.loggamma(scipy_number(b)))
+    return _fast_result("gamma_ratio", number_to_string(value, digits=float_digits(requested)), requested)
 
 
 def scipy_airy(z, *, dps: int = 50):

@@ -15,3 +15,7 @@ def loggamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
 
 def rgamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("rgamma", z, dps=dps, mode=mode, certify=certify)
+
+
+def gamma_ratio(a, b, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("gamma_ratio", a, b, dps=dps, mode=mode, certify=certify)
