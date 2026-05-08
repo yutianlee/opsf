@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.0-alpha.1 - 2026-05-08
+
+- Added the public `gamma_ratio(a, b)` wrapper as the only public API expansion
+  for the 0.2.0 alpha line.
+- Added SciPy, mpmath, and Arb backends for `gamma_ratio`.
+- Certified `gamma_ratio` uses the Arb product `Gamma(a) * rgamma(b)` in the
+  `direct_arb_gamma_ratio` scope.
+- Denominator poles certify to zero when `Gamma(a)` is finite, while numerator
+  poles and simultaneous numerator/denominator poles fail cleanly.
+- Added the MCP tool `special_gamma_ratio`.
+- Added external fixtures and certified identity tests for the gamma-ratio
+  behavior.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.1.0 - 2026-05-08
 
 - Planned the first non-prerelease package release with the same frozen public

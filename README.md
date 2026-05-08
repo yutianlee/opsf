@@ -177,6 +177,15 @@ certified mode, `rgamma` returns a rigorous zero at poles, while `gamma` and
 `loggamma` return clean non-certified failures when the requested value is not
 finite.
 
+```python
+from certsf import gamma_ratio
+
+r = gamma_ratio("3.2", "1.2", mode="certified", dps=50)
+print(r.value)
+print(r.certified)
+print(r.diagnostics)
+```
+
 Certified `gamma_ratio(a, b)` evaluates `Gamma(a) * rgamma(b)`. This lets
 denominator poles certify to exact zero when `Gamma(a)` is finite, while
 numerator poles and simultaneous numerator/denominator poles return clean
@@ -280,6 +289,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.1.md` for v0.2.0-alpha.1 feature-alpha planning
+  notes.
 - `docs/release-0.1.0.md` for conservative 0.1.0 release notes and example
   commands.
 - `docs/release-0.1.0-alpha.2.md` for the v0.1.0-alpha.2 planning notes.
