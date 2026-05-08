@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0-alpha.3 - 2026-05-08
+
+- Added deterministic parabolic-cylinder formula-audit grids for recurrence,
+  connection-formula, derivative, branch-side, cancellation, and stress
+  coverage.
+- Added external-reference fixture containment tests for selected gamma, Airy,
+  Bessel, and parabolic-cylinder certified results.
+- Hardened release workflows by making TestPyPI manual-only and adding a
+  tag/version parity guard before publishing builds.
+- No mathematical implementation changes, public-wrapper expansion, or
+  certification-claim broadening are included.
+
 ## 0.1.0-alpha.2 - 2026-05-08
 
 - Added TestPyPI and PyPI trusted-publishing workflows, plus a PyPI smoke
