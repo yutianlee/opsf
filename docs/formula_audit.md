@@ -1,6 +1,6 @@
 # Formula Audit
 
-Last reviewed: 2026-05-07.
+Last reviewed: 2026-05-08.
 
 This document records formula-level certification claims for wrappers that do
 not call a single Arb special-function primitive. It is intentionally stricter
@@ -72,6 +72,10 @@ Contract tests:
 - `tests/test_certified_identities.py` checks certified ball residuals for
   recurrences, connection formulas, and derivative identities with propagated
   radii.
+- `tests/test_parabolic_cylinder_formula_audit.py` extends deterministic
+  per-wrapper audit grids for small real values, moderate real values,
+  negative arguments where allowed, complex branch-side samples where allowed,
+  near reciprocal-gamma cancellation points, and larger-argument stress cases.
 - `tests/test_pbdv.py` compares current formula outputs against mpmath and
   checks domain rejections.
 
@@ -143,12 +147,18 @@ Tests covering the identity:
 - `test_certified_pcfu_balls_imply_complex_branch_side_recurrence` checks the
   `z U(a,z) - U(a-1,z) + (a+1/2) U(a+1,z) = 0` recurrence on complex
   branch-side samples using certified balls rather than reference values.
+- `test_certified_pcfu_audit_grid_recurrence_residual_contains_zero` extends
+  that certified recurrence residual across small real, moderate real,
+  negative real, upper/lower branch-side, near `U'(a,0)` and `U(a,0)`
+  reciprocal-gamma cancellation, and larger-argument samples.
 
 Audit note:
 complex branch-side recurrence coverage is now part of the first-pass audit,
 including v0.1.x branch-side residual grids in
-`tests/test_v01x_audit_issues.py`. The wrapper remains `experimental_formula`
-until the formula-backed family is explicitly promoted in a later release.
+`tests/test_v01x_audit_issues.py` and the deterministic 2026-05-08 grid in
+`tests/test_parabolic_cylinder_formula_audit.py`. The wrapper remains
+`experimental_formula` until the formula-backed family is explicitly promoted
+in a later release.
 
 Status:
 experimental_formula.
@@ -194,10 +204,16 @@ Tests covering the identity:
 - `test_certified_parabolic_cylinder_balls_imply_differential_equation_residual`
   checks a shifted recurrence form of the `D_v` differential-equation residual
   on real and complex samples.
+- `test_certified_pcfd_audit_grid_direct_recurrence_residual_contains_zero`
+  extends the direct recurrence residual across small real, moderate real,
+  negative real, complex branch-side, near inherited `pcfu` gamma-factor
+  cancellation, and larger-argument samples.
 
 Audit note:
 direct `D_v` recurrence and shifted differential-equation residual coverage are
-now part of the first-pass audit.
+now part of the first-pass audit. The 2026-05-08 grid also checks orders near
+the integer values where the underlying `pcfu` initial-value gamma factors
+cancel.
 
 Status:
 experimental_formula.
@@ -244,6 +260,11 @@ Tests covering the identity:
 - `test_certified_pbdv_derivative_relation_covers_wider_grid` checks the same
   derivative identity over positive real, negative real, larger real, and
   complex samples.
+- `test_certified_pbdv_audit_grid_value_and_derivative_residuals_contain_zero`
+  checks certified containment for both the `pbdv` value component's equality
+  with `pcfd` and the derivative identity across small real, moderate real,
+  negative real, complex branch-side, inherited gamma-cancellation, and
+  larger-argument samples.
 - `test_mcp_pbdv_returns_nested_component_payloads` checks the component payload
   shape exposed to MCP.
 - `test_parabolic_cylinder_certified_results_keep_formula_audit_visible` checks
@@ -255,7 +276,9 @@ arguments for `pbdv`. The `x` name is retained for SciPy compatibility, while
 the certified formula layer treats it as the documented argument and allows
 complex values; use `pcfd(v, z)` when only the complex `D_v(z)` value is needed.
 The wider derivative residual grid and v0.1.x domain-policy tests are now part
-of the audit.
+of the audit. The 2026-05-08 deterministic grid keeps the certified complex
+argument policy visible while testing the value and derivative payloads through
+ball residuals.
 
 Status:
 experimental_formula.
@@ -308,11 +331,15 @@ Tests covering the identity:
 - `test_certified_pcfv_balls_imply_independent_recurrence` checks the
   `z V(a,z) - V(a+1,z) + (a-1/2) V(a-1,z) = 0` recurrence independently of
   reference-value comparison.
+- `test_certified_pcfv_audit_grid_connection_and_recurrence_residuals_contain_zero`
+  checks both the documented `V(a,z)` connection formula and the independent
+  recurrence across small real, moderate real, negative real, upper/lower
+  branch-side, near `1/Gamma(1/2-a)` cancellation, and larger-argument samples.
 
 Audit note:
 branch-side connection-formula and independent recurrence coverage are now part
-of the first-pass audit, with v0.1.x branch-side grids covering both the
-connection formula and an independent recurrence residual.
+of the first-pass audit, with v0.1.x branch-side grids and the 2026-05-08 grid
+covering both the connection formula and an independent recurrence residual.
 
 Status:
 experimental_formula.
@@ -378,12 +405,25 @@ Tests covering the identity:
 - `test_certified_pcfw_satisfies_real_variable_differential_equation_residual`
   checks the real-variable residual `W''(a,x) + (x^2/4 - a) W(a,x) = 0` on
   representative real grids.
+- `test_certified_pcfw_zero_parameter_bessel_identity_residual_contains_zero`
+  checks the `a=0` Bessel-function identity for `W(0,+x)` and `W(0,-x)` using
+  certified `pcfw` and certified `besselj` balls over small, moderate,
+  negative, and larger real arguments.
+- `test_certified_pcfw_origin_gamma_modulus_identity_intervals_overlap` checks
+  the `W(a,0)` gamma-modulus identity using certified `pcfw` and certified
+  complex `gamma` balls over negative, near-zero, zero, and positive real
+  parameters.
 
 Audit note:
 connection round-trip, phase-continuity, and real-variable residual coverage are
 now part of the first-pass audit. The v0.1.x audit grid extends real-variable
 residual checks across both signs of `x` and adds a wider `phi2` continuity
-grid. Complex `x` remains outside the certified `pcfw` domain.
+grid. The 2026-05-08 grid adds certified Bessel and gamma-modulus identity
+coverage. Unlike `pcfu` and `pcfv`, the documented real-argument `pcfw`
+connection formula has no real-parameter reciprocal-gamma zero; the near-zero
+parameter grid therefore exercises phase and two-term cancellation, not a
+promotion-level proof of the continuous DLMF phase convention. Complex `x`
+remains outside the certified `pcfw` domain.
 
 Status:
 experimental_formula.
