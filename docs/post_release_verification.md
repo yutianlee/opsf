@@ -1,5 +1,95 @@
 # Post-release verification
 
+## v0.2.0-alpha.4 / certsf 0.2.0a4
+
+This records the verification evidence for the fourth 0.2.0 alpha PyPI
+prerelease artifact.
+
+### Published artifact
+
+- Git tag: `v0.2.0-alpha.4`
+- GitHub prerelease: <https://github.com/yutianlee/certsf/releases/tag/v0.2.0-alpha.4>
+- PyPI URL: <https://pypi.org/project/certsf/0.2.0a4/>
+- PyPI version: `certsf 0.2.0a4`
+- Publish workflow run: `25599731814`
+- Publish workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25599731814>
+- Publish trigger: GitHub `release` event for `v0.2.0-alpha.4`
+- Source commit: `a6514c20e2615005890265018c6edb957fc7954a`
+- Wheel SHA256:
+  `9d441d6e65d33ed5913cd8594a62d808286c2f31e35274342a7720dcdc16e4ef`
+- sdist SHA256:
+  `7d9a922d2cfb72ac7fbb67d3fee752e54599e032437f45da5ec35023103711f8`
+
+The publish workflow build job passed checkout, Python 3.12 setup, tag/version
+parity check, build-tool installation, sdist/wheel build, `twine check`, and
+distribution artifact upload. The PyPI publish job passed after the `pypi`
+environment approval and published the distributions through trusted publishing.
+
+### PyPI confirmation
+
+The PyPI JSON endpoint for `certsf 0.2.0a4` returned the published version and
+the two uploaded files listed above. PyPI release metadata is tied to uploaded
+file data, so these hashes are the durable evidence for this public prerelease
+artifact.
+
+### Fresh install smoke test
+
+Final manual `pypi-smoke` run: `25601711537`
+
+Workflow URL:
+<https://github.com/yutianlee/certsf/actions/runs/25601711537>
+
+Install targets:
+
+```bash
+python -m pip install --pre "certsf==0.2.0a4"
+python -m pip install --pre "certsf[certified]==0.2.0a4"
+python -m pip install --pre "certsf[mcp,certified]==0.2.0a4"
+```
+
+Verified from fresh GitHub Actions environments:
+
+- Base installs passed on Python 3.10, 3.11, and 3.12.
+- Certified installs passed on Python 3.10, 3.11, and 3.12.
+- MCP certified installs passed on Python 3.10, 3.11, and 3.12.
+- Imports came from environment `site-packages`, not the checkout.
+- Smoke calls passed for `gamma`, `gamma_ratio`, `loggamma_ratio`, `beta`,
+  `ai`, `besselj`, and `pcfu`.
+- Certified smoke calls passed for `gamma`, `gamma_ratio`, `loggamma_ratio`,
+  `beta`, `ai`, `besselj`, and `pcfu`.
+- MCP server import and `special_gamma` / `special_gamma_ratio` /
+  `special_loggamma_ratio` / `special_beta` smoke calls passed.
+
+One earlier manual smoke run captured PyPI edge-cache propagation lag:
+
+- Run `25601669244` started immediately after publish. Some matrix jobs
+  installed successfully, but failed install logs on other runners saw only
+  versions through `0.2.0a3`.
+
+The final run above passed every matrix job after the PyPI edge cache caught up.
+
+After the successful smoke run, this follow-up PR updates the scheduled/manual
+`pypi-smoke` workflow default and fallback version from `0.2.0a3` to
+`0.2.0a4`. It also adds `pochhammer` calls to the base and certified smoke
+paths and adds `special_pochhammer` to the MCP-certified smoke path while
+preserving the existing `gamma_ratio`, `loggamma_ratio`, and `beta` coverage.
+
+### Validation summary
+
+- `v0.2.0-alpha.4` tag points at clean `main` commit
+  `a6514c20e2615005890265018c6edb957fc7954a`.
+- GitHub prerelease `v0.2.0-alpha.4` is marked prerelease.
+- `publish-pypi` run `25599731814` completed successfully.
+- PyPI confirms `certsf 0.2.0a4` is available at the release URL above.
+- PyPI file hashes match the wheel and sdist hashes recorded above.
+- Initial `pypi-smoke` run `25601669244` had PyPI edge-cache propagation
+  failures only; the failed install logs did not yet list `0.2.0a4`.
+- Final `pypi-smoke` run `25601711537` completed successfully across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- No `src/`, mathematical implementation, backend formula, public-wrapper, or
+  certification-scope changes were made during publication or verification.
+
 ## v0.2.0-alpha.3 / certsf 0.2.0a3
 
 This records the verification evidence for the third 0.2.0 alpha PyPI

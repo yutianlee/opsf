@@ -1,6 +1,6 @@
 # Release Claim Guardrails
 
-The 0.1.0 alpha line should make conservative certification claims. Release
+The 0.x alpha line should make conservative certification claims. Release
 copy, package metadata, README text, examples, and GitHub release notes must
 help users distinguish three different things:
 
