@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 import pytest
 
@@ -183,6 +184,40 @@ def test_pypi_smoke_covers_current_gamma_family_surface():
         assert call in text
     for name in GAMMA_FAMILY:
         assert f"special_{name}" in text
+
+
+def test_external_reference_fixtures_cover_current_gamma_family_surface():
+    fixture_dir = ROOT / "tests" / "fixtures" / "external_reference"
+    covered_functions = set()
+
+    for path in fixture_dir.glob("*.json"):
+        entries = json.loads(path.read_text(encoding="utf-8"))
+        covered_functions.update(entry["function"] for entry in entries)
+
+    assert set(GAMMA_FAMILY) <= covered_functions
+    for fixture in (
+        "gamma_reference.json",
+        "gamma_ratio_reference.json",
+        "loggamma_ratio_reference.json",
+        "beta_reference.json",
+        "pochhammer_reference.json",
+    ):
+        assert (fixture_dir / fixture).is_file()
+
+
+def test_pypi_smoke_certified_path_covers_current_gamma_family_surface():
+    text = _read(".github/workflows/pypi-smoke.yml")
+
+    for call in (
+        'gamma("3.2", mode="certified"',
+        'loggamma("3.2", mode="certified"',
+        'rgamma("0", mode="certified"',
+        'gamma_ratio("3.2", "1.2", mode="certified"',
+        'loggamma_ratio("3.2", "1.2", mode="certified"',
+        'beta("2", "3", mode="certified"',
+        'pochhammer("0.5", "3", mode="certified"',
+    ):
+        assert call in text
 
 
 def test_publish_workflows_use_node24_artifact_actions():
