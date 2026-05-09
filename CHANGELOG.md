@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0-alpha.8 - 2026-05-09
+
+- Added the public `dawson(z)` wrapper.
+- Defined `dawson(z)` as `sqrt(pi)/2 * exp(-z^2) * erfi(z)`.
+- Fast mode uses `scipy.special.dawsn(z)` when available; otherwise it uses
+  the `erfi` identity fallback.
+- High-precision mode uses a mpmath Dawson function when available; otherwise
+  it uses the `erfi` identity fallback.
+- Certified mode prefers direct Arb Dawson when available; otherwise it uses
+  the Arb formula `sqrt(pi)/2*exp(-z^2)*erfi(z)` with formula diagnostics.
+- No inverse error functions, Faddeeva functions, plasma dispersion wrapper, or
+  additional variants are added.
+- No `erf`, `erfc`, `erfcx`, or `erfi` behavior changes are included.
+- No gamma-family behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.7 - 2026-05-09
 
 - Added the public `erfi(z)` wrapper.

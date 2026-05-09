@@ -273,6 +273,12 @@ d = dawson("1.0", mode="certified", dps=50)
 ```
 
 ```python
+from certsf import dawson
+
+r = dawson("1.0", mode="certified", dps=50)
+```
+
+```python
 from certsf import erfi
 
 r = erfi("1.0", mode="certified", dps=50)
@@ -399,6 +405,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.8.md` for v0.2.0-alpha.8 feature-alpha planning
+  notes.
 - `docs/release-0.2.0-alpha.7.md` for v0.2.0-alpha.7 feature-alpha planning
   notes.
 - `docs/release-0.2.0-alpha.6.md` for v0.2.0-alpha.6 feature-alpha planning
