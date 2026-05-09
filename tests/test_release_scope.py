@@ -35,6 +35,7 @@ CURRENT_0_2_0_FUNCTIONS = (
     "erf",
     "erfc",
     "erfcx",
+    "erfi",
     "airy",
     "ai",
     "bi",
@@ -66,7 +67,7 @@ CURRENT_0_2_0_STATUS_ROWS = (
         "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | "
         "alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |",
+    "| `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -97,7 +98,7 @@ CURRENT_0_2_0_SCOPE_ROWS = (
         "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, "
         "`pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| Error-function family | `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |",
+    "| Error-function family | `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "

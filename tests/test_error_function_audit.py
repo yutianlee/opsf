@@ -11,26 +11,35 @@ from certsf.dispatcher import REGISTRY
 
 ROOT = Path(__file__).resolve().parents[1]
 
-ERROR_FUNCTIONS = ("erf", "erfc", "erfcx")
-SAMPLE_ARGS = {"erf": ("0.5+0.25j",), "erfc": ("0.5+0.25j",), "erfcx": ("0.5+0.25j",)}
+ERROR_FUNCTIONS = ("erf", "erfc", "erfcx", "erfi")
+SAMPLE_ARGS = {
+    "erf": ("0.5+0.25j",),
+    "erfc": ("0.5+0.25j",),
+    "erfcx": ("0.5+0.25j",),
+    "erfi": ("0.5+0.25j",),
+}
 CERTIFIED_SCOPES = {
     "erf": "direct_arb_erf",
     "erfc": "direct_arb_erfc",
     "erfcx": "direct_arb_erfcx|arb_erfcx_formula",
+    "erfi": "direct_arb_erfi|arb_erfi_formula",
 }
 UNSUPPORTED_CERTIFIED_CASES = (
     ("erf", ("nan",)),
     ("erfc", ("nan",)),
     ("erfcx", ("nan",)),
+    ("erfi", ("nan",)),
 )
-FORBIDDEN_ERROR_FUNCTION_WRAPPERS = ("erfi", "erfinv", "erfcinv")
+FORBIDDEN_ERROR_FUNCTION_WRAPPERS = ("erfinv", "erfcinv", "faddeeva", "dawson")
 DOC_EXPECTATIONS = {
     "README.md": (
-        "| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |",
-        "Certified `erf` and `erfc` use direct Arb error-function primitives",
+        "| `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |",
+        "Certified `erf`, `erfc`, and `erfi` use direct Arb error-function primitives",
         "Certified `erfcx` prefers direct Arb `erfcx` when available",
+        "Certified `erfi` prefers direct Arb `erfi` when available",
         "`erfc` may evaluate `1 - erf(z)` and records `formula=\"1-erf\"`.",
         "`formula=\"exp(z^2)*erfc(z)\"`.",
+        "`formula=\"-i*erf(i*z)\"`.",
         "No custom asymptotic certification is added.",
         "[`docs/error_function.md`](docs/error_function.md)",
     ),
@@ -38,9 +47,11 @@ DOC_EXPECTATIONS = {
         "erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt",
         "erfc(z) = 1 - erf(z)",
         "erfcx(z) = exp(z^2) erfc(z)",
+        "erfi(z) = -i erf(i z)",
         "direct Arb `erf` and `erfc` primitives",
         "record `diagnostics[\"formula\"] == \"1-erf\"`",
         "records `diagnostics[\"formula\"] == \"exp(z^2)*erfc(z)\"`",
+        "records `diagnostics[\"formula\"] == \"-i*erf(i*z)\"`",
         "`erfinv`, `erfcinv`, or Faddeeva functions",
         "No Taylor, asymptotic, or custom certification method",
     ),
@@ -49,7 +60,9 @@ DOC_EXPECTATIONS = {
         "`1 - erf(z)` and records `formula=\"1-erf\"`",
         "`erfcx(z) = exp(z^2) erfc(z)`",
         "`formula=\"exp(z^2)*erfc(z)\"`",
-        "No `erfi`, `erfinv`, `erfcinv`",
+        "`erfi(z) = -i erf(i z)`",
+        "`formula=\"-i*erf(i*z)\"`",
+        "No `erfinv`, `erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
         "`pypi-smoke.yml` defaults to `0.2.0a6`",
@@ -60,26 +73,31 @@ DOC_EXPECTATIONS = {
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
         "`direct_arb_erfc` | `erfc` | `direct_arb_primitive`",
         "`arb_erfcx_formula` | `erfcx` | `formula_audited_alpha`",
+        "`arb_erfi_formula` | `erfi` | `formula_audited_alpha`",
         "diagnostics record",
         "`formula=\"1-erf\"`",
         "`formula=\"exp(z^2)*erfc(z)\"`",
+        "`formula=\"-i*erf(i*z)\"`",
     ),
     "docs/certified_scope_0_2_0.md": (
-        "Error-function family | `erf`, `erfc`, `erfcx`",
+        "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`",
         "`erf(z)` and `erfc(z)` are the v0.2.0-alpha.5",
         "`erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.",
+        "`erfi(z)` is the future v0.2.0-alpha.7 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
+        "otherwise certified `erfi` may use `-i*erf(i*z)`",
         "Custom Taylor, asymptotic, or non-Arb certification methods are outside",
         "Parabolic-cylinder family",
         "experimental certified formula layer",
     ),
     "docs/release_claims.md": (
-        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx identity formula",
+        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas",
         "direct Arb `erfc` is preferred",
         "direct Arb `erfcx` is",
+        "direct Arb `erfi` is",
         "fallback must be visible in diagnostics",
-        "Do not claim `erfi`, `erfinv`, `erfcinv`, or Faddeeva",
+        "Do not claim `erfinv`, `erfcinv`, Faddeeva",
         "Do not describe the parabolic-cylinder family as certified without the",
     ),
 }
@@ -132,6 +150,11 @@ def test_error_function_certified_scopes_match_audit(name):
         assert result.diagnostics["audit_status"] == "formula_identity"
         assert result.diagnostics["certification_claim"] == "certified Arb enclosure of exp(z^2)*erfc(z)"
         assert result.diagnostics["formula"] == "exp(z^2)*erfc(z)"
+    elif result.diagnostics["certificate_scope"] == "arb_erfi_formula":
+        assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
+        assert result.diagnostics["audit_status"] == "formula_identity"
+        assert result.diagnostics["certification_claim"] == "certified Arb enclosure of -i*erf(i*z)"
+        assert result.diagnostics["formula"] == "-i*erf(i*z)"
     else:
         assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
         assert result.diagnostics["audit_status"] == "audited_direct"
@@ -204,6 +227,28 @@ def test_erfcx_formula_fallback_records_formula_when_direct_erfcx_is_unavailable
     assert result.diagnostics["certification_claim"] == "certified Arb enclosure of exp(z^2)*erfc(z)"
 
 
+def test_erfi_formula_fallback_records_formula_when_direct_erfi_is_unavailable(monkeypatch):
+    flint = pytest.importorskip("flint")
+
+    class ErfOnlyBall:
+        def __init__(self, value):
+            self.value = flint.acb(value)
+
+        def __rmul__(self, other):
+            return other * self.value
+
+    monkeypatch.setattr(arb_backend, "_make_ball", lambda z: ErfOnlyBall(z))
+
+    result = arb_backend.arb_erfi("0.5", dps=50)
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "arb_erfi_formula"
+    assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
+    assert result.diagnostics["audit_status"] == "formula_identity"
+    assert result.diagnostics["formula"] == "-i*erf(i*z)"
+    assert result.diagnostics["certification_claim"] == "certified Arb enclosure of -i*erf(i*z)"
+
+
 @pytest.mark.parametrize(("path", "expected_fragments"), DOC_EXPECTATIONS.items())
 def test_error_function_documentation_uses_current_audit_wording(path, expected_fragments):
     text = _read(path)
@@ -215,7 +260,7 @@ def test_error_function_documentation_uses_current_audit_wording(path, expected_
 def test_external_reference_fixture_covers_error_function_surface():
     fixture_dir = ROOT / "tests" / "fixtures" / "external_reference"
     entries = []
-    for fixture_name in ("error_function_reference.json", "erfcx_reference.json"):
+    for fixture_name in ("error_function_reference.json", "erfcx_reference.json", "erfi_reference.json"):
         entries.extend(json.loads((fixture_dir / fixture_name).read_text(encoding="utf-8")))
     covered_cases = {(entry["function"], tuple(entry["parameters"])) for entry in entries}
 
@@ -227,9 +272,13 @@ def test_external_reference_fixture_covers_error_function_surface():
         ("erfc", ("1",)),
         ("erfcx", ("1",)),
         ("erfcx", ("-1",)),
+        ("erfi", ("0",)),
+        ("erfi", ("1",)),
+        ("erfi", ("-1",)),
         ("erf", ("0.5+0.25j",)),
         ("erfc", ("0.5+0.25j",)),
         ("erfcx", ("0.5+0.25j",)),
+        ("erfi", ("0.5+0.25j",)),
     } <= covered_cases
 
 
@@ -247,6 +296,7 @@ def test_pypi_smoke_covers_error_function_release_surface():
     assert "special_erf" in text
     assert "special_erfc" in text
     assert "special_erfcx" in text
+    assert "erfi" not in text
     assert 'special_erf("1.0", mode="certified", dps=50)' in text
     assert 'special_erfc("1.0", mode="certified", dps=50)' in text
     assert 'special_erfcx("1.0", mode="certified", dps=50)' in text

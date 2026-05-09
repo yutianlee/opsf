@@ -28,7 +28,7 @@ status matrix is:
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |
+| `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -140,7 +140,7 @@ Certificate scope:
 ## Error-Function Family
 
 Function:
-`erf(z)`, `erfc(z)`, `erfcx(z)`
+`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`
 
 Certified domain:
 real or complex inputs accepted by Arb for the corresponding error-function
@@ -154,19 +154,24 @@ the Arb expression `1 - erf(z)` and records `formula="1-erf"`.
 Certified `erfcx` prefers direct Arb `erfcx` if exposed by python-flint;
 otherwise it evaluates `exp(z^2) * erfc(z)` with Arb ball arithmetic and
 records `formula="exp(z^2)*erfc(z)"`.
+Certified `erfi` prefers direct Arb `erfi` if exposed by python-flint;
+otherwise it evaluates `-i*erf(i*z)` with Arb ball arithmetic and records
+`formula="-i*erf(i*z)"`.
 
 Returned enclosure:
 Arb midpoint string plus absolute radius.
 
 Branch convention:
-`erf`, `erfc`, and `erfcx` are entire functions. The wrappers follow Arb's
-complex primitive and elementary-function conventions.
+`erf`, `erfc`, `erfcx`, and `erfi` are entire functions. The wrappers follow
+Arb's complex primitive and elementary-function conventions.
 
 Formula transformations:
 none for `erf`; direct `erfc` is preferred. The only allowed certified `erfc`
 fallback is the explicit Arb expression `1 - erf(z)`.
 For `erfcx`, direct Arb `erfcx` is preferred when available. The allowed
 formula fallback is the explicit Arb expression `exp(z^2) * erfc(z)`.
+For `erfi`, direct Arb `erfi` is preferred when available. The allowed formula
+fallback is the explicit Arb expression `-i*erf(i*z)`.
 
 Known exclusions:
 non-finite Arb input or output enclosures and any domain where Arb does not
@@ -182,11 +187,16 @@ certified ball containment for `erf(z) + erfc(z) = 1` and
 values, a complex sample, `erfcx(z) = exp(z^2) erfc(z)`, auto dispatch, MCP
 parity, external fixtures, and certified containment of
 `exp(z^2)*erfc(z) - erfcx(z) = 0`.
+`erfi` tests cover zero, positive and negative real values, a complex sample,
+`erfi(z) = -i erf(i z)`, auto dispatch, MCP parity, external fixtures, and
+certified containment of `erfi(z) + i*erf(i*z) = 0`.
 
 Certificate scopes:
 `direct_arb_erf`, `direct_arb_erfc`, and either `direct_arb_erfcx` or
 `arb_erfcx_formula` for `erfcx`, depending on the Arb primitive exposed by the
-installed backend.
+installed backend. `erfi` uses either `direct_arb_erfi` or
+`arb_erfi_formula`, depending on the Arb primitive exposed by the installed
+backend.
 
 ## Airy Family
 

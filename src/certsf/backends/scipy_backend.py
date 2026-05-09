@@ -95,6 +95,14 @@ def scipy_erfcx(z, *, dps: int = 50):
     return _fast_result("erfcx", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_erfi(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    zz = scipy_number(z)
+    method = getattr(special, "erfi", None)
+    value = method(zz) if method is not None else -1j * special.erf(1j * zz)
+    return _fast_result("erfi", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

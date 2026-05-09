@@ -5,14 +5,15 @@ line. The 0.1.0 surface remains frozen in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The gamma-family
 additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
 `pochhammer(a, n)`. The v0.2.0-alpha.5 feature branch adds `erf(z)` and
-`erfc(z)`. The v0.2.0-alpha.6 feature branch adds `erfcx(z)`.
+`erfc(z)`. The v0.2.0-alpha.6 feature branch adds `erfcx(z)`. The future
+v0.2.0-alpha.7 feature branch adds `erfi(z)`.
 
 ## Release Status Matrix
 
 | Area | Public wrappers or surface | Release status |
 | --- | --- | --- |
 | Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |
+| Error-function family | `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |
 | Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -34,6 +35,7 @@ pochhammer
 erf
 erfc
 erfcx
+erfi
 airy
 ai
 bi
@@ -59,6 +61,7 @@ for `ai` and `bi`, not additional certified functions.
 - `pochhammer(a, n)` is the v0.2.0-alpha.4 API expansion.
 - `erf(z)` and `erfc(z)` are the v0.2.0-alpha.5 feature-branch API expansion.
 - `erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.
+- `erfi(z)` is the future v0.2.0-alpha.7 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.
@@ -91,6 +94,13 @@ for `ai` and `bi`, not additional certified functions.
   `audit_status="formula_identity"`.
 - Certified `erfcx` does not add a custom asymptotic certification path or claim
   scaled-erfc stability beyond what the selected backend certifies.
+- Certified `erfi` uses `erfi(z) = -i erf(i z)`. Direct Arb `erfi` is
+  preferred when available; otherwise certified `erfi` may use `-i*erf(i*z)`
+  and must record `formula="-i*erf(i*z)"`,
+  `certificate_scope="arb_erfi_formula"`,
+  `certificate_level="formula_audited_alpha"`, and
+  `audit_status="formula_identity"`.
+- Certified `erfi` does not add a custom asymptotic certification path.
 - Direct Arb primitive families are alpha-certified only on the domains where
   Arb returns finite enclosures and the wrapper records the documented
   certificate scope.
