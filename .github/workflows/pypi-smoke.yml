@@ -6,7 +6,7 @@ on:
       version:
         description: "Published certsf version to test"
         required: true
-        default: "0.2.0a9"
+        default: "0.2.0a10"
   schedule:
     - cron: "0 3 * * 1"
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a9' }}"
+          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a10' }}"
 
       - name: Smoke test import and calls
         run: |
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcx, erfi, erfinv, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -57,6 +57,7 @@ jobs:
           print(pochhammer("0.5", "3", mode="fast").to_mcp_dict())
           print(erf("1.0", mode="fast").to_mcp_dict())
           print(erfc("1.0", mode="fast").to_mcp_dict())
+          print(erfcinv("0.5", mode="fast").to_mcp_dict())
           print(erfcx("1.0", mode="fast").to_mcp_dict())
           print(erfi("1.0", mode="fast").to_mcp_dict())
           print(erfinv("0.5", mode="fast").to_mcp_dict())
@@ -70,7 +71,7 @@ jobs:
         if: matrix.extras == '[certified]'
         run: |
           python - <<'PY'
-          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcx, erfi, erfinv, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           cases = [
               gamma("3.2", mode="certified", dps=50),
@@ -82,6 +83,7 @@ jobs:
               pochhammer("0.5", "3", mode="certified", dps=50),
               erf("1.0", mode="certified", dps=50),
               erfc("1.0", mode="certified", dps=50),
+              erfcinv("0.5", mode="certified", dps=50),
               erfcx("1.0", mode="certified", dps=50),
               erfi("1.0", mode="certified", dps=50),
               erfinv("0.5", mode="certified", dps=50),
@@ -112,7 +114,7 @@ jobs:
       - name: Install MCP extra from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a9' }}"
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a10' }}"
 
       - name: MCP smoke test
         run: |
@@ -121,7 +123,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf.mcp_server import build_server, special_beta, special_dawson, special_erf, special_erfc, special_erfcx, special_erfi, special_erfinv, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
+          from certsf.mcp_server import build_server, special_beta, special_dawson, special_erf, special_erfc, special_erfcinv, special_erfcx, special_erfi, special_erfinv, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -139,6 +141,7 @@ jobs:
           pochhammer_result = special_pochhammer("0.5", "3", mode="fast")
           erf_result = special_erf("1.0", mode="certified", dps=50)
           erfc_result = special_erfc("1.0", mode="certified", dps=50)
+          erfcinv_result = special_erfcinv("0.5", mode="certified", dps=50)
           erfcx_result = special_erfcx("1.0", mode="certified", dps=50)
           erfi_result = special_erfi("1.0", mode="certified", dps=50)
           erfinv_result = special_erfinv("0.5", mode="certified", dps=50)
@@ -155,6 +158,7 @@ jobs:
           print(pochhammer_result)
           print(erf_result)
           print(erfc_result)
+          print(erfcinv_result)
           print(erfcx_result)
           print(erfi_result)
           print(erfinv_result)
@@ -169,6 +173,7 @@ jobs:
           assert isinstance(pochhammer_result, dict)
           assert isinstance(erf_result, dict)
           assert isinstance(erfc_result, dict)
+          assert isinstance(erfcinv_result, dict)
           assert isinstance(erfcx_result, dict)
           assert isinstance(erfi_result, dict)
           assert isinstance(erfinv_result, dict)
@@ -182,12 +187,14 @@ jobs:
           assert pochhammer_result["function"] == "pochhammer"
           assert erf_result["function"] == "erf"
           assert erfc_result["function"] == "erfc"
+          assert erfcinv_result["function"] == "erfcinv"
           assert erfcx_result["function"] == "erfcx"
           assert erfi_result["function"] == "erfi"
           assert erfinv_result["function"] == "erfinv"
           assert dawson_result["function"] == "dawson"
           assert erf_result["certified"]
           assert erfc_result["certified"]
+          assert erfcinv_result["certified"]
           assert erfcx_result["certified"]
           assert erfi_result["certified"]
           assert erfinv_result["certified"]

@@ -170,8 +170,8 @@ def test_gamma_family_documentation_uses_current_v0_2_scope_wording(path, expect
 def test_pypi_smoke_covers_current_gamma_family_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0a9"' in text
-    assert "inputs.version || '0.2.0a9'" in text
+    assert 'default: "0.2.0a10"' in text
+    assert "inputs.version || '0.2.0a10'" in text
     for call in (
         'gamma("3.2"',
         'loggamma("3.2"',
@@ -182,6 +182,7 @@ def test_pypi_smoke_covers_current_gamma_family_surface():
         'pochhammer("0.5", "3"',
         'erf("1.0"',
         'erfc("1.0"',
+        'erfcinv("0.5"',
         'erfcx("1.0"',
         'erfi("1.0"',
         'erfinv("0.5"',
@@ -192,6 +193,7 @@ def test_pypi_smoke_covers_current_gamma_family_surface():
         assert f"special_{name}" in text
     assert "special_erf" in text
     assert "special_erfc" in text
+    assert "special_erfcinv" in text
     assert "special_erfcx" in text
     assert "special_erfi" in text
     assert "special_erfinv" in text
