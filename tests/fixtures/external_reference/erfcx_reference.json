@@ -1,0 +1,34 @@
+[
+  {
+    "function": "erfcx",
+    "parameters": ["0"],
+    "expected_value": "1.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "erfcx(0)=exp(0)*erfc(0)=1"
+  },
+  {
+    "function": "erfcx",
+    "parameters": ["1"],
+    "expected_value": "0.42758357615580700441075034449051518082015950316425266374553977074050542182024325",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular positive-real scaled complementary error-function value"
+  },
+  {
+    "function": "erfcx",
+    "parameters": ["-1"],
+    "expected_value": "5.0089800807622834663098245982148098146943346842356664861883954847076478388868519",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular negative-real scaled complementary error-function value"
+  },
+  {
+    "function": "erfcx",
+    "parameters": ["0.5+0.25j"],
+    "expected_value": "0.59370885150521580956768052020873528583612244785564580539298050313573532808704312-0.12476492296402974150966377862175567093733265080972859139796031394267727305202956j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex scaled complementary error-function value"
+  }
+]

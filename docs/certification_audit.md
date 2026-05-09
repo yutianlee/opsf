@@ -10,9 +10,10 @@ Certified successes must include:
 
 - `diagnostics["certificate_scope"]`: the scope listed below.
 - `diagnostics["certificate_level"]`: `direct_arb_primitive`,
-  `direct_arb_finite_product`, or `formula_audited_experimental`.
+  `direct_arb_finite_product`, `formula_audited_alpha`, or
+  `formula_audited_experimental`.
 - `diagnostics["audit_status"]`: either `audited_direct` or
-  `experimental_formula`.
+  `formula_identity` or `experimental_formula`.
 - `diagnostics["certification_claim"]`: concise wording for the level of claim.
 
 The certificate levels mean:
@@ -27,6 +28,9 @@ The certificate levels mean:
 - `direct_arb_finite_product`: the wrapper evaluates a finite product with Arb
   ball arithmetic for a documented integer-parameter domain, with explicit
   exclusions for unsupported continuation or pole-limit cases.
+- `formula_audited_alpha`: Arb rigorously encloses a narrowly documented
+  identity formula for an alpha wrapper. The runtime diagnostics must identify
+  the formula and must not imply a broader algorithmic stability claim.
 - `formula_audited_experimental`: Arb rigorously encloses the implemented
   formula, and repo tests cover the documented first-pass identities, branches,
   and domains, but the formula-backed family has not been promoted to a broad
@@ -58,6 +62,8 @@ certificate level or promote
 | `direct_arb_pochhammer_product` | `pochhammer` | `direct_arb_finite_product` | Arb finite product `prod_{k=0}^{n-1}(a+k)`; special-value tests; zero-factor test; recurrence identity check; integer-domain rejection tests | Non-integer `n`; negative `n`; analytic continuation in `n`; simultaneous-pole limiting values; product paths above the documented term ceiling |
 | `direct_arb_erf` | `erf` | `direct_arb_primitive` | Direct Arb `erf` primitive; zero, oddness, complex sample, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `direct_arb_erfc` | `erfc` | `direct_arb_primitive` | Direct Arb `erfc` primitive, or explicit Arb `1-erf` fallback with `formula="1-erf"`; zero, complement identity, complex sample, and external-reference containment tests | Non-finite Arb enclosures; unrecorded cancellation-prone fallback formulas; custom asymptotic certification paths |
+| `direct_arb_erfcx` | `erfcx` | `direct_arb_primitive` | Direct Arb `erfcx` primitive when exposed by python-flint; runtime scope and diagnostics tests preserve the direct path | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `arb_erfcx_formula` | `erfcx` | `formula_audited_alpha` | Arb identity formula `exp(z^2)*erfc(z)` with `formula="exp(z^2)*erfc(z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; large-argument scaled-erfc stability claims beyond the backend-certified formula |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -103,6 +109,7 @@ The error-function scopes use narrow audited-direct wording:
 ```text
 certified Arb enclosure of erf(z) using direct Arb error-function primitive
 certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive
+certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive
 ```
 
 If certified `erfc` uses the allowed Arb fallback, diagnostics record
@@ -110,6 +117,14 @@ If certified `erfc` uses the allowed Arb fallback, diagnostics record
 
 ```text
 certified Arb enclosure of 1 - erf(z) using direct Arb error-function primitive
+```
+
+If certified `erfcx` uses the Arb identity fallback, diagnostics record
+`formula="exp(z^2)*erfc(z)"`, use `audit_status="formula_identity"`, and use
+the claim:
+
+```text
+certified Arb enclosure of exp(z^2)*erfc(z)
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:

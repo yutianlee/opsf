@@ -86,6 +86,15 @@ def scipy_erfc(z, *, dps: int = 50):
     return _fast_result("erfc", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_erfcx(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    method = getattr(special, "erfcx", None)
+    if method is None:
+        return _fast_unavailable("erfcx", requested, "SciPy does not expose special.erfcx in this environment.")
+    value = method(scipy_number(z))
+    return _fast_result("erfcx", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

@@ -26,7 +26,7 @@ Release-facing support matrices must keep these status phrases:
 | Surface | Required wording |
 | --- | --- |
 | Gamma family | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | alpha-certified, direct Arb error-function primitives |
+| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -53,7 +53,12 @@ Release-facing support matrices must keep these status phrases:
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.
-- Do not claim `erfi`, `erfinv`, `erfcinv`, or `erfcx` support until those
+- Say that `erfcx` is defined as `exp(z^2) erfc(z)`; direct Arb `erfcx` is
+  preferred when available, and any allowed `exp(z^2)*erfc(z)` fallback must be
+  visible in diagnostics.
+- Do not claim scaled-erfc stability for large arguments beyond what the
+  selected backend certifies.
+- Do not claim `erfi`, `erfinv`, `erfcinv`, or Faddeeva support until those
   wrappers, backends, tests, and audit docs exist.
 - Do not claim Taylor, asymptotic, or custom certification methods for the
   error-function family.

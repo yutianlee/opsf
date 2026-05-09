@@ -28,7 +28,7 @@ status matrix is:
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |
+| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -46,10 +46,12 @@ Certified results set:
 - `diagnostics["certificate_scope"]` to one of the scopes below
 - `diagnostics["certificate_level"]` to `direct_arb_primitive` for direct Arb
   primitive paths, `direct_arb_finite_product` for audited finite-product
-  paths, or `formula_audited_experimental` for formula-backed certificates
-  with open formula audit work
+  paths, `formula_audited_alpha` for a narrowly audited identity formula, or
+  `formula_audited_experimental` for formula-backed certificates with open
+  formula audit work
 - `diagnostics["audit_status"]` to `audited_direct` for direct Arb primitive
-  paths or `experimental_formula` for formula-backed paths with open audit work
+  paths, `formula_identity` for a narrowly audited identity formula, or
+  `experimental_formula` for formula-backed paths with open audit work
 - `diagnostics["certification_claim"]` to the precise claim wording for that
   audit status
 
@@ -138,41 +140,53 @@ Certificate scope:
 ## Error-Function Family
 
 Function:
-`erf(z)`, `erfc(z)`
+`erf(z)`, `erfc(z)`, `erfcx(z)`
 
 Certified domain:
 real or complex inputs accepted by Arb for the corresponding error-function
-primitive, with non-finite target values reported as clean failures.
+primitive or identity formula, with non-finite target values reported as clean
+failures.
 
 Backend primitive:
 `arb/acb.erf` and `arb/acb.erfc`. If a supported python-flint build exposes
 direct `erf` but not direct `erfc`, the certified `erfc` backend may evaluate
 the Arb expression `1 - erf(z)` and records `formula="1-erf"`.
+Certified `erfcx` prefers direct Arb `erfcx` if exposed by python-flint;
+otherwise it evaluates `exp(z^2) * erfc(z)` with Arb ball arithmetic and
+records `formula="exp(z^2)*erfc(z)"`.
 
 Returned enclosure:
 Arb midpoint string plus absolute radius.
 
 Branch convention:
-`erf` and `erfc` are entire functions. The wrappers follow Arb's complex
-primitive conventions.
+`erf`, `erfc`, and `erfcx` are entire functions. The wrappers follow Arb's
+complex primitive and elementary-function conventions.
 
 Formula transformations:
 none for `erf`; direct `erfc` is preferred. The only allowed certified `erfc`
 fallback is the explicit Arb expression `1 - erf(z)`.
+For `erfcx`, direct Arb `erfcx` is preferred when available. The allowed
+formula fallback is the explicit Arb expression `exp(z^2) * erfc(z)`.
 
 Known exclusions:
 non-finite Arb input or output enclosures and any domain where Arb does not
 return a finite enclosure. No asymptotic or custom certification path is
-included.
+included. The scaled wrapper does not claim large-argument stability beyond
+what the selected backend certifies.
 
 Validation tests:
 zero values, regular real and complex samples, `erf(-z) = -erf(z)`,
 `erfc(z) = 1 - erf(z)`, auto dispatch, MCP parity, external fixtures, and
 certified ball containment for `erf(z) + erfc(z) = 1` and
-`erf(-z) + erf(z) = 0`.
+`erf(-z) + erf(z) = 0`. `erfcx` tests cover zero, positive and negative real
+values, a complex sample, `erfcx(z) = exp(z^2) erfc(z)`, auto dispatch, MCP
+parity, external fixtures, and certified containment of
+`exp(z^2)*erfc(z) - erfcx(z) = 0`.
 
 Certificate scopes:
-`direct_arb_erf`, `direct_arb_erfc`.
+`direct_arb_erf`, `direct_arb_erfc`, and either `direct_arb_erfcx` or
+`arb_erfcx_formula` for `erfcx`, depending on the Arb primitive exposed by the
+installed backend.
 
 ## Airy Family
 

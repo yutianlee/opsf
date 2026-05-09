@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .functions.airy import ai, airy, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
-from .functions.error_function import erf, erfc
+from .functions.error_function import erf, erfc, erfcx
 from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -43,6 +43,10 @@ def special_erf(z: str, dps: int = 50, mode: str = "auto", certify: bool = False
 
 def special_erfc(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return erfc(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+
+
+def special_erfcx(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return erfcx(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
 
 
 def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -103,6 +107,7 @@ _MCP_TOOLS = (
     special_pochhammer,
     special_erf,
     special_erfc,
+    special_erfcx,
     special_airy,
     special_ai,
     special_bi,
