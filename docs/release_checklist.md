@@ -41,7 +41,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.5
+python scripts/check_release_version.py v0.2.0-alpha.6
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -66,12 +66,48 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.2.0-alpha.6` maps to `0.2.0a6`,
   `v0.2.0-alpha.5` maps to `0.2.0a5`,
   `v0.2.0-alpha.4` maps to `0.2.0a4`,
   `v0.2.0-alpha.3` maps to `0.2.0a3`,
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.2.0-alpha.6 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0a6`.
+- [ ] `CITATION.cff` version is `0.2.0-alpha.6`.
+- [ ] `CITATION.cff` date-released is `2026-05-09`.
+- [ ] `CHANGELOG.md` records `erfcx(z)` as the only public API expansion since
+  `0.2.0-alpha.5`.
+- [ ] `docs/release-0.2.0-alpha.6.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0-alpha.6`.
+- [ ] PyPI smoke workflow still targets `0.2.0a5` until `0.2.0a6` is
+  published.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes beyond the already-merged `erfcx(z)` are
+  included.
+- [ ] Release copy defines `erfcx(z)` as `exp(z^2) erfc(z)`.
+- [ ] Release copy says fast mode uses `scipy.special.erfcx(z)`.
+- [ ] Release copy says high-precision mode uses mpmath evaluation of
+  `exp(z*z) * erfc(z)`.
+- [ ] Release copy says certified mode prefers direct Arb `erfcx` when
+  available and otherwise uses the Arb formula `exp(z^2)*erfc(z)`.
+- [ ] Release copy does not imply custom Taylor/asymptotic certification.
+- [ ] Release copy does not imply `erfi`, `erfinv`, `erfcinv`, Faddeeva, or
+  other error-function wrappers are included.
+- [ ] No `erf` or `erfc` behavior change is included.
+- [ ] No gamma-family behavior change is included.
+- [ ] No parabolic-cylinder claim broadening is included.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] `python scripts/check_release_version.py v0.2.0-alpha.6` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.5 Checklist
 

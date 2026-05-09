@@ -266,6 +266,12 @@ c = erfc("1.0", mode="certified", dps=50)
 x = erfcx("1.0", mode="certified", dps=50)
 ```
 
+```python
+from certsf import erfcx
+
+r = erfcx("1.0", mode="certified", dps=50)
+```
+
 Certified `erf` and `erfc` use direct Arb error-function primitives for real or
 complex inputs when Arb returns finite enclosures. If a supported
 `python-flint` build lacks direct `erfc` but exposes direct `erf`, certified
@@ -379,6 +385,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.6.md` for v0.2.0-alpha.6 feature-alpha planning
+  notes.
 - `docs/release-0.2.0-alpha.5.md` for v0.2.0-alpha.5 feature-alpha planning
   notes.
 - `docs/release-0.2.0-alpha.4.md` for v0.2.0-alpha.4 feature-alpha planning

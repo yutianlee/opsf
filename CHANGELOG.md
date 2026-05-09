@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0-alpha.6 - 2026-05-09
+
+- Added the public `erfcx(z)` wrapper.
+- Defined `erfcx(z)` as `exp(z^2) erfc(z)`.
+- Fast mode uses `scipy.special.erfcx(z)`.
+- High-precision mode uses `mpmath` evaluation of `exp(z*z) * erfc(z)`.
+- Certified mode prefers direct Arb `erfcx` when available; otherwise it uses
+  the Arb formula `exp(z^2)*erfc(z)` with formula diagnostics.
+- No `erfi`, `erfinv`, `erfcinv`, or Faddeeva wrappers are added.
+- No `erf` or `erfc` behavior changes are included.
+- No gamma-family behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.5 - 2026-05-09
 
 - Added the public `erf(z)` and `erfc(z)` wrappers as the only public API
