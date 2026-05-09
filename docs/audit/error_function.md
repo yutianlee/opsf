@@ -1,19 +1,20 @@
 # Error-Function Certification Audit
 
 Function:
-`erf(z)`, `erfc(z)`, `erfcx(z)`.
+`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`.
 
 Public API:
-`erf`, `erfc`, and `erfcx` are exported from `certsf.__init__`, listed in
+`erf`, `erfc`, `erfcx`, and `erfi` are exported from `certsf.__init__`, listed in
 `certsf.__all__`, registered in the dispatcher with `fast`, `high_precision`,
 and `certified` modes, and exposed through thin MCP tools named `special_erf`,
-`special_erfc`, and `special_erfcx`. No `erfi`, `erfinv`, `erfcinv`, or
-Faddeeva wrapper is part of this audit scope.
+`special_erfc`, `special_erfcx`, and `special_erfi`. No `erfinv`, `erfcinv`,
+or Faddeeva wrapper is part of this audit scope.
 
 Target mathematical definition:
 `erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt`.
 `erfc(z) = 1 - erf(z)`.
 `erfcx(z) = exp(z^2) erfc(z)`.
+`erfi(z) = -i erf(i z)`.
 
 Backend primitive or formula:
 Direct Arb error-function primitives through python-flint: `arb/acb.erf` and
@@ -23,6 +24,9 @@ Direct Arb error-function primitives through python-flint: `arb/acb.erf` and
 For `erfcx`, the certified path prefers a direct Arb `erfcx` primitive when
 available. Otherwise it evaluates the audited Arb identity
 `exp(z^2) * erfc(z)` and records `formula="exp(z^2)*erfc(z)"`.
+For `erfi`, the certified path prefers a direct Arb `erfi` primitive when
+available. Otherwise it evaluates the audited Arb identity `-i*erf(i*z)` and
+records `formula="-i*erf(i*z)"`.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding error-function
@@ -38,11 +42,11 @@ certification of the selected expression.
 Branch convention:
 The error-function family entries here are entire. The certified wrappers
 follow Arb's complex elementary-function conventions for the direct primitives
-and the `exp(z^2)*erfc(z)` formula.
+and the `exp(z^2)*erfc(z)` and `-i*erf(i*z)` formulas.
 
 Singularities:
-No finite singularities for `erf`, `erfc`, or `erfcx`; failures are limited to
-unsupported or non-finite Arb enclosure cases.
+No finite singularities for `erf`, `erfc`, `erfcx`, or `erfi`; failures are
+limited to unsupported or non-finite Arb enclosure cases.
 
 Validation identities:
 Tests cover `erf(0) = 0`, `erfc(0) = 1`, regular real and complex samples,
@@ -50,6 +54,9 @@ Tests cover `erf(0) = 0`, `erfc(0) = 1`, regular real and complex samples,
 `erf(z) + erfc(z) = 1`. `erfcx` tests cover `erfcx(0) = 1`, positive and
 negative real samples, a complex sample, external-reference containment, and
 certified identity containment for `exp(z^2)*erfc(z) - erfcx(z) = 0`.
+`erfi` tests cover `erfi(0) = 0`, positive and negative real samples, a complex
+sample, external-reference containment, and certified identity containment for
+`erfi(z) + i*erf(i*z) = 0`.
 
 Reference equations:
 DLMF 7.2 for definitions and DLMF 7.4 for symmetry. Arb/python-flint error
@@ -75,6 +82,12 @@ available. The formula fallback uses `certificate_scope="arb_erfcx_formula"`,
 `certificate_level="formula_audited_alpha"`, `audit_status="formula_identity"`,
 `certification_claim="certified Arb enclosure of exp(z^2)*erfc(z)"`, and
 `formula="exp(z^2)*erfc(z)"`.
+Certified `erfi` results use `certificate_scope="direct_arb_erfi"` with
+`certificate_level="direct_arb_primitive"` if a direct Arb primitive is
+available. The formula fallback uses `certificate_scope="arb_erfi_formula"`,
+`certificate_level="formula_audited_alpha"`, `audit_status="formula_identity"`,
+`certification_claim="certified Arb enclosure of -i*erf(i*z)"`, and
+`formula="-i*erf(i*z)"`.
 
 Release hygiene:
 `pypi-smoke.yml` defaults to `0.2.0a6` after the published
@@ -84,6 +97,10 @@ certified Python API smoke calls, plus certified `special_erf`,
 PyPI publish workflows
 continue to use `actions/upload-artifact@v6` and
 `actions/download-artifact@v6`.
+
+The `erfi(z)` feature branch intentionally does not update `pypi-smoke.yml`;
+the smoke workflow remains pinned to `0.2.0a6` until a future release is
+published.
 
 Current audit finding:
 The MCP-certified smoke job must call the error-function MCP tools in

@@ -47,7 +47,9 @@ DIRECT_ARB_ERFC_CLAIM = (
 DIRECT_ARB_ERFCX_CLAIM = (
     "certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive"
 )
+DIRECT_ARB_ERFI_CLAIM = "certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive"
 ARB_ERFCX_FORMULA_CLAIM = "certified Arb enclosure of exp(z^2)*erfc(z)"
+ARB_ERFI_FORMULA_CLAIM = "certified Arb enclosure of -i*erf(i*z)"
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -141,22 +143,52 @@ def test_error_function_certified_results_expose_narrow_audited_claim(function, 
     assert result.diagnostics["certification_claim"] == claim
 
 
-def test_erfcx_certified_result_exposes_direct_or_formula_claim():
-    result = certsf.erfcx("1", dps=60, mode="certified")
+@pytest.mark.parametrize(
+    ("function", "direct_scope", "direct_claim", "formula_scope", "formula_claim", "formula"),
+    [
+        pytest.param(
+            certsf.erfcx,
+            "direct_arb_erfcx",
+            DIRECT_ARB_ERFCX_CLAIM,
+            "arb_erfcx_formula",
+            ARB_ERFCX_FORMULA_CLAIM,
+            "exp(z^2)*erfc(z)",
+            id="erfcx",
+        ),
+        pytest.param(
+            certsf.erfi,
+            "direct_arb_erfi",
+            DIRECT_ARB_ERFI_CLAIM,
+            "arb_erfi_formula",
+            ARB_ERFI_FORMULA_CLAIM,
+            "-i*erf(i*z)",
+            id="erfi",
+        ),
+    ],
+)
+def test_error_function_formula_wrappers_expose_direct_or_formula_claim(
+    function,
+    direct_scope,
+    direct_claim,
+    formula_scope,
+    formula_claim,
+    formula,
+):
+    result = function("1", dps=60, mode="certified")
     if _backend_is_unavailable(result):
         pytest.skip(result.diagnostics["error"])
 
     assert result.certified is True
-    assert result.diagnostics["certificate_scope"] in {"direct_arb_erfcx", "arb_erfcx_formula"}
-    if result.diagnostics["certificate_scope"] == "direct_arb_erfcx":
+    assert result.diagnostics["certificate_scope"] in {direct_scope, formula_scope}
+    if result.diagnostics["certificate_scope"] == direct_scope:
         assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
         assert result.diagnostics["audit_status"] == "audited_direct"
-        assert result.diagnostics["certification_claim"] == DIRECT_ARB_ERFCX_CLAIM
+        assert result.diagnostics["certification_claim"] == direct_claim
     else:
         assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
         assert result.diagnostics["audit_status"] == "formula_identity"
-        assert result.diagnostics["certification_claim"] == ARB_ERFCX_FORMULA_CLAIM
-        assert result.diagnostics["formula"] == "exp(z^2)*erfc(z)"
+        assert result.diagnostics["certification_claim"] == formula_claim
+        assert result.diagnostics["formula"] == formula
 
 
 @pytest.mark.parametrize(

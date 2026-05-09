@@ -1,6 +1,6 @@
 # Certification Audit
 
-Last reviewed: 2026-05-09.
+Last reviewed: 2026-05-10.
 
 This audit is the public map from a certified result to the evidence behind the
 claim. It covers every `certificate_scope` that the dispatcher can select in
@@ -64,6 +64,8 @@ certificate level or promote
 | `direct_arb_erfc` | `erfc` | `direct_arb_primitive` | Direct Arb `erfc` primitive, or explicit Arb `1-erf` fallback with `formula="1-erf"`; zero, complement identity, complex sample, and external-reference containment tests | Non-finite Arb enclosures; unrecorded cancellation-prone fallback formulas; custom asymptotic certification paths |
 | `direct_arb_erfcx` | `erfcx` | `direct_arb_primitive` | Direct Arb `erfcx` primitive when exposed by python-flint; runtime scope and diagnostics tests preserve the direct path | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `arb_erfcx_formula` | `erfcx` | `formula_audited_alpha` | Arb identity formula `exp(z^2)*erfc(z)` with `formula="exp(z^2)*erfc(z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; large-argument scaled-erfc stability claims beyond the backend-certified formula |
+| `direct_arb_erfi` | `erfi` | `direct_arb_primitive` | Direct Arb `erfi` primitive when exposed by python-flint; zero, oddness, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `arb_erfi_formula` | `erfi` | `formula_audited_alpha` | Arb identity formula `-i*erf(i*z)` with `formula="-i*erf(i*z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -110,6 +112,7 @@ The error-function scopes use narrow audited-direct wording:
 certified Arb enclosure of erf(z) using direct Arb error-function primitive
 certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive
 certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive
+certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive
 ```
 
 If certified `erfc` uses the allowed Arb fallback, diagnostics record
@@ -125,6 +128,14 @@ the claim:
 
 ```text
 certified Arb enclosure of exp(z^2)*erfc(z)
+```
+
+If certified `erfi` uses the Arb identity fallback, diagnostics record
+`formula="-i*erf(i*z)"`, use `audit_status="formula_identity"`, and use the
+claim:
+
+```text
+certified Arb enclosure of -i*erf(i*z)
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:

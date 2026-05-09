@@ -85,6 +85,15 @@ def mpmath_erfcx(z, *, dps: int = 50):
         return _mp_result("erfcx", _mp_string(value, requested), requested, working)
 
 
+def mpmath_erfi(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        zz = _mp_number(z)
+        method = getattr(mp, "erfi", None)
+        value = method(zz) if method is not None else -mp.j * mp.erf(mp.j * zz)
+        return _mp_result("erfi", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

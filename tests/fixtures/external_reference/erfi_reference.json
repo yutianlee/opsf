@@ -1,0 +1,34 @@
+[
+  {
+    "function": "erfi",
+    "parameters": ["0"],
+    "expected_value": "0.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "erfi(0)=0"
+  },
+  {
+    "function": "erfi",
+    "parameters": ["1"],
+    "expected_value": "1.6504257587975428760253377295613624438956798748740228776002579963161113049256459",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular positive-real imaginary error-function value"
+  },
+  {
+    "function": "erfi",
+    "parameters": ["-1"],
+    "expected_value": "-1.6504257587975428760253377295613624438956798748740228776002579963161113049256459",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular negative-real imaginary error-function value"
+  },
+  {
+    "function": "erfi",
+    "parameters": ["0.5+0.25j"],
+    "expected_value": "0.57128662239433419331313105634450952245977715094887949576224592792780426208541+0.35118665938138045452713964603416829251241528906974370858210345945027584441246j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex imaginary error-function value"
+  }
+]

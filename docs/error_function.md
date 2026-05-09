@@ -18,24 +18,34 @@ erfc(z) = 1 - erf(z)
 erfcx(z) = exp(z^2) erfc(z)
 ```
 
+`erfi(z)` returns an `SFResult` for the imaginary error function:
+
+```text
+erfi(z) = -i erf(i z)
+```
+
 The public signatures are:
 
 ```python
 erf(z, *, dps=50, mode="auto", certify=False)
 erfc(z, *, dps=50, mode="auto", certify=False)
 erfcx(z, *, dps=50, mode="auto", certify=False)
+erfi(z, *, dps=50, mode="auto", certify=False)
 ```
 
 ## Backend Policy
 
 - `mode="fast"` uses `scipy.special.erf(z)`, `scipy.special.erfc(z)`, or
-  `scipy.special.erfcx(z)`.
+  `scipy.special.erfcx(z)`. For `erfi`, it uses `scipy.special.erfi(z)` when
+  available and otherwise evaluates `-1j * scipy.special.erf(1j*z)`.
 - `mode="high_precision"` uses `mpmath.erf(z)`, `mpmath.erfc(z)`, or
-  `mpmath.exp(z*z) * mpmath.erfc(z)`.
+  `mpmath.exp(z*z) * mpmath.erfc(z)`. For `erfi`, it uses `mpmath.erfi(z)`
+  when available and otherwise evaluates `-i*mpmath.erf(i*z)`.
 - `mode="certified"` uses direct Arb `erf` and `erfc` primitives through
   `python-flint` where available. Certified `erfcx` prefers direct Arb `erfcx`
   when available; otherwise it evaluates the Arb ball formula
-  `exp(z^2)*erfc(z)`.
+  `exp(z^2)*erfc(z)`. Certified `erfi` prefers direct Arb `erfi` when
+  available; otherwise it evaluates the Arb ball formula `-i*erf(i*z)`.
 
 Certified `erfc` uses the direct Arb `erfc` primitive when available. If a
 supported `python-flint` build exposes direct `erf` but not direct `erfc`, the
@@ -47,6 +57,12 @@ primitive is exposed. The formula fallback uses
 `certificate_scope="arb_erfcx_formula"`,
 `certificate_level="formula_audited_alpha"`, `audit_status="formula_identity"`,
 and records `diagnostics["formula"] == "exp(z^2)*erfc(z)"`.
+
+Certified `erfi` uses `certificate_scope="direct_arb_erfi"` if a direct Arb
+primitive is exposed. The formula fallback uses
+`certificate_scope="arb_erfi_formula"`,
+`certificate_level="formula_audited_alpha"`, `audit_status="formula_identity"`,
+and records `diagnostics["formula"] == "-i*erf(i*z)"`.
 
 ## Certified Domain
 
@@ -61,8 +77,10 @@ wrappers. Certified successes use narrow scopes:
 - `erfc`: `certificate_scope="direct_arb_erfc"`
 - `erfcx`: `certificate_scope="direct_arb_erfcx"` or
   `certificate_scope="arb_erfcx_formula"`
+- `erfi`: `certificate_scope="direct_arb_erfi"` or
+  `certificate_scope="arb_erfi_formula"`
 
-The wrapper does not add other public error-function variants such as `erfi`,
+The wrapper does not add other public error-function variants such as
 `erfinv`, `erfcinv`, or Faddeeva functions. It does not claim large-argument
 scaled-erfc stability beyond the Arb or SciPy/mpmath backend behavior used for
 the selected mode.
