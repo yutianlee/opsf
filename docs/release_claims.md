@@ -39,6 +39,11 @@ Release-facing support matrices must keep these status phrases:
 - Say that `gamma_ratio` is certified through the narrow
   `Gamma(a) * rgamma(b)` Arb product, with denominator-pole zeros and
   numerator-pole clean failures.
+- Say that `loggamma_ratio` is certified through the narrow principal
+  `loggamma(a) - loggamma(b)` Arb difference, with clean failures for poles in
+  either argument.
+- Do not imply that complex `loggamma_ratio` is the principal logarithm of
+  `gamma_ratio` or that it certifies pole-limiting values.
 - Say that Bessel certified mode is restricted to real-valued order.
 - Say that parabolic-cylinder certificates are experimental formula-layer
   certificates until the formula, branch, and domain audit issues are closed.

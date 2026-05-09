@@ -30,6 +30,9 @@ DIRECT_ARB_CLAIM = "certified Arb enclosure of the documented direct Arb primiti
 DIRECT_ARB_GAMMA_RATIO_CLAIM = (
     "certified Arb enclosure of Gamma(a) * rgamma(b) using direct Arb gamma primitives"
 )
+DIRECT_ARB_LOGGAMMA_RATIO_CLAIM = (
+    "certified Arb enclosure of principal loggamma(a) - principal loggamma(b) using direct Arb gamma primitives"
+)
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -66,6 +69,18 @@ def test_gamma_ratio_certified_result_exposes_narrow_audited_claim():
     assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
     assert result.diagnostics["audit_status"] == "audited_direct"
     assert result.diagnostics["certification_claim"] == DIRECT_ARB_GAMMA_RATIO_CLAIM
+
+
+def test_loggamma_ratio_certified_result_exposes_narrow_audited_claim():
+    result = certsf.loggamma_ratio("3.2", "1.2", dps=60, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "direct_arb_loggamma_ratio"
+    assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+    assert result.diagnostics["audit_status"] == "audited_direct"
+    assert result.diagnostics["certification_claim"] == DIRECT_ARB_LOGGAMMA_RATIO_CLAIM
 
 
 @pytest.mark.parametrize(

@@ -132,12 +132,12 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.2.0 alpha line adds `gamma_ratio(a, b)` to the gamma family while keeping
+The 0.2.0 alpha line adds ratio-oriented gamma-family wrappers while keeping
 the release wording conservative and the parabolic-cylinder claims unchanged.
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -148,6 +148,7 @@ the release wording conservative and the parabolic-cylinder claims unchanged.
 from certsf import (
     gamma,
     loggamma,
+    loggamma_ratio,
     rgamma,
     gamma_ratio,
     airy,
@@ -171,6 +172,8 @@ from certsf import (
 - `loggamma(z)`, using the principal branch
 - `rgamma(z) = 1 / gamma(z)`
 - `gamma_ratio(a, b) = Gamma(a) / Gamma(b)`
+- `loggamma_ratio(a, b) = loggamma(a) - loggamma(b)`, using the principal
+  `loggamma` branch
 
 `rgamma` is the safest wrapper near non-positive integer gamma poles. In
 certified mode, `rgamma` returns a rigorous zero at poles, while `gamma` and
@@ -191,6 +194,22 @@ denominator poles certify to exact zero when `Gamma(a)` is finite, while
 numerator poles and simultaneous numerator/denominator poles return clean
 non-certified failures with pole diagnostics. See
 [`docs/gamma_ratio.md`](docs/gamma_ratio.md).
+
+```python
+from certsf import loggamma_ratio
+
+r = loggamma_ratio("3.2", "1.2", mode="certified", dps=50)
+print(r.value)
+print(r.certified)
+print(r.diagnostics)
+```
+
+Certified `loggamma_ratio(a, b)` evaluates Arb `lgamma(a) - lgamma(b)` with
+`certificate_scope="direct_arb_loggamma_ratio"`. Any gamma pole in either
+argument returns a clean non-certified failure. For complex values, the result
+is the difference of principal `loggamma` values, not necessarily the principal
+logarithm of `gamma_ratio(a, b)`. See
+[`docs/loggamma_ratio.md`](docs/loggamma_ratio.md).
 
 ### Airy Family
 
@@ -285,6 +304,8 @@ The repository also includes:
 - `docs/audit/` for family-level certification checklists.
 - `docs/gamma_ratio.md` for gamma-ratio pole policy and certified-backend
   rationale.
+- `docs/loggamma_ratio.md` for loggamma-ratio branch convention and pole
+  policy.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support

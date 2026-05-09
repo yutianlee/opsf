@@ -23,6 +23,13 @@ def mpmath_loggamma(z, *, dps: int = 50):
         return _mp_result("loggamma", _mp_string(value, requested), requested, working)
 
 
+def mpmath_loggamma_ratio(a, b, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.loggamma(_mp_number(a)) - mp.loggamma(_mp_number(b))
+        return _mp_result("loggamma_ratio", _mp_string(value, requested), requested, working)
+
+
 def mpmath_rgamma(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

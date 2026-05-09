@@ -1,16 +1,19 @@
 # Gamma Certification Audit
 
 Function:
-`gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`.
+`gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`,
+`loggamma_ratio(a, b)`.
 
 Target mathematical definition:
 Euler gamma function, principal logarithm of gamma, and reciprocal gamma
 function `1/gamma(z)`. `gamma_ratio(a, b)` is `Gamma(a) / Gamma(b)`.
+`loggamma_ratio(a, b)` is principal `loggamma(a) - loggamma(b)`.
 
 Backend primitive or formula:
 Direct Arb primitives through python-flint: `arb/acb.gamma`,
 `arb/acb.lgamma`, and `arb/acb.rgamma`. The certified `gamma_ratio` path uses
-the audited product `Gamma(a) * rgamma(b)`.
+the audited product `Gamma(a) * rgamma(b)`. The certified `loggamma_ratio` path
+uses the audited Arb `lgamma(a) - lgamma(b)` difference.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding primitive, when
@@ -18,20 +21,27 @@ the requested target value is finite. `rgamma` accepts non-positive integer
 gamma poles and returns the exact certified reciprocal-gamma zero reported by
 Arb. `gamma_ratio` accepts denominator poles as certified zeros when
 `Gamma(a)` is finite.
+`loggamma_ratio` accepts only arguments where both principal `loggamma` terms
+are finite.
 
 Excluded domain:
 `gamma` and `loggamma` at poles; `gamma_ratio` when `a` is a gamma pole,
 including simultaneous numerator/denominator poles; non-finite input values;
-any domain where Arb does not return a finite enclosure.
+`loggamma_ratio` when either argument is a gamma pole, including simultaneous
+pole cases; any domain where Arb does not return a finite enclosure.
 
 Branch convention:
-`loggamma` follows Arb's principal branch. Branch-side tests cover the negative
-real axis away from poles.
+`loggamma` follows Arb's principal branch. `loggamma_ratio` is the difference
+of principal `loggamma` values and is not necessarily the principal logarithm
+of `gamma_ratio` for complex inputs. Branch-side tests cover the negative real
+axis away from poles.
 
 Singularities:
 `gamma` and `loggamma` have poles at non-positive integers. `rgamma` has zeros
 at those points. `gamma_ratio(a, b)` has a certified zero when `b` is a pole and
 `Gamma(a)` is finite; numerator poles are reported as non-certified failures.
+`loggamma_ratio(a, b)` reports any pole in either argument as a non-certified
+failure.
 
 Validation identities:
 `gamma(z + 1) = z gamma(z)`, `rgamma(z) gamma(z) = 1` away from poles, and
@@ -39,6 +49,10 @@ Validation identities:
 `gamma_ratio(a+1,b) = a gamma_ratio(a,b)`,
 `gamma_ratio(a,b+1) = gamma_ratio(a,b) / b`, and
 `gamma_ratio(a,b) gamma_ratio(b,c) = gamma_ratio(a,c)`.
+Loggamma-ratio tests cover the additive recurrence identities
+`loggamma_ratio(a+1,b) - loggamma_ratio(a,b) = log(a)`,
+`loggamma_ratio(a,b+1) - loggamma_ratio(a,b) = -log(b)`, and
+`loggamma_ratio(a,b) + loggamma_ratio(b,c) = loggamma_ratio(a,c)`.
 
 Reference equations:
 DLMF 5.2 for gamma definitions, DLMF 5.4 for recurrence, and Arb gamma
@@ -48,10 +62,14 @@ Known numerical risks:
 Pole neighborhoods, branch-side evaluation for `loggamma`, and cancellation in
 identity residual checks near singularities. `gamma_ratio` uses `rgamma(b)` to
 avoid introducing non-finite denominator-pole divisions.
+`loggamma_ratio` follows principal branches, so complex values can differ from
+the principal logarithm of `gamma_ratio` by integer multiples of `2*pi*i`.
 
 Certification status:
 `certificate_level="direct_arb_primitive"`. Certified `gamma`, `loggamma`, and
 `rgamma` results enclose direct Arb primitive output for the documented target
 function and domain. Certified `gamma_ratio` results use
 `certificate_scope="direct_arb_gamma_ratio"` and enclose the audited Arb
-`Gamma(a) * rgamma(b)` product.
+`Gamma(a) * rgamma(b)` product. Certified `loggamma_ratio` results use
+`certificate_scope="direct_arb_loggamma_ratio"` and enclose the audited Arb
+principal `lgamma(a) - lgamma(b)` difference.

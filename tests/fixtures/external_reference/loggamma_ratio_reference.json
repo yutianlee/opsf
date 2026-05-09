@@ -1,0 +1,34 @@
+[
+  {
+    "function": "loggamma_ratio",
+    "parameters": ["5", "3"],
+    "expected_value": "2.484906649788000310229709479838878840798490826543259959976054352624281537157998398085342408806569464",
+    "source": "DLMF gamma recurrence",
+    "digits": 60,
+    "note": "integer loggamma ratio log(Gamma(5)) - log(Gamma(3)) = log(12)"
+  },
+  {
+    "function": "loggamma_ratio",
+    "parameters": ["0.5", "1"],
+    "expected_value": "0.5723649429247000870717136756765293558236474064576557857568115357360688849424130398918116351377448539",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "loggamma(1/2)-loggamma(1)=0.5*log(pi)"
+  },
+  {
+    "function": "loggamma_ratio",
+    "parameters": ["3.2", "1.2"],
+    "expected_value": "0.9707789171582247956729022698934562934934948375833864372486462693131035636862248662942660336264263462",
+    "source": "DLMF gamma recurrence",
+    "digits": 60,
+    "note": "real noninteger principal loggamma difference log(2.64)"
+  },
+  {
+    "function": "loggamma_ratio",
+    "parameters": ["2.5+0.25j", "1.5-0.5j"],
+    "expected_value": "0.50358178622965767602513905459883551398730444495016747002819275553581899845520768430137801402812214+0.2110706986466717053290532347743182371909459314789836262974706279787708898117355084137486202412673007j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex principal loggamma difference"
+  }
+]

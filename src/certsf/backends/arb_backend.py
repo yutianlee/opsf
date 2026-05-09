@@ -18,6 +18,11 @@ _DIRECT_ARB_GAMMA_RATIO_SCOPE = "direct_arb_gamma_ratio"
 _DIRECT_ARB_GAMMA_RATIO_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of Gamma(a) * rgamma(b) using direct Arb gamma primitives"
 )
+_DIRECT_ARB_LOGGAMMA_RATIO_SCOPE = "direct_arb_loggamma_ratio"
+_DIRECT_ARB_LOGGAMMA_RATIO_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of principal loggamma(a) - principal loggamma(b) "
+    "using direct Arb gamma primitives"
+)
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -39,6 +44,78 @@ def arb_loggamma(z, *, dps: int = 50):
         dps,
         lambda: _make_ball(z, force_complex=_is_real_nonpositive(z)).lgamma(),
     )
+
+
+def arb_loggamma_ratio(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    numerator_pole = _is_gamma_pole(a)
+    denominator_pole = _is_gamma_pole(b)
+    if numerator_pole or denominator_pole:
+        pole_case = (
+            "both_poles"
+            if numerator_pole and denominator_pole
+            else "numerator_pole"
+            if numerator_pole
+            else "denominator_pole"
+        )
+        if numerator_pole and denominator_pole:
+            message = "loggamma_ratio is undefined when both Gamma(a) and Gamma(b) have poles."
+        elif numerator_pole:
+            message = "loggamma_ratio has a non-finite loggamma(a) term because Gamma(a) has a pole."
+        else:
+            message = "loggamma_ratio has a non-finite loggamma(b) term because Gamma(b) has a pole."
+        return _unavailable(
+            "loggamma_ratio",
+            requested,
+            message,
+            diagnostics={
+                "pole_case": pole_case,
+                "numerator_pole": numerator_pole,
+                "denominator_pole": denominator_pole,
+                "certificate_scope": _DIRECT_ARB_LOGGAMMA_RATIO_SCOPE,
+            },
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable("loggamma_ratio", requested, str(exc))
+    try:
+        value = _make_ball(a, force_complex=_is_real_nonpositive(a)).lgamma() - _make_ball(
+            b,
+            force_complex=_is_real_nonpositive(b),
+        ).lgamma()
+        result = _certified_result("loggamma_ratio", value, requested, bits, flint)
+        if result.certified:
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update(
+                {
+                    "certificate_scope": _DIRECT_ARB_LOGGAMMA_RATIO_SCOPE,
+                    "certification_claim": _DIRECT_ARB_LOGGAMMA_RATIO_CERTIFICATION_CLAIM,
+                    "branch": "principal_loggamma_difference",
+                    "pole_case": "regular",
+                    "numerator_pole": False,
+                    "denominator_pole": False,
+                }
+            )
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method=result.method,
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        return result
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable("loggamma_ratio", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
 
 
 def arb_rgamma(z, *, dps: int = 50):

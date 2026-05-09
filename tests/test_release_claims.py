@@ -20,7 +20,7 @@ HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| Custom Taylor/asymptotic methods | not yet |",
 )
 CURRENT_RELEASE_STATUS_ROWS = (
-    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -45,7 +45,7 @@ HISTORICAL_0_1_0_SCOPE_ROWS = (
     "| Custom Taylor/asymptotic methods | none | not yet |",
 )
 CURRENT_0_2_0_SCOPE_ROWS = (
-    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -83,11 +83,24 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcomplete certified parabolic-cylinder support\b",
 )
 README_SUPPORT_MATRIX = {
-    "gamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
-    "loggamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
-    "rgamma": ("`gamma`, `loggamma`, `rgamma`, `gamma_ratio`", "alpha-certified, direct Arb gamma primitives"),
+    "gamma": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`",
+        "alpha-certified, direct Arb gamma primitives",
+    ),
+    "loggamma": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`",
+        "alpha-certified, direct Arb gamma primitives",
+    ),
+    "rgamma": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`",
+        "alpha-certified, direct Arb gamma primitives",
+    ),
     "gamma_ratio": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`",
+        "alpha-certified, direct Arb gamma primitives",
+    ),
+    "loggamma_ratio": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`",
         "alpha-certified, direct Arb gamma primitives",
     ),
     "airy": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),

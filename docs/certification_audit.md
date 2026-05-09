@@ -21,7 +21,8 @@ The two certificate levels mean:
   for the documented target function, and repo tests cover representative domain,
   branch, singularity, and result-contract behavior. The
   `direct_arb_gamma_ratio` scope is a narrow audited composition of Arb gamma
-  primitives rather than a broader formula-layer claim.
+  primitives, and `direct_arb_loggamma_ratio` is a narrow principal-branch Arb
+  `lgamma` difference, rather than a broader formula-layer claim.
 - `formula_audited_experimental`: Arb rigorously encloses the implemented
   formula, and repo tests cover the documented first-pass identities, branches,
   and domains, but the formula-backed family has not been promoted to a broad
@@ -46,6 +47,7 @@ below; it does not broaden any certificate level or promote
 | --- | --- | --- | --- | --- |
 | `direct_arb_primitive` | `gamma`, `loggamma`, `rgamma` | `direct_arb_primitive` | Direct Arb gamma primitives; pole and reciprocal tests; principal `loggamma` branch-side tests | Non-finite `gamma` and `loggamma` targets at poles |
 | `direct_arb_gamma_ratio` | `gamma_ratio` | `direct_arb_primitive` | Arb `gamma(a) * rgamma(b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; recurrence and composition identity checks | Non-finite `Gamma(a)` targets, including numerator poles and simultaneous numerator/denominator poles |
+| `direct_arb_loggamma_ratio` | `loggamma_ratio` | `direct_arb_primitive` | Arb `lgamma(a) - lgamma(b)` principal-branch difference; pole clean-failure tests; branch convention test; recurrence and composition identity checks | Gamma poles in either argument; simultaneous-pole limiting values; principal-log-of-ratio claims |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -65,6 +67,13 @@ The `direct_arb_gamma_ratio` scope uses the narrower audited-direct wording:
 
 ```text
 certified Arb enclosure of Gamma(a) * rgamma(b) using direct Arb gamma primitives
+```
+
+The `direct_arb_loggamma_ratio` scope also uses narrower audited-direct
+wording:
+
+```text
+certified Arb enclosure of principal loggamma(a) - principal loggamma(b) using direct Arb gamma primitives
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:
