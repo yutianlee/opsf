@@ -23,6 +23,7 @@ EXPECTED_PUBLIC_NAMES = (
     "erfcx",
     "erfi",
     "dawson",
+    "erfinv",
     "gamma",
     "gamma_ratio",
     "loggamma",
@@ -63,6 +64,7 @@ EXPECTED_MCP_TOOL_NAMES = (
     "special_erfcx",
     "special_erfi",
     "special_dawson",
+    "special_erfinv",
     "special_airy",
     "special_ai",
     "special_bi",
@@ -81,7 +83,7 @@ EXPECTED_MCP_TOOL_NAMES = (
 def test_review_public_imports_remain_clean():
     from certsf import besseli, besselj, besselk, bessely
     from certsf import SFResult as ImportedResult
-    from certsf import ai, airy, beta, bi, dawson, erf, erfc, erfcx, erfi
+    from certsf import ai, airy, beta, bi, dawson, erf, erfc, erfcx, erfi, erfinv
     from certsf import gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
     from certsf import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -97,6 +99,7 @@ def test_review_public_imports_remain_clean():
         erfc,
         erfcx,
         erfi,
+        erfinv,
         pochhammer,
         airy,
         ai,
@@ -138,6 +141,7 @@ def test_representative_public_calls_return_sfresult():
         (certsf.erfc, ("1",)),
         (certsf.erfcx, ("1",)),
         (certsf.erfi, ("1",)),
+        (certsf.erfinv, ("0.5",)),
         (certsf.rgamma, ("3.2",)),
         (certsf.airy, ("1.0",)),
         (certsf.ai, ("1.0",)),

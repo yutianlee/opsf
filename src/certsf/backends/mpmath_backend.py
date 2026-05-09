@@ -108,6 +108,15 @@ def mpmath_dawson(z, *, dps: int = 50):
         return _mp_result("dawson", _mp_string(value, requested), requested, working)
 
 
+def mpmath_erfinv(x, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        xx = _mp_number(x)
+        method = getattr(mp, "erfinv", None)
+        value = method(xx) if method is not None else _mp_erfinv_solve(xx)
+        return _mp_result("erfinv", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):
@@ -267,6 +276,22 @@ def _parse_complex_text(text: str) -> tuple[str, str]:
 
 def _mp_string(value, requested_dps: int) -> str:
     return str(mp.nstr(value, n=max(requested_dps + 8, 20), strip_zeros=False))
+
+
+def _mp_erfinv_solve(value):
+    if value == 0:
+        return mp.mpf("0")
+    if not (mp.im(value) == 0 and -1 < mp.re(value) < 1):
+        raise ValueError("high-precision erfinv fallback supports real x in (-1, 1)")
+
+    xx = mp.re(value)
+    sign = -1 if xx < 0 else 1
+    abs_x = abs(xx)
+    a = mp.mpf("0.147")
+    log_term = mp.log(1 - abs_x * abs_x)
+    first = 2 / (mp.pi * a) + log_term / 2
+    guess = sign * mp.sqrt(mp.sqrt(first * first - log_term / a) - first)
+    return mp.findroot(lambda y: mp.erf(y) - xx, guess)
 
 
 def _mp_result(

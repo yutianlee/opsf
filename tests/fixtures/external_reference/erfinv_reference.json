@@ -1,0 +1,42 @@
+[
+  {
+    "function": "erfinv",
+    "parameters": ["0"],
+    "expected_value": "0.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "erfinv(0)=0"
+  },
+  {
+    "function": "erfinv",
+    "parameters": ["0.5"],
+    "expected_value": "0.476936276204469873381418353643130559808969749059470644703882695919383447774646733488695916",
+    "source": "mpmath high precision erfinv",
+    "digits": 60,
+    "note": "regular positive real principal inverse value"
+  },
+  {
+    "function": "erfinv",
+    "parameters": ["-0.5"],
+    "expected_value": "-0.476936276204469873381418353643130559808969749059470644703882695919383447774646733488695916",
+    "source": "mpmath high precision erfinv",
+    "digits": 60,
+    "note": "regular negative real principal inverse value"
+  },
+  {
+    "function": "erfinv",
+    "parameters": ["0.9"],
+    "expected_value": "1.16308715367667408672625426056294759347793255000208165119272013611339235331523512956568701",
+    "source": "mpmath high precision erfinv",
+    "digits": 60,
+    "note": "near-endpoint positive real value inside certified domain"
+  },
+  {
+    "function": "erfinv",
+    "parameters": ["-0.9"],
+    "expected_value": "-1.16308715367667408672625426056294759347793255000208165119272013611339235331523512956568701",
+    "source": "mpmath high precision erfinv",
+    "digits": 60,
+    "note": "near-endpoint negative real value inside certified domain"
+  }
+]

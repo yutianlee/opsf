@@ -41,6 +41,9 @@ _DIRECT_ARB_ERFI_SCOPE = "direct_arb_erfi"
 _ARB_ERFI_FORMULA_SCOPE = "arb_erfi_formula"
 _DIRECT_ARB_DAWSON_SCOPE = "direct_arb_dawson"
 _ARB_DAWSON_FORMULA_SCOPE = "arb_dawson_formula"
+_DIRECT_ARB_ERFINV_SCOPE = "direct_arb_erfinv"
+_ARB_ERFINV_REAL_ROOT_SCOPE = "arb_erfinv_real_root"
+_ARB_ERFINV_REAL_DOMAIN = "real_x_in_open_interval_minus1_1"
 _DIRECT_ARB_ERF_CERTIFICATION_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error-function primitive"
 _DIRECT_ARB_ERFC_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
@@ -55,6 +58,14 @@ _DIRECT_ARB_ERFI_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive"
 )
 _DIRECT_ARB_DAWSON_CERTIFICATION_CLAIM = "certified Arb enclosure of dawson(z) using direct Arb Dawson primitive"
+_DIRECT_ARB_ERFINV_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of real principal erfinv(x) using direct Arb inverse error-function primitive"
+)
+_ARB_ERFINV_REAL_ROOT_CERTIFICATE_LEVEL = "certified_real_root"
+_ARB_ERFINV_REAL_ROOT_AUDIT_STATUS = "monotone_real_inverse"
+_ARB_ERFINV_REAL_ROOT_CERTIFICATION_CLAIM = (
+    "certified real root enclosure for erf(y)-x=0 using monotonicity of real erf"
+)
 _ARB_ERFCX_FORMULA = "exp(z^2)*erfc(z)"
 _ARB_ERFCX_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
 _ARB_ERFCX_FORMULA_AUDIT_STATUS = "formula_identity"
@@ -404,6 +415,61 @@ def arb_dawson(z, *, dps: int = 50):
             requested,
             f"{_PHASE1_UNAVAILABLE} {exc}",
             diagnostics={"certificate_scope": _ARB_DAWSON_FORMULA_SCOPE, "formula": _ARB_DAWSON_FORMULA},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def arb_erfinv(x, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    x_text, domain_error = _erfinv_real_input_text(x)
+    if domain_error is not None:
+        return _unavailable(
+            "erfinv",
+            requested,
+            domain_error,
+            diagnostics=_erfinv_domain_diagnostics(),
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(
+            "erfinv",
+            requested,
+            str(exc),
+            diagnostics=_erfinv_domain_diagnostics(),
+        )
+    try:
+        argument = flint.arb(x_text)
+        method = _direct_arb_erfinv_method(argument)
+        if method is not None:
+            result = _certified_result("erfinv", method(), requested, bits, flint)
+            return _with_erfinv_diagnostics(
+                result,
+                _DIRECT_ARB_ERFINV_SCOPE,
+                _DIRECT_ARB_CERTIFICATE_LEVEL,
+                _DIRECT_ARB_AUDIT_STATUS,
+                _DIRECT_ARB_ERFINV_CERTIFICATION_CLAIM,
+            )
+
+        value, iterations = _arb_erfinv_real_root(argument, requested, bits, flint)
+        result = _certified_result("erfinv", value, requested, bits, flint)
+        return _with_erfinv_diagnostics(
+            result,
+            _ARB_ERFINV_REAL_ROOT_SCOPE,
+            _ARB_ERFINV_REAL_ROOT_CERTIFICATE_LEVEL,
+            _ARB_ERFINV_REAL_ROOT_AUDIT_STATUS,
+            _ARB_ERFINV_REAL_ROOT_CERTIFICATION_CLAIM,
+            iterations=iterations,
+            formula="erf(y)-x=0",
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(
+            "erfinv",
+            requested,
+            f"{_PHASE1_UNAVAILABLE} {exc}",
+            diagnostics=_erfinv_domain_diagnostics(),
         )
     finally:
         flint.ctx.prec = old_prec
@@ -794,6 +860,144 @@ def _arb_erfi_value(argument, flint):
     if isinstance(argument, flint.arb):
         return value.real
     return value
+
+
+def _direct_arb_erfinv_method(argument):
+    return getattr(argument, "erfinv", None)
+
+
+def _erfinv_real_input_text(value: Any) -> tuple[str | None, str | None]:
+    if isinstance(value, complex):
+        return None, "certified erfinv supports real x only; complex inverse branches are not certified in this PR."
+    try:
+        if isinstance(value, str):
+            text = value.strip()
+            lowered = text.lower()
+            if "j" in lowered or lowered.endswith("i"):
+                return (
+                    None,
+                    "certified erfinv supports real x only; complex inverse branches are not certified in this PR.",
+                )
+            value = text
+        decimal = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None, "certified erfinv requires a finite real x with -1 < x < 1."
+
+    if not decimal.is_finite():
+        return None, "certified erfinv requires a finite real x with -1 < x < 1."
+    if decimal <= Decimal(-1) or decimal >= Decimal(1):
+        return None, "certified erfinv supports real x only with -1 < x < 1."
+    return format(decimal, "f"), None
+
+
+def _arb_erfinv_real_root(target, requested_dps: int, bits: int, flint):
+    if target == flint.arb(0):
+        return flint.arb(0), 0
+
+    left, right = _arb_erfinv_bracket(target, flint)
+    target_radius = flint.arb(f"1e-{requested_dps}")
+    max_iterations = max(bits + 64, 128)
+    for iterations in range(1, max_iterations + 1):
+        center = (left + right) / 2
+        radius = (right - left) / 2
+        if radius < target_radius:
+            return flint.arb(center, radius), iterations
+
+        residual = _arb_erfinv_residual(center, target)
+        if _arb_sign_negative(residual):
+            left = center
+        elif _arb_sign_positive(residual):
+            right = center
+        else:
+            raise ValueError("unable to certify erfinv bisection sign at current Arb precision")
+
+    raise ValueError("certified erfinv real-root refinement did not reach the requested precision")
+
+
+def _arb_erfinv_bracket(target, flint):
+    left = flint.arb(-1)
+    right = flint.arb(1)
+
+    expansions = 0
+    while not _arb_sign_negative(_arb_erfinv_residual(left, target)):
+        expansions += 1
+        if expansions > 128:
+            raise ValueError("unable to bracket the erfinv real root on the left")
+        left *= 2
+
+    expansions = 0
+    while not _arb_sign_positive(_arb_erfinv_residual(right, target)):
+        expansions += 1
+        if expansions > 128:
+            raise ValueError("unable to bracket the erfinv real root on the right")
+        right *= 2
+
+    return left, right
+
+
+def _arb_erfinv_residual(y, target):
+    return y.erf() - target
+
+
+def _arb_sign_negative(value) -> bool:
+    return bool(value < 0)
+
+
+def _arb_sign_positive(value) -> bool:
+    return bool(value > 0)
+
+
+def _erfinv_domain_diagnostics():
+    return {
+        "certificate_scope": _ARB_ERFINV_REAL_ROOT_SCOPE,
+        "domain": _ARB_ERFINV_REAL_DOMAIN,
+        "branch": "real_principal_inverse",
+    }
+
+
+def _with_erfinv_diagnostics(
+    result,
+    scope: str,
+    certificate_level: str,
+    audit_status: str,
+    claim: str,
+    *,
+    iterations: int | None = None,
+    formula: str | None = None,
+):
+    diagnostics = dict(result.diagnostics)
+    diagnostics.update(
+        {
+            "domain": _ARB_ERFINV_REAL_DOMAIN,
+            "branch": "real_principal_inverse",
+            "certificate_scope": scope,
+        }
+    )
+    if result.certified:
+        diagnostics.update(
+            {
+                "certificate_level": certificate_level,
+                "audit_status": audit_status,
+                "certification_claim": claim,
+            }
+        )
+    if iterations is not None:
+        diagnostics["iterations"] = iterations
+    if formula is not None:
+        diagnostics["formula"] = formula
+    return make_result(
+        function=result.function,
+        value=result.value,
+        abs_error_bound=result.abs_error_bound,
+        rel_error_bound=result.rel_error_bound,
+        certified=result.certified,
+        method=result.method,
+        backend=result.backend,
+        requested_dps=result.requested_dps,
+        working_dps=result.working_dps,
+        terms_used=result.terms_used,
+        diagnostics=diagnostics,
+    )
 
 
 def _with_error_function_diagnostics(
