@@ -34,6 +34,7 @@ Release publishing policy is recorded in
 - [ ] Package metadata passes `python -m twine check dist/*`.
 - [ ] Wheel installs in a clean virtual environment.
 - [ ] GitHub release is marked prerelease for alpha tags.
+- [ ] GitHub release is a normal release, not a prerelease, for final tags.
 - [ ] Decide whether TestPyPI staging is needed under
   [`release_policy.md`](release_policy.md).
 
@@ -46,7 +47,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.10
+python scripts/check_release_version.py v0.2.0
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -73,6 +74,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.2.0` maps to `0.2.0`,
   `v0.2.0-alpha.10` maps to `0.2.0a10`,
   `v0.2.0-alpha.9` maps to `0.2.0a9`,
   `v0.2.0-alpha.8` maps to `0.2.0a8`,
@@ -84,6 +86,50 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.2.0 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0`.
+- [ ] `CITATION.cff` version is `0.2.0`.
+- [ ] `CITATION.cff` date-released is `2026-05-09`.
+- [ ] `CHANGELOG.md` records the first non-prerelease 0.2 line release.
+- [ ] `docs/release-0.2.0.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0`.
+- [ ] PyPI smoke workflow still targets `0.2.0a10` until `0.2.0` is
+  published.
+- [ ] GitHub release for `v0.2.0` is a normal release, not a prerelease.
+- [ ] Stage to TestPyPI under `release_policy.md` because this is the first
+  non-prerelease release of the 0.2 line and publish workflow defaults changed.
+- [ ] Manually run `publish-testpypi` with `ref=v0.2.0` and
+  `confirm=publish-testpypi` before the real PyPI release.
+- [ ] Keep the TestPyPI confirm guard in `publish-testpypi.yml`.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes are included.
+- [ ] The same public API as `0.2.0-alpha.10` is retained.
+- [ ] Release copy includes `gamma_ratio`, `loggamma_ratio`, `beta`, and
+  `pochhammer`.
+- [ ] Release copy includes `erf`, `erfc`, `erfcx`, `erfi`, and `dawson`.
+- [ ] Release copy includes real-only `erfinv` on `-1 < x < 1`.
+- [ ] Release copy includes real-only `erfcinv` on `0 < x < 2`.
+- [ ] Release copy says no new public wrappers are added since
+  `0.2.0-alpha.10`.
+- [ ] Release copy says no mathematical implementation changes are included
+  since `0.2.0-alpha.10`.
+- [ ] Release copy does not broaden certification claims.
+- [ ] Direct Arb primitive families remain certified only on documented
+  finite-enclosure domains.
+- [ ] Formula-backed wrappers remain certified only for explicitly documented
+  formula enclosures.
+- [ ] No complex inverse error-function branches are certified.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] No custom Taylor/asymptotic certification methods are claimed.
+- [ ] `python scripts/check_release_version.py v0.2.0` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.10 Checklist
 
