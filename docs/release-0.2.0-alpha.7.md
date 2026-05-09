@@ -4,7 +4,7 @@
 release wording conservative while adding one public special-function wrapper
 since `0.2.0-alpha.6`: `erfi(z)`.
 
-This planning release is metadata and documentation only. It does not include
+The release-planning PR was metadata and documentation only. It did not include
 `src/` changes, backend formula changes, or public wrapper expansion beyond the
 already-merged `erfi(z)`.
 
@@ -71,5 +71,7 @@ python -m build
 python -m twine check dist/*
 ```
 
-The PyPI smoke workflow should continue to target `0.2.0a6` until
-`0.2.0a7` is published.
+Before publication, the PyPI smoke workflow continued to target `0.2.0a6`.
+After post-release verification, `pypi-smoke.yml` targets `0.2.0a7` for both
+manual and scheduled smoke runs. Post-release evidence is recorded in
+[`post_release_verification.md`](post_release_verification.md).

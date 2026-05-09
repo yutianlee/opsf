@@ -1,5 +1,7 @@
 # Error-Function Certification Audit
 
+Last reviewed: 2026-05-10.
+
 Function:
 `erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`.
 
@@ -97,8 +99,12 @@ and certified Python API smoke calls, plus certified `special_erf`,
 smoke job. The PyPI publish workflows continue to use
 `actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
-Current audit finding:
-The MCP-certified smoke job must call the error-function MCP tools in
-`mode="certified"` and assert certified payloads. This preserves coverage of
-the installed `certsf[mcp,certified]` path without changing wrapper behavior or
-certification scope.
+Current v0.2 audit result:
+No public API, dispatcher, backend formula, MCP, or certified-scope
+inconsistency was found for `erf`, `erfc`, `erfcx`, or `erfi`. This audit
+corrected stale pre-publication wording in
+[`../certified_scope_0_2_0.md`](../certified_scope_0_2_0.md) and
+[`../release-0.2.0-alpha.7.md`](../release-0.2.0-alpha.7.md), and strengthened
+tests that keep all four wrappers, MCP parity, release-smoke coverage, and
+formula diagnostics in lockstep. No source, backend formula, gamma-family, or
+parabolic-cylinder claim changes are part of this audit.

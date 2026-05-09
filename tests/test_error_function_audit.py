@@ -56,6 +56,7 @@ DOC_EXPECTATIONS = {
         "No Taylor, asymptotic, or custom certification method",
     ),
     "docs/audit/error_function.md": (
+        "Last reviewed: 2026-05-10.",
         "Direct Arb error-function primitives",
         "`1 - erf(z)` and records `formula=\"1-erf\"`",
         "`erfcx(z) = exp(z^2) erfc(z)`",
@@ -68,6 +69,8 @@ DOC_EXPECTATIONS = {
         "`pypi-smoke.yml` defaults to `0.2.0a7`",
         "certified `special_erf`",
         "`special_erfcx`, and `special_erfi` calls in the MCP-certified",
+        "Current v0.2 audit result:",
+        "No public API, dispatcher, backend formula, MCP, or certified-scope",
     ),
     "docs/certification_audit.md": (
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
@@ -83,7 +86,7 @@ DOC_EXPECTATIONS = {
         "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`",
         "`erf(z)` and `erfc(z)` are the v0.2.0-alpha.5",
         "`erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.",
-        "`erfi(z)` is the future v0.2.0-alpha.7 feature-branch API expansion.",
+        "`erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
         "otherwise certified `erfi` may use `-i*erf(i*z)`",
@@ -99,6 +102,12 @@ DOC_EXPECTATIONS = {
         "fallback must be visible in diagnostics",
         "Do not claim `erfinv`, `erfcinv`, Faddeeva",
         "Do not describe the parabolic-cylinder family as certified without the",
+    ),
+    "docs/release-0.2.0-alpha.7.md": (
+        "The release-planning PR was metadata and documentation only.",
+        "Before publication, the PyPI smoke workflow continued to target `0.2.0a6`.",
+        "After post-release verification, `pypi-smoke.yml` targets `0.2.0a7`",
+        "[`post_release_verification.md`](post_release_verification.md)",
     ),
 }
 
@@ -133,6 +142,28 @@ def test_error_function_mcp_tools_match_python_api(name):
         dps=50,
         mode="high_precision",
     ).to_mcp_dict()
+
+
+@pytest.mark.parametrize("name", ERROR_FUNCTIONS)
+@pytest.mark.parametrize("mode", ("fast", "high_precision", "certified", "auto"))
+def test_error_function_public_wrappers_return_sfresult_in_every_mode(name, mode):
+    result = getattr(certsf, name)("1", dps=40, mode=mode)
+
+    assert isinstance(result, certsf.SFResult)
+    assert result.function == name
+
+
+@pytest.mark.parametrize("name", ERROR_FUNCTIONS)
+@pytest.mark.parametrize("mode", ("fast", "high_precision", "certified"))
+def test_error_function_mcp_tools_match_python_api_in_every_concrete_mode(name, mode):
+    args = SAMPLE_ARGS[name]
+    wrapper = getattr(certsf, name)
+    tool = getattr(mcp_server, f"special_{name}")
+    result = wrapper(*args, dps=50, mode=mode)
+    if mode == "certified" and _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert tool(*args, dps=50, mode=mode) == result.to_mcp_dict()
 
 
 @pytest.mark.parametrize("name", ERROR_FUNCTIONS)
@@ -317,6 +348,14 @@ def test_publish_workflow_artifact_actions_remain_on_v6():
         assert "actions/download-artifact@v6" in text
         assert "actions/upload-artifact@v5" not in text
         assert "actions/download-artifact@v5" not in text
+
+
+def test_error_function_release_docs_do_not_keep_pre_publication_alpha7_wording():
+    current_scope = _read("docs/certified_scope_0_2_0.md")
+    alpha7_release = _read("docs/release-0.2.0-alpha.7.md")
+
+    assert "future v0.2.0-alpha.7" not in current_scope
+    assert "should continue to target `0.2.0a6` until" not in alpha7_release
 
 
 def _read(path: str) -> str:
