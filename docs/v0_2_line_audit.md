@@ -66,6 +66,12 @@ The README gamma-family section, dedicated docs for `gamma_ratio`,
 current 0.2 scope document, and release-claim guardrails all describe the same
 seven-wrapper surface and the same narrow certified expressions.
 
+External-reference fixtures cover every gamma-family wrapper through
+`gamma_reference.json`, `gamma_ratio_reference.json`,
+`loggamma_ratio_reference.json`, `beta_reference.json`, and
+`pochhammer_reference.json`. These fixtures supplement the recurrence,
+identity, and pole-policy tests; they do not broaden any certified claim.
+
 Parabolic-cylinder wrappers remain `experimental_formula`; this audit does not
 broaden those claims.
 
