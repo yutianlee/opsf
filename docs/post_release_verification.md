@@ -1,5 +1,109 @@
 # Post-release verification
 
+## v0.2.0-alpha.7 / certsf 0.2.0a7
+
+This records the verification evidence for the seventh 0.2.0 alpha PyPI
+prerelease artifact.
+
+### Published artifact
+
+- Git tag: `v0.2.0-alpha.7`
+- GitHub prerelease: <https://github.com/yutianlee/certsf/releases/tag/v0.2.0-alpha.7>
+- PyPI URL: <https://pypi.org/project/certsf/0.2.0a7/>
+- PyPI version: `certsf 0.2.0a7`
+- Publish workflow run: `25608607009`
+- Publish workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25608607009>
+- Publish trigger: GitHub `release` event for `v0.2.0-alpha.7`
+- Source commit: `7e0bc59dbe9d81f2680de4f4ea8ee042f97987ff`
+- Wheel SHA256:
+  `818477ceaf1ebabe80aa9be60f8daa3e41c326858cc4035a5681e4bd21b454b3`
+- sdist SHA256:
+  `63f2796ecae870ac3bdd2f4e735039b6a0eea93a0ba190b32763b137a8f7093e`
+
+The publish workflow build job passed checkout, Python 3.12 setup, tag/version
+parity check, build-tool installation, sdist/wheel build, `twine check`, and
+distribution artifact upload. The first publish job attempt was rejected by the
+`pypi` environment deployment policy because tag deployments were not yet
+covered by the environment's custom deployment policy. After adding the missing
+`v*` tag deployment policy, rerunning the failed job in the same workflow run
+published the distributions through trusted publishing.
+
+### PyPI confirmation
+
+The PyPI JSON endpoint for `certsf 0.2.0a7` returned the published version and
+the two uploaded files listed above. PyPI release metadata is tied to uploaded
+file data, so these hashes are the durable evidence for this public prerelease
+artifact.
+
+### Fresh install smoke test
+
+Final manual `pypi-smoke` run: `25608711789`
+
+Workflow URL:
+<https://github.com/yutianlee/certsf/actions/runs/25608711789>
+
+Install targets:
+
+```bash
+python -m pip install --pre "certsf==0.2.0a7"
+python -m pip install --pre "certsf[certified]==0.2.0a7"
+python -m pip install --pre "certsf[mcp,certified]==0.2.0a7"
+```
+
+Verified from fresh GitHub Actions environments:
+
+- Base installs passed on Python 3.10, 3.11, and 3.12.
+- Certified installs passed on Python 3.10, 3.11, and 3.12.
+- MCP certified installs passed on Python 3.10, 3.11, and 3.12.
+- Imports came from environment `site-packages`, not the checkout.
+- Smoke calls passed for `gamma`, `loggamma`, `rgamma`, `gamma_ratio`,
+  `loggamma_ratio`, `beta`, `pochhammer`, `erf`, `erfc`, `erfcx`, `erfi`,
+  `ai`, `besselj`, and `pcfu`.
+- Certified smoke calls passed for `gamma`, `loggamma`, `rgamma`,
+  `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`, `erf`, `erfc`,
+  `erfcx`, `erfi`, `ai`, `besselj`, and `pcfu`.
+- MCP server import and `special_gamma` / `special_loggamma` /
+  `special_rgamma` / `special_gamma_ratio` / `special_loggamma_ratio` /
+  `special_beta` / `special_pochhammer` / `special_erf` / `special_erfc` /
+  `special_erfcx` / `special_erfi` smoke calls passed.
+
+Two earlier manual smoke runs captured PyPI edge-cache propagation lag:
+
+- Run `25608650711` started immediately after publish. Most matrix jobs
+  installed successfully, but the Python 3.11 base install job saw only
+  versions through `0.2.0a6`.
+- Run `25608670104` followed shortly after. Most matrix jobs passed, but the
+  Python 3.12 MCP-certified, Python 3.11 base, and Python 3.10 certified
+  install jobs still saw only versions through `0.2.0a6`.
+
+The final run above passed every matrix job after the PyPI edge cache caught up.
+
+After the successful smoke run, this follow-up PR updates the scheduled/manual
+`pypi-smoke` workflow default and fallback version from `0.2.0a6` to
+`0.2.0a7`. It also adds `erfi` calls to the base and certified smoke paths and
+adds `special_erfi` to the MCP-certified smoke path while preserving the
+existing gamma-family, `erf`, `erfc`, `erfcx`, Airy, Bessel, and
+parabolic-cylinder smoke coverage.
+
+### Validation summary
+
+- `v0.2.0-alpha.7` tag points at clean `main` commit
+  `7e0bc59dbe9d81f2680de4f4ea8ee042f97987ff`.
+- GitHub prerelease `v0.2.0-alpha.7` is marked prerelease.
+- `publish-pypi` run `25608607009` completed successfully after rerunning the
+  publish job with the corrected `pypi` environment tag deployment policy.
+- PyPI confirms `certsf 0.2.0a7` is available at the release URL above.
+- PyPI file hashes match the wheel and sdist hashes recorded above.
+- Initial `pypi-smoke` runs `25608650711` and `25608670104` had PyPI
+  edge-cache propagation failures only; the failed install logs did not yet
+  list `0.2.0a7`.
+- Final `pypi-smoke` run `25608711789` completed successfully across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- No `src/`, mathematical implementation, backend formula, public-wrapper,
+  gamma-family behavior, parabolic-cylinder claim, or certification-scope
+  changes were made during publication or verification.
+
 ## v0.2.0-alpha.6 / certsf 0.2.0a6
 
 This records the verification evidence for the sixth 0.2.0 alpha PyPI

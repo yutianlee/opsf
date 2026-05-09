@@ -3,7 +3,7 @@
 Last reviewed: 2026-05-09.
 
 This audit records the v0.2 alpha gamma-family surface and release hygiene
-checks after `v0.2.0-alpha.6`.
+checks after `v0.2.0-alpha.7`.
 
 ## Public API
 
@@ -80,7 +80,7 @@ broaden those claims.
 - `publish-pypi.yml` uses `actions/upload-artifact@v6`.
 - `publish-testpypi.yml` uses `actions/upload-artifact@v6`.
 - Both publish workflows keep `actions/download-artifact@v6`.
-- `pypi-smoke.yml` defaults to `0.2.0a6`.
+- `pypi-smoke.yml` defaults to `0.2.0a7`.
 - `pypi-smoke.yml` now covers all seven gamma-family wrappers in Python API
   smoke calls and all seven corresponding MCP tools in MCP smoke calls.
 - `pypi-smoke.yml` now covers `erf`, `erfc`, `special_erf`, and
@@ -88,6 +88,9 @@ broaden those claims.
 - `pypi-smoke.yml` now covers `erfcx` and covers `special_erf`,
   `special_erfc`, and `special_erfcx` in certified MCP smoke calls after the
   `v0.2.0-alpha.6` publication.
+- `pypi-smoke.yml` now covers `erfi` in base and certified smoke calls and
+  covers `special_erfi` in certified MCP smoke calls after the
+  `v0.2.0-alpha.7` publication.
 
 ## Audit Findings
 
