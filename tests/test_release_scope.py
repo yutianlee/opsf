@@ -30,6 +30,7 @@ CURRENT_0_2_0_FUNCTIONS = (
     "rgamma",
     "gamma_ratio",
     "loggamma_ratio",
+    "beta",
     "airy",
     "ai",
     "bi",
@@ -57,7 +58,7 @@ FROZEN_0_1_0_STATUS_ROWS = (
 )
 
 CURRENT_0_2_0_STATUS_ROWS = (
-    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -84,7 +85,7 @@ FROZEN_0_1_0_SCOPE_ROWS = (
 )
 
 CURRENT_0_2_0_SCOPE_ROWS = (
-    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |",
+    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "

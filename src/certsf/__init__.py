@@ -2,7 +2,7 @@
 
 from .functions.airy import ai, airyai, airy, airybi, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
-from .functions.gamma import gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
+from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 from .result import SFResult
 
@@ -17,6 +17,7 @@ __all__ = [
     "besselj",
     "besselk",
     "bessely",
+    "beta",
     "gamma",
     "gamma_ratio",
     "loggamma",

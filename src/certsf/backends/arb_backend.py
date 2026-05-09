@@ -23,6 +23,10 @@ _DIRECT_ARB_LOGGAMMA_RATIO_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of principal loggamma(a) - principal loggamma(b) "
     "using direct Arb gamma primitives"
 )
+_DIRECT_ARB_BETA_SCOPE = "direct_arb_beta"
+_DIRECT_ARB_BETA_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of Gamma(a) * Gamma(b) * rgamma(a+b) using direct Arb gamma primitives"
+)
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -185,6 +189,85 @@ def arb_gamma_ratio(a, b, *, dps: int = 50):
         return result
     except Exception as exc:  # pragma: no cover - depends on optional backend domains
         return _unavailable("gamma_ratio", requested, f"{_PHASE1_UNAVAILABLE} {exc}")
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def arb_beta(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    a_pole = _is_gamma_pole(a)
+    b_pole = _is_gamma_pole(b)
+    sum_pole = _is_gamma_sum_pole(a, b)
+    pole_diagnostics = {
+        "a_pole": a_pole,
+        "b_pole": b_pole,
+        "sum_pole": sum_pole,
+        "certificate_scope": _DIRECT_ARB_BETA_SCOPE,
+    }
+    if a_pole or b_pole:
+        pole_case = _beta_failure_pole_case(a_pole, b_pole, sum_pole)
+        return _unavailable(
+            "beta",
+            requested,
+            "beta is undefined for certification when Gamma(a) or Gamma(b) has a pole; "
+            "simultaneous singularities are not certified.",
+            diagnostics={"pole_case": pole_case, **pole_diagnostics},
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable("beta", requested, str(exc), diagnostics={"pole_case": "unavailable", **pole_diagnostics})
+    try:
+        aa = _make_ball(a)
+        bb = _make_ball(b)
+        value = aa.gamma() * bb.gamma() * (aa + bb).rgamma()
+        result = _certified_result("beta", value, requested, bits, flint)
+        if result.certified:
+            diagnostics = dict(result.diagnostics)
+            diagnostics.update(
+                {
+                    "certificate_scope": _DIRECT_ARB_BETA_SCOPE,
+                    "certification_claim": _DIRECT_ARB_BETA_CERTIFICATION_CLAIM,
+                    "pole_case": "sum_pole_zero" if sum_pole else "regular",
+                    **pole_diagnostics,
+                }
+            )
+            return make_result(
+                function=result.function,
+                value=result.value,
+                abs_error_bound=result.abs_error_bound,
+                rel_error_bound=result.rel_error_bound,
+                certified=True,
+                method=result.method,
+                backend=result.backend,
+                requested_dps=result.requested_dps,
+                working_dps=result.working_dps,
+                terms_used=result.terms_used,
+                diagnostics=diagnostics,
+            )
+        diagnostics = dict(result.diagnostics)
+        diagnostics.update(
+            {
+                "pole_case": "sum_pole_zero" if sum_pole else "regular",
+                **pole_diagnostics,
+            }
+        )
+        return make_result(
+            function=result.function,
+            value=result.value,
+            abs_error_bound=result.abs_error_bound,
+            rel_error_bound=result.rel_error_bound,
+            certified=False,
+            method=result.method,
+            backend=result.backend,
+            requested_dps=result.requested_dps,
+            working_dps=result.working_dps,
+            terms_used=result.terms_used,
+            diagnostics=diagnostics,
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable("beta", requested, f"{_PHASE1_UNAVAILABLE} {exc}", diagnostics=pole_diagnostics)
     finally:
         flint.ctx.prec = old_prec
 
@@ -686,6 +769,26 @@ def _is_gamma_pole(value: Any) -> bool:
         return False
     decimal = Decimal(real_text)
     return decimal <= 0 and decimal == decimal.to_integral_value()
+
+
+def _is_gamma_sum_pole(a: Any, b: Any) -> bool:
+    a_text = _real_order_text(a)
+    b_text = _real_order_text(b)
+    if a_text is None or b_text is None:
+        return False
+    total = Decimal(a_text) + Decimal(b_text)
+    return total <= 0 and total == total.to_integral_value()
+
+
+def _beta_failure_pole_case(a_pole: bool, b_pole: bool, sum_pole: bool) -> str:
+    pole_names = []
+    if a_pole:
+        pole_names.append("a")
+    if b_pole:
+        pole_names.append("b")
+    if sum_pole:
+        pole_names.append("sum")
+    return "_".join(pole_names) + "_poles" if len(pole_names) > 1 else pole_names[0] + "_pole"
 
 
 def _real_order_text(value: Any) -> str | None:

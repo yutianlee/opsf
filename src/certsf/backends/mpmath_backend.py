@@ -30,6 +30,18 @@ def mpmath_loggamma_ratio(a, b, *, dps: int = 50):
         return _mp_result("loggamma_ratio", _mp_string(value, requested), requested, working)
 
 
+def mpmath_beta(a, b, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        aa = _mp_number(a)
+        bb = _mp_number(b)
+        if hasattr(mp, "beta"):
+            value = mp.beta(aa, bb)
+        else:
+            value = mp.exp(mp.loggamma(aa) + mp.loggamma(bb) - mp.loggamma(aa + bb))
+        return _mp_result("beta", _mp_string(value, requested), requested, working)
+
+
 def mpmath_rgamma(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

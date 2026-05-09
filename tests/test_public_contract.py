@@ -17,6 +17,7 @@ EXPECTED_PUBLIC_NAMES = (
     "besselj",
     "besselk",
     "bessely",
+    "beta",
     "gamma",
     "gamma_ratio",
     "loggamma",
@@ -49,6 +50,7 @@ EXPECTED_MCP_TOOL_NAMES = (
     "special_rgamma",
     "special_gamma_ratio",
     "special_loggamma_ratio",
+    "special_beta",
     "special_airy",
     "special_ai",
     "special_bi",
@@ -66,7 +68,7 @@ EXPECTED_MCP_TOOL_NAMES = (
 
 def test_review_public_imports_remain_clean():
     from certsf import SFResult as ImportedResult
-    from certsf import ai, airy, bi, gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
+    from certsf import ai, airy, beta, bi, gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
     from certsf import besseli, besselj, besselk, bessely
     from certsf import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -76,6 +78,7 @@ def test_review_public_imports_remain_clean():
         loggamma,
         loggamma_ratio,
         rgamma,
+        beta,
         airy,
         ai,
         bi,
@@ -105,6 +108,7 @@ def test_sfresult_fields_are_stable():
 
 def test_representative_public_calls_return_sfresult():
     cases = [
+        (certsf.beta, ("2", "3")),
         (certsf.gamma, ("3.2",)),
         (certsf.gamma_ratio, ("3.2", "1.2")),
         (certsf.loggamma, ("3.2",)),

@@ -3,6 +3,7 @@ import json
 
 import pytest
 
+from certsf import beta
 from certsf import mcp_server
 
 
@@ -37,6 +38,18 @@ def test_special_loggamma_ratio_returns_json_object_payload():
     assert isinstance(payload, dict)
     assert json.loads(json.dumps(payload)) == payload
     assert payload["function"] == "loggamma_ratio"
+    assert payload["certified"] is False
+    assert payload["backend"] == "mpmath"
+    assert isinstance(payload["diagnostics"], dict)
+
+
+def test_special_beta_returns_json_object_payload():
+    payload = mcp_server.special_beta("3.2", "1.2", dps=50, mode="high_precision")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload == beta("3.2", "1.2", dps=50, mode="high_precision").to_mcp_dict()
+    assert payload["function"] == "beta"
     assert payload["certified"] is False
     assert payload["backend"] == "mpmath"
     assert isinstance(payload["diagnostics"], dict)

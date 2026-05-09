@@ -1,6 +1,6 @@
 # Certification Audit
 
-Last reviewed: 2026-05-08.
+Last reviewed: 2026-05-09.
 
 This audit is the public map from a certified result to the evidence behind the
 claim. It covers every `certificate_scope` that the dispatcher can select in
@@ -20,9 +20,10 @@ The two certificate levels mean:
 - `direct_arb_primitive`: the wrapper calls an Arb special-function primitive
   for the documented target function, and repo tests cover representative domain,
   branch, singularity, and result-contract behavior. The
-  `direct_arb_gamma_ratio` scope is a narrow audited composition of Arb gamma
-  primitives, and `direct_arb_loggamma_ratio` is a narrow principal-branch Arb
-  `lgamma` difference, rather than a broader formula-layer claim.
+  `direct_arb_gamma_ratio` and `direct_arb_beta` scopes are narrow audited
+  compositions of Arb gamma primitives, and `direct_arb_loggamma_ratio` is a
+  narrow principal-branch Arb `lgamma` difference, rather than a broader
+  formula-layer claim.
 - `formula_audited_experimental`: Arb rigorously encloses the implemented
   formula, and repo tests cover the documented first-pass identities, branches,
   and domains, but the formula-backed family has not been promoted to a broad
@@ -48,6 +49,7 @@ below; it does not broaden any certificate level or promote
 | `direct_arb_primitive` | `gamma`, `loggamma`, `rgamma` | `direct_arb_primitive` | Direct Arb gamma primitives; pole and reciprocal tests; principal `loggamma` branch-side tests | Non-finite `gamma` and `loggamma` targets at poles |
 | `direct_arb_gamma_ratio` | `gamma_ratio` | `direct_arb_primitive` | Arb `gamma(a) * rgamma(b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; recurrence and composition identity checks | Non-finite `Gamma(a)` targets, including numerator poles and simultaneous numerator/denominator poles |
 | `direct_arb_loggamma_ratio` | `loggamma_ratio` | `direct_arb_primitive` | Arb `lgamma(a) - lgamma(b)` principal-branch difference; pole clean-failure tests; branch convention test; recurrence and composition identity checks | Gamma poles in either argument; simultaneous-pole limiting values; principal-log-of-ratio claims |
+| `direct_arb_beta` | `beta` | `direct_arb_primitive` | Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; symmetry and recurrence identity checks | Non-finite `Gamma(a)` or `Gamma(b)` targets; simultaneous pole interactions and limiting-value claims |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -76,16 +78,21 @@ wording:
 certified Arb enclosure of principal loggamma(a) - principal loggamma(b) using direct Arb gamma primitives
 ```
 
+The `direct_arb_beta` scope uses narrower audited-direct wording:
+
+```text
+certified Arb enclosure of Gamma(a) * Gamma(b) * rgamma(a+b) using direct Arb gamma primitives
+```
+
 For `experimental_formula` scopes, runtime diagnostics use:
 
 ```text
 certified Arb enclosure of the implemented documented formula; formula audit in progress
 ```
 
-The second wording is deliberately narrower. It allows callers to rely on Arb's
-enclosure of the computed expression while preserving the fact that
-formula-backed scopes require an explicit promotion review before any broader
-non-experimental claim.
+The narrow audited-direct wordings are deliberately specific about the Arb
+expression being enclosed. Formula-backed scopes still require an explicit
+promotion review before any broader non-experimental claim.
 
 ## Audit Gates
 
