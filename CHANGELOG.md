@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0-alpha.5 - 2026-05-09
+
+- Added the public `erf(z)` and `erfc(z)` wrappers as the only public API
+  expansions since `0.2.0-alpha.4`.
+- Added SciPy, mpmath, and Arb backends for `erf` and `erfc`.
+- Certified `erf` uses the direct Arb `erf` primitive in the
+  `direct_arb_erf` scope.
+- Certified `erfc` uses the direct Arb `erfc` primitive when available in the
+  `direct_arb_erfc` scope, with the documented Arb fallback `1 - erf(z)` only
+  if direct `erfc` is unavailable.
+- Added the MCP tools `special_erf` and `special_erfc`.
+- Added external fixtures and certified identity tests for error-function
+  behavior.
+- No gamma-family behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.4 - 2026-05-09
 
 - Added the public `pochhammer(a, n)` wrapper as the only public API expansion
