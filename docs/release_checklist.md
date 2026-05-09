@@ -41,7 +41,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.4
+python scripts/check_release_version.py v0.2.0-alpha.5
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -66,10 +66,46 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
-  `v0.2.0-alpha.4` maps to `0.2.0a4`, `v0.2.0-alpha.3` maps to
-  `0.2.0a3`, `v0.2.0-alpha.2` maps to `0.2.0a2`,
+  `v0.2.0-alpha.5` maps to `0.2.0a5`,
+  `v0.2.0-alpha.4` maps to `0.2.0a4`,
+  `v0.2.0-alpha.3` maps to `0.2.0a3`,
+  `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.2.0-alpha.5 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0a5`.
+- [ ] `CITATION.cff` version is `0.2.0-alpha.5`.
+- [ ] `CITATION.cff` date-released is `2026-05-09`.
+- [ ] `CHANGELOG.md` records `erf(z)` and `erfc(z)` as the only public API
+  expansions since `0.2.0-alpha.4`.
+- [ ] `docs/release-0.2.0-alpha.5.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0-alpha.5`.
+- [ ] PyPI smoke workflow still targets `0.2.0a4` until `0.2.0a5` is
+  published.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes beyond the already-merged `erf(z)` and
+  `erfc(z)` are included.
+- [ ] `erf` certified scope remains `direct_arb_erf`.
+- [ ] `erfc` certified scope remains `direct_arb_erfc`.
+- [ ] Release copy says certified `erf` uses the direct Arb `erf` primitive.
+- [ ] Release copy says certified `erfc` uses the direct Arb `erfc` primitive
+  when available, with the documented Arb fallback `1 - erf(z)` only if
+  necessary.
+- [ ] Release copy does not imply custom Taylor/asymptotic certification.
+- [ ] Release copy does not imply inverse, imaginary, scaled, or other
+  error-function wrappers are included.
+- [ ] No gamma-family behavior change is included.
+- [ ] No parabolic-cylinder claim broadening is included.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] `python scripts/check_release_version.py v0.2.0-alpha.5` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.4 Checklist
 
