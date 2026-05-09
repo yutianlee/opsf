@@ -7,14 +7,15 @@ additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
 `pochhammer(a, n)`. The v0.2.0-alpha.5 feature branch adds `erf(z)` and
 `erfc(z)`. The v0.2.0-alpha.6 feature branch adds `erfcx(z)`. The
 v0.2.0-alpha.7 feature branch adds `erfi(z)`. The v0.2.0-alpha.8 feature
-branch adds `dawson(z)`.
+branch adds `dawson(z)`. The future v0.2.0-alpha.9 feature branch adds
+`erfinv(x)`.
 
 ## Release Status Matrix
 
 | Area | Public wrappers or surface | Release status |
 | --- | --- | --- |
 | Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |
+| Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |
 | Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -38,6 +39,7 @@ erfc
 erfcx
 erfi
 dawson
+erfinv
 airy
 ai
 bi
@@ -65,6 +67,7 @@ for `ai` and `bi`, not additional certified functions.
 - `erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.
 - `erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.
 - `dawson(z)` is the v0.2.0-alpha.8 feature-branch API expansion.
+- `erfinv(x)` is the future v0.2.0-alpha.9 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.
@@ -112,6 +115,19 @@ for `ai` and `bi`, not additional certified functions.
   `certificate_level="formula_audited_alpha"`, and
   `audit_status="formula_identity"`.
 - Certified `dawson` does not add a custom asymptotic certification path.
+- Certified `erfinv` supports only real `x` with `-1 < x < 1` on the real
+  principal inverse branch. It rejects `x <= -1`, `x >= 1`, and complex inputs
+  as clean non-certified failures.
+- Certified `erfinv` prefers direct Arb `erfinv` when available. If direct Arb
+  `erfinv` is unavailable, it may use a certified monotone real-root enclosure
+  for `erf(y)-x=0` and must record
+  `certificate_scope="arb_erfinv_real_root"`,
+  `certificate_level="certified_real_root"`,
+  `audit_status="monotone_real_inverse"`,
+  `domain="real_x_in_open_interval_minus1_1"`, and
+  `formula="erf(y)-x=0"`.
+- Certified `erfinv` does not add `erfcinv`, complex inverse branches, or
+  endpoint asymptotic certification.
 - Direct Arb primitive families are alpha-certified only on the domains where
   Arb returns finite enclosures and the wrapper records the documented
   certificate scope.

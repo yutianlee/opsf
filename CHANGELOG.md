@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+- Added the public `erfinv(x)` wrapper for the real principal inverse of `erf`
+  on `-1 < x < 1`.
+- Fast mode uses `scipy.special.erfinv(x)`.
+- High-precision mode uses `mpmath.erfinv(x)` when available and otherwise
+  solves `erf(y) = x` numerically.
+- Certified mode supports real `x` only with `-1 < x < 1`, prefers direct Arb
+  `erfinv` when available, and otherwise uses a certified monotone real-root
+  enclosure for `erf(y)-x=0`.
+- No `erfcinv`, complex inverse branches, Faddeeva functions, plasma
+  dispersion wrapper, `wofz`, or endpoint asymptotic certification is added.
+- No `erf`, `erfc`, `erfcx`, `erfi`, or `dawson` behavior changes are included.
+- No gamma-family behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+- `pypi-smoke.yml` remains pinned to `0.2.0a8` for this feature PR.
+
 ## 0.2.0-alpha.8 - 2026-05-09
 
 - Added the public `dawson(z)` wrapper.

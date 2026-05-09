@@ -23,3 +23,7 @@ def erfi(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
 
 def dawson(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("dawson", z, dps=dps, mode=mode, certify=certify)
+
+
+def erfinv(x, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("erfinv", x, dps=dps, mode=mode, certify=certify)

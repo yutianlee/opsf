@@ -26,7 +26,7 @@ Release-facing support matrices must keep these status phrases:
 | Surface | Required wording |
 | --- | --- |
 | Gamma family | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |
+| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -62,12 +62,15 @@ Release-facing support matrices must keep these status phrases:
 - Say that `dawson` is defined as `sqrt(pi)/2 * exp(-z^2) * erfi(z)`; direct Arb `dawson` is preferred when
   available, and any allowed `sqrt(pi)/2*exp(-z^2)*erfi(z)` fallback must be
   visible in diagnostics.
+- Say that `erfinv` is only the real principal inverse on `-1 < x < 1`;
+  direct Arb `erfinv` is preferred when available, and any allowed
+  `erf(y)-x=0` real-root fallback must be visible in diagnostics.
 - Do not claim scaled-erfc stability for large arguments beyond what the
   selected backend certifies.
-- Do not claim `erfinv`, `erfcinv`, Faddeeva, plasma dispersion, or other
-  error-function variant support until those wrappers, backends, tests, and
-  audit docs exist.
-- Do not claim Taylor, asymptotic, or custom certification methods for the
+- Do not claim `erfcinv`, Faddeeva, plasma dispersion, or other error-function
+  variant support until those wrappers, backends, tests, and audit docs exist.
+- Do not claim complex inverse branches or endpoint asymptotic certification for `erfinv`.
+- Do not claim Taylor or asymptotic certification methods for the
   error-function family.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of
   `gamma_ratio` or that it certifies pole-limiting values.

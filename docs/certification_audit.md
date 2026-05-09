@@ -10,10 +10,10 @@ Certified successes must include:
 
 - `diagnostics["certificate_scope"]`: the scope listed below.
 - `diagnostics["certificate_level"]`: `direct_arb_primitive`,
-  `direct_arb_finite_product`, `formula_audited_alpha`, or
-  `formula_audited_experimental`.
+  `direct_arb_finite_product`, `certified_real_root`,
+  `formula_audited_alpha`, or `formula_audited_experimental`.
 - `diagnostics["audit_status"]`: either `audited_direct` or
-  `formula_identity` or `experimental_formula`.
+  `monotone_real_inverse` or `formula_identity` or `experimental_formula`.
 - `diagnostics["certification_claim"]`: concise wording for the level of claim.
 
 The certificate levels mean:
@@ -28,6 +28,9 @@ The certificate levels mean:
 - `direct_arb_finite_product`: the wrapper evaluates a finite product with Arb
   ball arithmetic for a documented integer-parameter domain, with explicit
   exclusions for unsupported continuation or pole-limit cases.
+- `certified_real_root`: Arb encloses a unique real root on a documented
+  monotone real interval. The runtime diagnostics must identify the domain and
+  root equation, and unsupported real or complex inputs must fail cleanly.
 - `formula_audited_alpha`: Arb rigorously encloses a narrowly documented
   identity formula for an alpha wrapper. The runtime diagnostics must identify
   the formula and must not imply a broader algorithmic stability claim.
@@ -68,6 +71,8 @@ certificate level or promote
 | `arb_erfi_formula` | `erfi` | `formula_audited_alpha` | Arb identity formula `-i*erf(i*z)` with `formula="-i*erf(i*z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `direct_arb_dawson` | `dawson` | `direct_arb_primitive` | Direct Arb `dawson` primitive when exposed by python-flint; zero, oddness, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `arb_dawson_formula` | `dawson` | `formula_audited_alpha` | Arb identity formula `sqrt(pi)/2*exp(-z^2)*erfi(z)` with `formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `direct_arb_erfinv` | `erfinv` | `direct_arb_primitive` | Direct Arb `erfinv` primitive when exposed by python-flint; zero, oddness, real composition checks, residual containment, MCP parity, and external-reference containment tests | Complex inverse branches; `x <= -1` or `x >= 1`; endpoint asymptotic certification; `erfcinv` |
+| `arb_erfinv_real_root` | `erfinv` | `certified_real_root` | Arb real interval root enclosure for `erf(y)-x=0`, using monotonicity of real `erf`; zero, oddness, real composition checks, forced-fallback diagnostics, residual containment, MCP parity, and external-reference containment tests | Complex inverse branches; `x <= -1` or `x >= 1`; endpoint asymptotic certification; `erfcinv` |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -116,6 +121,7 @@ certified Arb enclosure of erfc(z) using direct Arb complementary error-function
 certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive
 certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive
 certified Arb enclosure of dawson(z) using direct Arb Dawson primitive
+certified Arb enclosure of real principal erfinv(x) using direct Arb inverse error-function primitive
 ```
 
 If certified `erfc` uses the allowed Arb fallback, diagnostics record
@@ -147,6 +153,14 @@ If certified `dawson` uses the Arb identity fallback, diagnostics record
 
 ```text
 certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)
+```
+
+If certified `erfinv` uses the Arb real-root fallback, diagnostics record
+`formula="erf(y)-x=0"`, use `audit_status="monotone_real_inverse"`, and use
+the claim:
+
+```text
+certified real root enclosure for erf(y)-x=0 using monotonicity of real erf
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:

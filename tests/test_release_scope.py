@@ -37,6 +37,7 @@ CURRENT_0_2_0_FUNCTIONS = (
     "erfcx",
     "erfi",
     "dawson",
+    "erfinv",
     "airy",
     "ai",
     "bi",
@@ -68,7 +69,7 @@ CURRENT_0_2_0_STATUS_ROWS = (
         "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | "
         "alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |",
+    "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -99,7 +100,7 @@ CURRENT_0_2_0_SCOPE_ROWS = (
         "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, "
         "`pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |",
+    "| Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "
