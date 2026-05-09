@@ -116,6 +116,20 @@ certified `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`, and
 workflows continue to use
 `actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
+Audit evidence:
+This audit found no implementation inconsistency in the five-wrapper
+error-function surface. The Python API, dispatcher registry, certified method
+scopes, MCP thin wrappers, external-reference fixtures, identity tests, and
+formula-diagnostics tests are in lockstep. The audit also checked that
+`erfinv`, `erfcinv`, Faddeeva, plasma dispersion, and `wofz` wrappers are not
+exported, registered, or exposed as MCP tools.
+
+Release infrastructure remains unchanged: this audit keeps the package version
+fixed, keeps `pypi-smoke.yml` on `0.2.0a8`, keeps upload/download artifact
+actions on v6, and leaves the TestPyPI policy wording unchanged. Routine
+feature alphas may still skip TestPyPI under `docs/release_policy.md` when the
+documented release-policy conditions are met.
+
 Current v0.2 audit result:
 The published `v0.2.0-alpha.8` release includes `dawson(z)` as the only new
 public error-function-family wrapper since `v0.2.0-alpha.7`. Post-release
@@ -123,6 +137,6 @@ verification updates pypi-smoke to target `0.2.0a8` and adds Dawson smoke
 coverage without changing source behavior. Tests keep the five wrappers, MCP
 parity, fixture containment, and formula diagnostics in lockstep. No `erf`,
 `erfc`, `erfcx`, `erfi`, gamma-family, or parabolic-cylinder behavior or claim
-changes are part of this verification update.
+changes are part of this audit update.
 No public API, dispatcher, backend formula, MCP, or certified-scope
 inconsistency was found after the Dawson surface and audit docs were updated.
