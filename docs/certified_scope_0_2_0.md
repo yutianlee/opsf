@@ -7,8 +7,7 @@ additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
 `pochhammer(a, n)`. The v0.2.0-alpha.5 feature branch adds `erf(z)` and
 `erfc(z)`. The v0.2.0-alpha.6 feature branch adds `erfcx(z)`. The
 v0.2.0-alpha.7 feature branch adds `erfi(z)`. The v0.2.0-alpha.8 feature
-branch adds `dawson(z)`. The future v0.2.0-alpha.9 feature branch adds
-`erfinv(x)`.
+branch adds `dawson(z)`. The v0.2.0-alpha.9 feature branch adds `erfinv(x)`.
 
 ## Release Status Matrix
 
@@ -67,7 +66,7 @@ for `ai` and `bi`, not additional certified functions.
 - `erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.
 - `erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.
 - `dawson(z)` is the v0.2.0-alpha.8 feature-branch API expansion.
-- `erfinv(x)` is the future v0.2.0-alpha.9 feature-branch API expansion.
+- `erfinv(x)` is the v0.2.0-alpha.9 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.

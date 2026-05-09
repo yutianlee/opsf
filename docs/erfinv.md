@@ -53,4 +53,6 @@ Inline diagnostics include `certificate_scope="arb_erfinv_real_root"`,
 
 ## Guardrails
 
-This wrapper adds only the real principal inverse branch. No `erfcinv`, complex inverse branches, Faddeeva, plasma dispersion, or endpoint asymptotic certification is added by this feature PR.
+This wrapper adds only the real principal inverse branch. No `erfcinv`, complex
+inverse branches, Faddeeva, plasma dispersion, or endpoint asymptotic
+certification is part of the certified `erfinv` surface.
