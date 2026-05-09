@@ -131,8 +131,8 @@ jobs:
           log_ratio_result = special_loggamma_ratio("3.2", "1.2", mode="fast")
           beta_result = special_beta("2", "3", mode="fast")
           pochhammer_result = special_pochhammer("0.5", "3", mode="fast")
-          erf_result = special_erf("1.0", mode="fast")
-          erfc_result = special_erfc("1.0", mode="fast")
+          erf_result = special_erf("1.0", mode="certified", dps=50)
+          erfc_result = special_erfc("1.0", mode="certified", dps=50)
           erfcx_result = special_erfcx("1.0", mode="certified", dps=50)
 
           print(certsf_path)
@@ -168,4 +168,7 @@ jobs:
           assert erf_result["function"] == "erf"
           assert erfc_result["function"] == "erfc"
           assert erfcx_result["function"] == "erfcx"
+          assert erf_result["certified"]
+          assert erfc_result["certified"]
+          assert erfcx_result["certified"]
           PY

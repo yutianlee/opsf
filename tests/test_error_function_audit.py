@@ -53,7 +53,8 @@ DOC_EXPECTATIONS = {
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
         "`pypi-smoke.yml` defaults to `0.2.0a6`",
-        "`special_erfcx` in MCP-certified smoke calls",
+        "certified `special_erf`",
+        "`special_erfcx` calls in the MCP-certified smoke job",
     ),
     "docs/certification_audit.md": (
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
@@ -177,6 +178,32 @@ def test_erfc_fallback_path_records_formula_when_direct_erfc_is_unavailable(monk
     )
 
 
+def test_erfcx_formula_fallback_records_formula_when_direct_erfcx_is_unavailable(monkeypatch):
+    flint = pytest.importorskip("flint")
+
+    class ErfcOnlyBall:
+        def __init__(self, value):
+            self.value = flint.acb(value)
+
+        def __mul__(self, other):
+            other_value = other.value if isinstance(other, ErfcOnlyBall) else other
+            return self.value * other_value
+
+        def erfc(self):
+            return self.value.erfc()
+
+    monkeypatch.setattr(arb_backend, "_make_ball", lambda z: ErfcOnlyBall(z))
+
+    result = arb_backend.arb_erfcx("0.5", dps=50)
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "arb_erfcx_formula"
+    assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
+    assert result.diagnostics["audit_status"] == "formula_identity"
+    assert result.diagnostics["formula"] == "exp(z^2)*erfc(z)"
+    assert result.diagnostics["certification_claim"] == "certified Arb enclosure of exp(z^2)*erfc(z)"
+
+
 @pytest.mark.parametrize(("path", "expected_fragments"), DOC_EXPECTATIONS.items())
 def test_error_function_documentation_uses_current_audit_wording(path, expected_fragments):
     text = _read(path)
@@ -220,6 +247,12 @@ def test_pypi_smoke_covers_error_function_release_surface():
     assert "special_erf" in text
     assert "special_erfc" in text
     assert "special_erfcx" in text
+    assert 'special_erf("1.0", mode="certified", dps=50)' in text
+    assert 'special_erfc("1.0", mode="certified", dps=50)' in text
+    assert 'special_erfcx("1.0", mode="certified", dps=50)' in text
+    assert 'assert erf_result["certified"]' in text
+    assert 'assert erfc_result["certified"]' in text
+    assert 'assert erfcx_result["certified"]' in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():

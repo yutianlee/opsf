@@ -79,7 +79,14 @@ available. The formula fallback uses `certificate_scope="arb_erfcx_formula"`,
 Release hygiene:
 `pypi-smoke.yml` defaults to `0.2.0a6` after the published
 `v0.2.0-alpha.6` release and covers `erf`, `erfc`, and `erfcx` in base and
-certified Python API smoke calls, plus `special_erf`, `special_erfc`, and
-`special_erfcx` in MCP-certified smoke calls. The PyPI publish workflows
+certified Python API smoke calls, plus certified `special_erf`,
+`special_erfc`, and `special_erfcx` calls in the MCP-certified smoke job. The
+PyPI publish workflows
 continue to use `actions/upload-artifact@v6` and
 `actions/download-artifact@v6`.
+
+Current audit finding:
+The MCP-certified smoke job must call the error-function MCP tools in
+`mode="certified"` and assert certified payloads. This preserves coverage of
+the installed `certsf[mcp,certified]` path without changing wrapper behavior or
+certification scope.
