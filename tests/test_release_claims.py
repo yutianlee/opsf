@@ -24,7 +24,7 @@ CURRENT_RELEASE_STATUS_ROWS = (
         "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | "
         "alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |",
+    "| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -53,7 +53,7 @@ CURRENT_0_2_0_SCOPE_ROWS = (
         "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, "
         "`pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |"
     ),
-    "| Error-function family | `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |",
+    "| Error-function family | `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -119,8 +119,18 @@ README_SUPPORT_MATRIX = {
         "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
         "alpha-certified, direct Arb gamma primitives and finite products",
     ),
-    "erf": ("`erf`, `erfc`", "alpha-certified, direct Arb error-function primitives"),
-    "erfc": ("`erf`, `erfc`", "alpha-certified, direct Arb error-function primitives"),
+    "erf": (
+        "`erf`, `erfc`, `erfcx`",
+        "alpha-certified, direct Arb error-function primitives plus erfcx identity formula",
+    ),
+    "erfc": (
+        "`erf`, `erfc`, `erfcx`",
+        "alpha-certified, direct Arb error-function primitives plus erfcx identity formula",
+    ),
+    "erfcx": (
+        "`erf`, `erfc`, `erfcx`",
+        "alpha-certified, direct Arb error-function primitives plus erfcx identity formula",
+    ),
     "airy": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
     "ai": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
     "bi": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),

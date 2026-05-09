@@ -35,6 +35,8 @@ _DIRECT_ARB_POCHHAMMER_CERTIFICATION_CLAIM = (
 _ARB_POCHHAMMER_MAX_PRODUCT_TERMS = 10000
 _DIRECT_ARB_ERF_SCOPE = "direct_arb_erf"
 _DIRECT_ARB_ERFC_SCOPE = "direct_arb_erfc"
+_DIRECT_ARB_ERFCX_SCOPE = "direct_arb_erfcx"
+_ARB_ERFCX_FORMULA_SCOPE = "arb_erfcx_formula"
 _DIRECT_ARB_ERF_CERTIFICATION_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error-function primitive"
 _DIRECT_ARB_ERFC_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
@@ -42,6 +44,13 @@ _DIRECT_ARB_ERFC_CERTIFICATION_CLAIM = (
 _DIRECT_ARB_ERFC_FALLBACK_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of 1 - erf(z) using direct Arb error-function primitive"
 )
+_DIRECT_ARB_ERFCX_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive"
+)
+_ARB_ERFCX_FORMULA = "exp(z^2)*erfc(z)"
+_ARB_ERFCX_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
+_ARB_ERFCX_FORMULA_AUDIT_STATUS = "formula_identity"
+_ARB_ERFCX_FORMULA_CERTIFICATION_CLAIM = "certified Arb enclosure of exp(z^2)*erfc(z)"
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -214,6 +223,64 @@ def arb_erf(z, *, dps: int = 50):
 
 def arb_erfc(z, *, dps: int = 50):
     return _arb_error_function("erfc", z, dps=dps)
+
+
+def arb_erfcx(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(
+            "erfcx",
+            requested,
+            str(exc),
+            diagnostics={"certificate_scope": _ARB_ERFCX_FORMULA_SCOPE},
+        )
+    try:
+        argument = _make_ball(z)
+        domain = "real" if isinstance(argument, flint.arb) else "complex"
+        method = getattr(argument, "erfcx", None)
+        if method is not None:
+            result = _certified_result("erfcx", method(), requested, bits, flint)
+            return _with_error_function_diagnostics(
+                result,
+                _DIRECT_ARB_ERFCX_SCOPE,
+                domain,
+                _DIRECT_ARB_ERFCX_CERTIFICATION_CLAIM,
+            )
+
+        erfc_method = getattr(argument, "erfc", None)
+        if erfc_method is None:
+            return _unavailable(
+                "erfcx",
+                requested,
+                "python-flint does not expose an Arb erfcx or erfc primitive for this value.",
+                diagnostics={
+                    "certificate_scope": _ARB_ERFCX_FORMULA_SCOPE,
+                    "domain": domain,
+                    "formula": _ARB_ERFCX_FORMULA,
+                },
+            )
+        value = (argument * argument).exp() * erfc_method()
+        result = _certified_result("erfcx", value, requested, bits, flint)
+        return _with_error_function_diagnostics(
+            result,
+            _ARB_ERFCX_FORMULA_SCOPE,
+            domain,
+            _ARB_ERFCX_FORMULA_CERTIFICATION_CLAIM,
+            formula=_ARB_ERFCX_FORMULA,
+            certificate_level=_ARB_ERFCX_FORMULA_CERTIFICATE_LEVEL,
+            audit_status=_ARB_ERFCX_FORMULA_AUDIT_STATUS,
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(
+            "erfcx",
+            requested,
+            f"{_PHASE1_UNAVAILABLE} {exc}",
+            diagnostics={"certificate_scope": _ARB_ERFCX_FORMULA_SCOPE, "formula": _ARB_ERFCX_FORMULA},
+        )
+    finally:
+        flint.ctx.prec = old_prec
 
 
 def arb_beta(a, b, *, dps: int = 50):
@@ -587,14 +654,23 @@ def _arb_error_function(function: str, z, *, dps: int):
         flint.ctx.prec = old_prec
 
 
-def _with_error_function_diagnostics(result, scope: str, domain: str, claim: str, *, formula: str | None = None):
+def _with_error_function_diagnostics(
+    result,
+    scope: str,
+    domain: str,
+    claim: str,
+    *,
+    formula: str | None = None,
+    certificate_level: str = _DIRECT_ARB_CERTIFICATE_LEVEL,
+    audit_status: str = _DIRECT_ARB_AUDIT_STATUS,
+):
     diagnostics = dict(result.diagnostics)
     diagnostics.update({"domain": domain, "certificate_scope": scope})
     if result.certified:
         diagnostics.update(
             {
-                "certificate_level": _DIRECT_ARB_CERTIFICATE_LEVEL,
-                "audit_status": _DIRECT_ARB_AUDIT_STATUS,
+                "certificate_level": certificate_level,
+                "audit_status": audit_status,
                 "certification_claim": claim,
             }
         )

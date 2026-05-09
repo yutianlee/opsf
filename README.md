@@ -104,8 +104,8 @@ silently fall back to mpmath and call the value certified.
 
 Certified successes also expose `diagnostics["certificate_level"]`,
 `diagnostics["audit_status"]`, and `diagnostics["certification_claim"]`, so
-callers can distinguish direct Arb primitive wrappers from formula-backed
-experimental claims.
+callers can distinguish direct Arb primitive wrappers from narrow identity
+formulas and experimental formula-backed claims.
 
 ## Choosing a Mode
 
@@ -139,7 +139,7 @@ unchanged.
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |
+| `erf`, `erfc`, `erfcx` | alpha-certified, direct Arb error-function primitives plus erfcx identity formula |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -155,6 +155,7 @@ from certsf import (
     pochhammer,
     erf,
     erfc,
+    erfcx,
     rgamma,
     gamma_ratio,
     airy,
@@ -255,18 +256,23 @@ claim analytic continuation in `n` or simultaneous-pole limiting values. See
 
 - `erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt`
 - `erfc(z) = 1 - erf(z)`
+- `erfcx(z) = exp(z^2) erfc(z)`
 
 ```python
-from certsf import erf, erfc
+from certsf import erf, erfc, erfcx
 
 r = erf("1.0", mode="certified", dps=50)
 c = erfc("1.0", mode="certified", dps=50)
+x = erfcx("1.0", mode="certified", dps=50)
 ```
 
 Certified `erf` and `erfc` use direct Arb error-function primitives for real or
 complex inputs when Arb returns finite enclosures. If a supported
 `python-flint` build lacks direct `erfc` but exposes direct `erf`, certified
 `erfc` may evaluate `1 - erf(z)` and records `formula="1-erf"`.
+Certified `erfcx` prefers direct Arb `erfcx` when available; otherwise it uses
+the Arb identity formula `exp(z^2)*erfc(z)` and records
+`formula="exp(z^2)*erfc(z)"`.
 No custom asymptotic certification is added. See
 [`docs/error_function.md`](docs/error_function.md).
 

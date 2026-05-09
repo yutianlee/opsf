@@ -44,6 +44,10 @@ DIRECT_ARB_ERF_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error
 DIRECT_ARB_ERFC_CLAIM = (
     "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
 )
+DIRECT_ARB_ERFCX_CLAIM = (
+    "certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive"
+)
+ARB_ERFCX_FORMULA_CLAIM = "certified Arb enclosure of exp(z^2)*erfc(z)"
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -135,6 +139,24 @@ def test_error_function_certified_results_expose_narrow_audited_claim(function, 
     assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
     assert result.diagnostics["audit_status"] == "audited_direct"
     assert result.diagnostics["certification_claim"] == claim
+
+
+def test_erfcx_certified_result_exposes_direct_or_formula_claim():
+    result = certsf.erfcx("1", dps=60, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] in {"direct_arb_erfcx", "arb_erfcx_formula"}
+    if result.diagnostics["certificate_scope"] == "direct_arb_erfcx":
+        assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+        assert result.diagnostics["audit_status"] == "audited_direct"
+        assert result.diagnostics["certification_claim"] == DIRECT_ARB_ERFCX_CLAIM
+    else:
+        assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
+        assert result.diagnostics["audit_status"] == "formula_identity"
+        assert result.diagnostics["certification_claim"] == ARB_ERFCX_FORMULA_CLAIM
+        assert result.diagnostics["formula"] == "exp(z^2)*erfc(z)"
 
 
 @pytest.mark.parametrize(

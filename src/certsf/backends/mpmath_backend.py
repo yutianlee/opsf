@@ -77,6 +77,14 @@ def mpmath_erfc(z, *, dps: int = 50):
         return _mp_result("erfc", _mp_string(value, requested), requested, working)
 
 
+def mpmath_erfcx(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        zz = _mp_number(z)
+        value = mp.exp(zz * zz) * mp.erfc(zz)
+        return _mp_result("erfcx", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

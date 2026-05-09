@@ -11,3 +11,7 @@ def erf(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
 
 def erfc(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("erfc", z, dps=dps, mode=mode, certify=certify)
+
+
+def erfcx(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("erfcx", z, dps=dps, mode=mode, certify=certify)
