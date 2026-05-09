@@ -85,7 +85,8 @@ broaden those claims.
   smoke calls and all seven corresponding MCP tools in MCP smoke calls.
 - `pypi-smoke.yml` now covers `erf`, `erfc`, `special_erf`, and
   `special_erfc` after the `v0.2.0-alpha.5` publication.
-- `pypi-smoke.yml` now covers `erfcx` and `special_erfcx` after the
+- `pypi-smoke.yml` now covers `erfcx` and covers `special_erf`,
+  `special_erfc`, and `special_erfcx` in certified MCP smoke calls after the
   `v0.2.0-alpha.6` publication.
 
 ## Audit Findings
