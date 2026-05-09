@@ -90,17 +90,12 @@ available. The formula fallback uses `certificate_scope="arb_erfi_formula"`,
 `formula="-i*erf(i*z)"`.
 
 Release hygiene:
-`pypi-smoke.yml` defaults to `0.2.0a6` after the published
-`v0.2.0-alpha.6` release and covers `erf`, `erfc`, and `erfcx` in base and
-certified Python API smoke calls, plus certified `special_erf`,
-`special_erfc`, and `special_erfcx` calls in the MCP-certified smoke job. The
-PyPI publish workflows
-continue to use `actions/upload-artifact@v6` and
-`actions/download-artifact@v6`.
-
-The `erfi(z)` feature branch intentionally does not update `pypi-smoke.yml`;
-the smoke workflow remains pinned to `0.2.0a6` until a future release is
-published.
+`pypi-smoke.yml` defaults to `0.2.0a7` after the published
+`v0.2.0-alpha.7` release and covers `erf`, `erfc`, `erfcx`, and `erfi` in base
+and certified Python API smoke calls, plus certified `special_erf`,
+`special_erfc`, `special_erfcx`, and `special_erfi` calls in the MCP-certified
+smoke job. The PyPI publish workflows continue to use
+`actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
 Current audit finding:
 The MCP-certified smoke job must call the error-function MCP tools in

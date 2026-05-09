@@ -65,9 +65,9 @@ DOC_EXPECTATIONS = {
         "No `erfinv`, `erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
-        "`pypi-smoke.yml` defaults to `0.2.0a6`",
+        "`pypi-smoke.yml` defaults to `0.2.0a7`",
         "certified `special_erf`",
-        "`special_erfcx` calls in the MCP-certified smoke job",
+        "`special_erfcx`, and `special_erfi` calls in the MCP-certified",
     ),
     "docs/certification_audit.md": (
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
@@ -285,24 +285,28 @@ def test_external_reference_fixture_covers_error_function_surface():
 def test_pypi_smoke_covers_error_function_release_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0a6"' in text
-    assert "inputs.version || '0.2.0a6'" in text
+    assert 'default: "0.2.0a7"' in text
+    assert "inputs.version || '0.2.0a7'" in text
     assert 'erf("1.0", mode="fast"' in text
     assert 'erfc("1.0", mode="fast"' in text
     assert 'erfcx("1.0", mode="fast"' in text
+    assert 'erfi("1.0", mode="fast"' in text
     assert 'erf("1.0", mode="certified"' in text
     assert 'erfc("1.0", mode="certified"' in text
     assert 'erfcx("1.0", mode="certified"' in text
+    assert 'erfi("1.0", mode="certified"' in text
     assert "special_erf" in text
     assert "special_erfc" in text
     assert "special_erfcx" in text
-    assert "erfi" not in text
+    assert "special_erfi" in text
     assert 'special_erf("1.0", mode="certified", dps=50)' in text
     assert 'special_erfc("1.0", mode="certified", dps=50)' in text
     assert 'special_erfcx("1.0", mode="certified", dps=50)' in text
+    assert 'special_erfi("1.0", mode="certified", dps=50)' in text
     assert 'assert erf_result["certified"]' in text
     assert 'assert erfc_result["certified"]' in text
     assert 'assert erfcx_result["certified"]' in text
+    assert 'assert erfi_result["certified"]' in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():
