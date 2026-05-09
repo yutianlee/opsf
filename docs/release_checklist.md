@@ -46,7 +46,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.7
+python scripts/check_release_version.py v0.2.0-alpha.8
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -73,6 +73,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.2.0-alpha.8` maps to `0.2.0a8`,
   `v0.2.0-alpha.7` maps to `0.2.0a7`,
   `v0.2.0-alpha.6` maps to `0.2.0a6`,
   `v0.2.0-alpha.5` maps to `0.2.0a5`,
@@ -81,6 +82,45 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.2.0-alpha.8 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0a8`.
+- [ ] `CITATION.cff` version is `0.2.0-alpha.8`.
+- [ ] `CITATION.cff` date-released is `2026-05-09`.
+- [ ] `CHANGELOG.md` records `dawson(z)` as the only public API expansion
+  since `0.2.0-alpha.7`.
+- [ ] `docs/release-0.2.0-alpha.8.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0-alpha.8`.
+- [ ] PyPI smoke workflow still targets `0.2.0a7` until `0.2.0a8` is
+  published.
+- [ ] TestPyPI staging is skipped for this routine feature alpha unless
+  packaging or workflow risk is introduced under `release_policy.md`.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes beyond the already-merged `dawson(z)` are
+  included.
+- [ ] Release copy defines `dawson(z)` as
+  `sqrt(pi)/2 * exp(-z^2) * erfi(z)`.
+- [ ] Release copy says fast mode uses `scipy.special.dawsn(z)` when available
+  and otherwise uses the `erfi` identity fallback.
+- [ ] Release copy says high-precision mode uses a mpmath Dawson function when
+  available and otherwise uses the `erfi` identity fallback.
+- [ ] Release copy says certified mode prefers direct Arb Dawson when available
+  and otherwise uses the Arb formula `sqrt(pi)/2*exp(-z^2)*erfi(z)`.
+- [ ] Release copy does not imply custom Taylor/asymptotic certification.
+- [ ] Release copy does not imply inverse error functions, Faddeeva functions,
+  plasma dispersion, or additional variants are included.
+- [ ] No `erf`, `erfc`, `erfcx`, or `erfi` behavior change is included.
+- [ ] No gamma-family behavior change is included.
+- [ ] No parabolic-cylinder claim broadening is included.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] `python scripts/check_release_version.py v0.2.0-alpha.8` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.7 Checklist
 
