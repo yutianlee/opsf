@@ -5,7 +5,7 @@ line. The 0.1.0 surface remains frozen in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The gamma-family
 additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
 `pochhammer(a, n)`. The v0.2.0-alpha.5 feature branch adds `erf(z)` and
-`erfc(z)`. This future v0.2.0-alpha.6 feature branch adds `erfcx(z)`.
+`erfc(z)`. The v0.2.0-alpha.6 feature branch adds `erfcx(z)`.
 
 ## Release Status Matrix
 
@@ -58,7 +58,7 @@ for `ai` and `bi`, not additional certified functions.
 - `beta(a, b)` is the v0.2.0-alpha.3 API expansion.
 - `pochhammer(a, n)` is the v0.2.0-alpha.4 API expansion.
 - `erf(z)` and `erfc(z)` are the v0.2.0-alpha.5 feature-branch API expansion.
-- `erfcx(z)` is the future v0.2.0-alpha.6 feature-branch API expansion.
+- `erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.

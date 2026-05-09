@@ -52,7 +52,8 @@ DOC_EXPECTATIONS = {
         "No `erfi`, `erfinv`, `erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
-        "`pypi-smoke.yml` defaults to `0.2.0a5`",
+        "`pypi-smoke.yml` defaults to `0.2.0a6`",
+        "`special_erfcx` in MCP-certified smoke calls",
     ),
     "docs/certification_audit.md": (
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
@@ -65,7 +66,7 @@ DOC_EXPECTATIONS = {
     "docs/certified_scope_0_2_0.md": (
         "Error-function family | `erf`, `erfc`, `erfcx`",
         "`erf(z)` and `erfc(z)` are the v0.2.0-alpha.5",
-        "`erfcx(z)` is the future v0.2.0-alpha.6 feature-branch API expansion.",
+        "`erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
         "Custom Taylor, asymptotic, or non-Arb certification methods are outside",
@@ -208,14 +209,17 @@ def test_external_reference_fixture_covers_error_function_surface():
 def test_pypi_smoke_covers_error_function_release_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0a5"' in text
-    assert "inputs.version || '0.2.0a5'" in text
+    assert 'default: "0.2.0a6"' in text
+    assert "inputs.version || '0.2.0a6'" in text
     assert 'erf("1.0", mode="fast"' in text
     assert 'erfc("1.0", mode="fast"' in text
+    assert 'erfcx("1.0", mode="fast"' in text
     assert 'erf("1.0", mode="certified"' in text
     assert 'erfc("1.0", mode="certified"' in text
+    assert 'erfcx("1.0", mode="certified"' in text
     assert "special_erf" in text
     assert "special_erfc" in text
+    assert "special_erfcx" in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():

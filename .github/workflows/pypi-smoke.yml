@@ -6,7 +6,7 @@ on:
       version:
         description: "Published certsf version to test"
         required: true
-        default: "0.2.0a5"
+        default: "0.2.0a6"
   schedule:
     - cron: "0 3 * * 1"
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a5' }}"
+          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a6' }}"
 
       - name: Smoke test import and calls
         run: |
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf import ai, besselj, beta, erf, erfc, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, erf, erfc, erfcx, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -57,6 +57,7 @@ jobs:
           print(pochhammer("0.5", "3", mode="fast").to_mcp_dict())
           print(erf("1.0", mode="fast").to_mcp_dict())
           print(erfc("1.0", mode="fast").to_mcp_dict())
+          print(erfcx("1.0", mode="fast").to_mcp_dict())
           print(ai("1.0", mode="high_precision", dps=60).to_mcp_dict())
           print(besselj("2", "4.0", mode="fast").to_mcp_dict())
           print(pcfu("2.5", "1.25", mode="high_precision", dps=60).to_mcp_dict())
@@ -66,7 +67,7 @@ jobs:
         if: matrix.extras == '[certified]'
         run: |
           python - <<'PY'
-          from certsf import ai, besselj, beta, erf, erfc, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, erf, erfc, erfcx, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           cases = [
               gamma("3.2", mode="certified", dps=50),
@@ -78,6 +79,7 @@ jobs:
               pochhammer("0.5", "3", mode="certified", dps=50),
               erf("1.0", mode="certified", dps=50),
               erfc("1.0", mode="certified", dps=50),
+              erfcx("1.0", mode="certified", dps=50),
               ai("1.0", mode="certified", dps=50),
               besselj("2", "4.0", mode="certified", dps=50),
               pcfu("2.5", "1.25", mode="certified", dps=50),
@@ -104,7 +106,7 @@ jobs:
       - name: Install MCP extra from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a5' }}"
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a6' }}"
 
       - name: MCP smoke test
         run: |
@@ -113,7 +115,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf.mcp_server import build_server, special_beta, special_erf, special_erfc, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
+          from certsf.mcp_server import build_server, special_beta, special_erf, special_erfc, special_erfcx, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -131,6 +133,7 @@ jobs:
           pochhammer_result = special_pochhammer("0.5", "3", mode="fast")
           erf_result = special_erf("1.0", mode="fast")
           erfc_result = special_erfc("1.0", mode="fast")
+          erfcx_result = special_erfcx("1.0", mode="certified", dps=50)
 
           print(certsf_path)
           print(build_server)
@@ -143,6 +146,7 @@ jobs:
           print(pochhammer_result)
           print(erf_result)
           print(erfc_result)
+          print(erfcx_result)
           assert callable(build_server)
           assert isinstance(result, dict)
           assert isinstance(loggamma_result, dict)
@@ -153,6 +157,7 @@ jobs:
           assert isinstance(pochhammer_result, dict)
           assert isinstance(erf_result, dict)
           assert isinstance(erfc_result, dict)
+          assert isinstance(erfcx_result, dict)
           assert result["function"] == "gamma"
           assert loggamma_result["function"] == "loggamma"
           assert rgamma_result["function"] == "rgamma"
@@ -162,4 +167,5 @@ jobs:
           assert pochhammer_result["function"] == "pochhammer"
           assert erf_result["function"] == "erf"
           assert erfc_result["function"] == "erfc"
+          assert erfcx_result["function"] == "erfcx"
           PY

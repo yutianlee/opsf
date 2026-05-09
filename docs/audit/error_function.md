@@ -77,10 +77,9 @@ available. The formula fallback uses `certificate_scope="arb_erfcx_formula"`,
 `formula="exp(z^2)*erfc(z)"`.
 
 Release hygiene:
-`pypi-smoke.yml` defaults to `0.2.0a5` after the published
-`v0.2.0-alpha.5` release and covers `erf` and `erfc` in base and certified
-Python API smoke calls, plus `special_erf` and `special_erfc` in MCP-certified
-smoke calls. This erfcx feature branch intentionally does not update
-`pypi-smoke.yml`; it remains pinned to `0.2.0a5` until a future release is
-published. The PyPI publish workflows continue to use
-`actions/upload-artifact@v6` and `actions/download-artifact@v6`.
+`pypi-smoke.yml` defaults to `0.2.0a6` after the published
+`v0.2.0-alpha.6` release and covers `erf`, `erfc`, and `erfcx` in base and
+certified Python API smoke calls, plus `special_erf`, `special_erfc`, and
+`special_erfcx` in MCP-certified smoke calls. The PyPI publish workflows
+continue to use `actions/upload-artifact@v6` and
+`actions/download-artifact@v6`.
