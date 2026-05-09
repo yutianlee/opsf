@@ -302,6 +302,20 @@ def arb_pochhammer(a, n, *, dps: int = 50):
                 "max_product_terms": _ARB_POCHHAMMER_MAX_PRODUCT_TERMS,
             },
         )
+    pole_case = _pochhammer_pole_case(a, n_int) if n_int > 0 else "regular"
+    if pole_case == "simultaneous_poles_not_certified":
+        return _unavailable(
+            "pochhammer",
+            requested,
+            "pochhammer certified mode does not certify simultaneous-pole limiting values.",
+            diagnostics={
+                "certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE,
+                "n": n_int,
+                "pole_case": pole_case,
+                "a_pole": True,
+                "shifted_pole": True,
+            },
+        )
 
     try:
         flint, old_prec, bits = _enter_flint_context(requested)
@@ -315,21 +329,6 @@ def arb_pochhammer(a, n, *, dps: int = 50):
     try:
         if n_int == 0:
             return _certified_pochhammer_result(flint.arb(1), requested, bits, flint, n_int, terms_used=0)
-
-        pole_case = _pochhammer_pole_case(a, n_int)
-        if pole_case == "simultaneous_poles_not_certified":
-            return _unavailable(
-                "pochhammer",
-                requested,
-                "pochhammer certified mode does not certify simultaneous-pole limiting values.",
-                diagnostics={
-                    "certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE,
-                    "n": n_int,
-                    "pole_case": pole_case,
-                    "a_pole": True,
-                    "shifted_pole": True,
-                },
-            )
 
         aa = _make_ball(a)
         value = flint.acb(1) if isinstance(aa, flint.acb) else flint.arb(1)
