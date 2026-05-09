@@ -3,8 +3,8 @@
 This document records the current public certified surface for the 0.2.0 alpha
 line. The 0.1.0 surface remains frozen in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The gamma-family
-additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and,
-for the future v0.2.0-alpha.4 feature branch, `pochhammer(a, n)`.
+additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
+`pochhammer(a, n)`.
 
 ## Release Status Matrix
 
@@ -51,8 +51,7 @@ for `ai` and `bi`, not additional certified functions.
 - `gamma_ratio(a, b)` is the only 0.2.0-alpha.1 API expansion.
 - `loggamma_ratio(a, b)` is the v0.2.0-alpha.2 API expansion.
 - `beta(a, b)` is the v0.2.0-alpha.3 API expansion.
-- `pochhammer(a, n)` is the future v0.2.0-alpha.4 feature-branch API
-  expansion.
+- `pochhammer(a, n)` is the v0.2.0-alpha.4 API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.

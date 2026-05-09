@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0-alpha.4 - 2026-05-09
+
+- Added the public `pochhammer(a, n)` wrapper as the only public API expansion
+  since `0.2.0-alpha.3`.
+- Defined `pochhammer(a, n)` as the rising factorial `(a)_n`.
+- Certified mode supports exact integer `n >= 0` only.
+- Certified mode uses the Arb finite product `prod_{k=0}^{n-1}(a+k)` in the
+  `direct_arb_pochhammer_product` scope.
+- `n = 0` returns certified `1`.
+- Exact zero factors return certified zero.
+- Non-integer `n`, negative `n`, oversized product paths, and simultaneous
+  gamma-pole limiting values fail cleanly.
+- Added the MCP tool `special_pochhammer`.
+- Added external fixtures and certified recurrence tests for Pochhammer
+  behavior.
+- No `beta`, `gamma_ratio`, or `loggamma_ratio` behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.3 - 2026-05-09
 
 - Added the public `beta(a, b)` wrapper as the only public API expansion since
