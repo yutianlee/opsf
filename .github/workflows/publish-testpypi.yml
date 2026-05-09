@@ -6,7 +6,7 @@ on:
       ref:
         description: "Git ref or tag to publish"
         required: true
-        default: "v0.2.0-alpha.5"
+        default: "v0.2.0-alpha.6"
 
 permissions:
   contents: read
