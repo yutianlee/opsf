@@ -48,6 +48,20 @@ def scipy_beta(a, b, *, dps: int = 50):
     return _fast_result("beta", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_pochhammer(a, n, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    aa = scipy_number(a)
+    nn = scipy_number(n)
+    try:
+        value = special.poch(aa, nn)
+    except (AttributeError, TypeError, ValueError):
+        if _is_nonnegative_integer_value(nn):
+            value = _finite_product(aa, int(float(nn.real if isinstance(nn, complex) else nn)))
+        else:
+            value = np.exp(special.loggamma(aa + nn) - special.loggamma(aa))
+    return _fast_result("pochhammer", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_rgamma(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     value = special.rgamma(scipy_number(z))
@@ -226,3 +240,20 @@ def _validate_airy_derivative(derivative: int) -> int:
 
 def _airy_component_function(component: str, derivative: int) -> str:
     return component if derivative == 0 else f"{component}p"
+
+
+def _is_nonnegative_integer_value(value) -> bool:
+    try:
+        if isinstance(value, complex):
+            return value.imag == 0 and value.real >= 0 and float(value.real).is_integer()
+        number = float(value)
+        return number >= 0 and number.is_integer()
+    except (TypeError, ValueError, OverflowError):
+        return False
+
+
+def _finite_product(a, n: int):
+    value = 1
+    for k in range(n):
+        value *= a + k
+    return value

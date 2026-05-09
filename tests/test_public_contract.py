@@ -22,6 +22,7 @@ EXPECTED_PUBLIC_NAMES = (
     "gamma_ratio",
     "loggamma",
     "loggamma_ratio",
+    "pochhammer",
     "rgamma",
     "pbdv",
     "pcfd",
@@ -51,6 +52,7 @@ EXPECTED_MCP_TOOL_NAMES = (
     "special_gamma_ratio",
     "special_loggamma_ratio",
     "special_beta",
+    "special_pochhammer",
     "special_airy",
     "special_ai",
     "special_bi",
@@ -68,7 +70,7 @@ EXPECTED_MCP_TOOL_NAMES = (
 
 def test_review_public_imports_remain_clean():
     from certsf import SFResult as ImportedResult
-    from certsf import ai, airy, beta, bi, gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
+    from certsf import ai, airy, beta, bi, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
     from certsf import besseli, besselj, besselk, bessely
     from certsf import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -79,6 +81,7 @@ def test_review_public_imports_remain_clean():
         loggamma_ratio,
         rgamma,
         beta,
+        pochhammer,
         airy,
         ai,
         bi,
@@ -113,6 +116,7 @@ def test_representative_public_calls_return_sfresult():
         (certsf.gamma_ratio, ("3.2", "1.2")),
         (certsf.loggamma, ("3.2",)),
         (certsf.loggamma_ratio, ("3.2", "1.2")),
+        (certsf.pochhammer, ("3", "4")),
         (certsf.rgamma, ("3.2",)),
         (certsf.airy, ("1.0",)),
         (certsf.ai, ("1.0",)),

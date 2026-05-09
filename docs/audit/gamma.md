@@ -2,13 +2,14 @@
 
 Function:
 `gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`,
-`loggamma_ratio(a, b)`, `beta(a, b)`.
+`loggamma_ratio(a, b)`, `beta(a, b)`, `pochhammer(a, n)`.
 
 Target mathematical definition:
 Euler gamma function, principal logarithm of gamma, and reciprocal gamma
 function `1/gamma(z)`. `gamma_ratio(a, b)` is `Gamma(a) / Gamma(b)`.
 `loggamma_ratio(a, b)` is principal `loggamma(a) - loggamma(b)`.
 `beta(a, b)` is the Euler beta function `Gamma(a) Gamma(b) / Gamma(a+b)`.
+`pochhammer(a, n)` is the rising factorial `(a)_n = Gamma(a+n) / Gamma(a)`.
 
 Backend primitive or formula:
 Direct Arb primitives through python-flint: `arb/acb.gamma`,
@@ -16,6 +17,8 @@ Direct Arb primitives through python-flint: `arb/acb.gamma`,
 the audited product `Gamma(a) * rgamma(b)`. The certified `loggamma_ratio` path
 uses the audited Arb `lgamma(a) - lgamma(b)` difference. The certified `beta`
 path uses the audited product `Gamma(a) * Gamma(b) * rgamma(a+b)`.
+The certified `pochhammer` path uses the audited finite product
+`prod_{k=0}^{n-1}(a+k)` for integer `n >= 0`.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding primitive, when
@@ -27,6 +30,8 @@ Arb. `gamma_ratio` accepts denominator poles as certified zeros when
 are finite.
 `beta` accepts denominator `Gamma(a+b)` poles as certified zeros when
 `Gamma(a)` and `Gamma(b)` are finite.
+`pochhammer` accepts real or complex `a` with integer `n >= 0`, subject to the
+finite-product ceiling, and certifies exact zero factors to zero.
 
 Excluded domain:
 `gamma` and `loggamma` at poles; `gamma_ratio` when `a` is a gamma pole,
@@ -34,6 +39,9 @@ including simultaneous numerator/denominator poles; non-finite input values;
 `loggamma_ratio` when either argument is a gamma pole, including simultaneous
 pole cases; `beta` when `a` or `b` is a gamma pole, including simultaneous pole
 interactions; any domain where Arb does not return a finite enclosure.
+`pochhammer` excludes non-integer `n`, negative `n`, product lengths above the
+documented ceiling, analytic continuation in `n`, and simultaneous-pole
+limiting values not covered by the zero-factor finite-product case.
 
 Branch convention:
 `loggamma` follows Arb's principal branch. `loggamma_ratio` is the difference
@@ -49,6 +57,9 @@ at those points. `gamma_ratio(a, b)` has a certified zero when `b` is a pole and
 failure.
 `beta(a, b)` has a certified zero when `a+b` is a pole and both numerator gamma
 factors are finite; numerator poles are reported as non-certified failures.
+`pochhammer(a, n)` has a certified zero when an exact factor `a+k` is zero.
+When both `Gamma(a)` and `Gamma(a+n)` have poles and no zero-factor case
+applies, the certified wrapper returns a clean non-certified failure.
 
 Validation identities:
 `gamma(z + 1) = z gamma(z)`, `rgamma(z) gamma(z) = 1` away from poles, and
@@ -63,6 +74,8 @@ Loggamma-ratio tests cover the additive recurrence identities
 Beta tests cover symmetry and the recurrence identities
 `beta(a+1,b) = a/(a+b) beta(a,b)` and
 `beta(a,b+1) = b/(a+b) beta(a,b)`.
+Pochhammer tests cover special finite products, complex `a`, zero factors, and
+`pochhammer(a,n+1) = (a+n) pochhammer(a,n)`.
 
 Reference equations:
 DLMF 5.2 for gamma definitions, DLMF 5.4 for recurrence, and Arb gamma
@@ -76,6 +89,9 @@ avoid introducing non-finite denominator-pole divisions.
 the principal logarithm of `gamma_ratio` by integer multiples of `2*pi*i`.
 `beta` uses `rgamma(a+b)` to avoid introducing non-finite denominator-pole
 divisions, but it does not claim limiting values at simultaneous singularities.
+`pochhammer` uses finite products to avoid gamma quotient pole ambiguity in the
+supported integer-`n` path. Large product lengths can accumulate wide balls, so
+the certified path has a documented term ceiling rather than a gamma fallback.
 
 Certification status:
 `certificate_level="direct_arb_primitive"`. Certified `gamma`, `loggamma`, and
@@ -87,3 +103,6 @@ function and domain. Certified `gamma_ratio` results use
 principal `lgamma(a) - lgamma(b)` difference. Certified `beta` results use
 `certificate_scope="direct_arb_beta"` and enclose the audited Arb
 `Gamma(a) * Gamma(b) * rgamma(a+b)` product.
+Certified `pochhammer` results use
+`certificate_scope="direct_arb_pochhammer_product"` and enclose the audited Arb
+finite product for nonnegative integer `n`.

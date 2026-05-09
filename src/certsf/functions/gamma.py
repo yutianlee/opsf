@@ -21,6 +21,10 @@ def loggamma_ratio(a, b, *, dps: int = 50, mode: str = "auto", certify: bool = F
     return dispatch("loggamma_ratio", a, b, dps=dps, mode=mode, certify=certify)
 
 
+def pochhammer(a, n, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("pochhammer", a, n, dps=dps, mode=mode, certify=certify)
+
+
 def rgamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("rgamma", z, dps=dps, mode=mode, certify=certify)
 

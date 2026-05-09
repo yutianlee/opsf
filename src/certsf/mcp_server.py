@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .functions.airy import ai, airy, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
-from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, rgamma
+from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
 
@@ -30,6 +30,10 @@ def special_loggamma_ratio(a: str, b: str, dps: int = 50, mode: str = "auto", ce
 
 def special_beta(a: str, b: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return beta(a, b, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+
+
+def special_pochhammer(a: str, n: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return pochhammer(a, n, dps=dps, mode=mode, certify=certify).to_mcp_dict()
 
 
 def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -87,6 +91,7 @@ _MCP_TOOLS = (
     special_gamma_ratio,
     special_loggamma_ratio,
     special_beta,
+    special_pochhammer,
     special_airy,
     special_ai,
     special_bi,

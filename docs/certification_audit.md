@@ -9,13 +9,13 @@ claim. It covers every `certificate_scope` that the dispatcher can select in
 Certified successes must include:
 
 - `diagnostics["certificate_scope"]`: the scope listed below.
-- `diagnostics["certificate_level"]`: either `direct_arb_primitive` or
-  `formula_audited_experimental`.
+- `diagnostics["certificate_level"]`: `direct_arb_primitive`,
+  `direct_arb_finite_product`, or `formula_audited_experimental`.
 - `diagnostics["audit_status"]`: either `audited_direct` or
   `experimental_formula`.
 - `diagnostics["certification_claim"]`: concise wording for the level of claim.
 
-The two certificate levels mean:
+The certificate levels mean:
 
 - `direct_arb_primitive`: the wrapper calls an Arb special-function primitive
   for the documented target function, and repo tests cover representative domain,
@@ -24,6 +24,9 @@ The two certificate levels mean:
   compositions of Arb gamma primitives, and `direct_arb_loggamma_ratio` is a
   narrow principal-branch Arb `lgamma` difference, rather than a broader
   formula-layer claim.
+- `direct_arb_finite_product`: the wrapper evaluates a finite product with Arb
+  ball arithmetic for a documented integer-parameter domain, with explicit
+  exclusions for unsupported continuation or pole-limit cases.
 - `formula_audited_experimental`: Arb rigorously encloses the implemented
   formula, and repo tests cover the documented first-pass identities, branches,
   and domains, but the formula-backed family has not been promoted to a broad
@@ -50,6 +53,7 @@ below; it does not broaden any certificate level or promote
 | `direct_arb_gamma_ratio` | `gamma_ratio` | `direct_arb_primitive` | Arb `gamma(a) * rgamma(b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; recurrence and composition identity checks | Non-finite `Gamma(a)` targets, including numerator poles and simultaneous numerator/denominator poles |
 | `direct_arb_loggamma_ratio` | `loggamma_ratio` | `direct_arb_primitive` | Arb `lgamma(a) - lgamma(b)` principal-branch difference; pole clean-failure tests; branch convention test; recurrence and composition identity checks | Gamma poles in either argument; simultaneous-pole limiting values; principal-log-of-ratio claims |
 | `direct_arb_beta` | `beta` | `direct_arb_primitive` | Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; symmetry and recurrence identity checks | Non-finite `Gamma(a)` or `Gamma(b)` targets; simultaneous pole interactions and limiting-value claims |
+| `direct_arb_pochhammer_product` | `pochhammer` | `direct_arb_finite_product` | Arb finite product `prod_{k=0}^{n-1}(a+k)`; special-value tests; zero-factor test; recurrence identity check; integer-domain rejection tests | Non-integer `n`; negative `n`; analytic continuation in `n`; simultaneous-pole limiting values; product paths above the documented term ceiling |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -82,6 +86,12 @@ The `direct_arb_beta` scope uses narrower audited-direct wording:
 
 ```text
 certified Arb enclosure of Gamma(a) * Gamma(b) * rgamma(a+b) using direct Arb gamma primitives
+```
+
+The `direct_arb_pochhammer_product` scope uses finite-product wording:
+
+```text
+certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:

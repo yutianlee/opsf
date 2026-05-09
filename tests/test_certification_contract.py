@@ -9,6 +9,7 @@ SUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.rgamma, ("3.2",), id="rgamma"),
     pytest.param(certsf.gamma_ratio, ("3.2", "1.2"), id="gamma_ratio"),
     pytest.param(certsf.loggamma_ratio, ("3.2", "1.2"), id="loggamma_ratio"),
+    pytest.param(certsf.pochhammer, ("3.2", "4"), id="pochhammer"),
     pytest.param(certsf.airy, ("1.0",), id="airy"),
     pytest.param(certsf.ai, ("1.0",), id="ai"),
     pytest.param(certsf.bi, ("1.0",), id="bi"),
@@ -32,6 +33,9 @@ UNSUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.loggamma_ratio, ("0", "3.2"), id="loggamma-ratio-numerator-pole"),
     pytest.param(certsf.loggamma_ratio, ("3.2", "0"), id="loggamma-ratio-denominator-pole"),
     pytest.param(certsf.loggamma_ratio, ("0", "0"), id="loggamma-ratio-both-poles"),
+    pytest.param(certsf.pochhammer, ("3", "2.5"), id="pochhammer-noninteger-n"),
+    pytest.param(certsf.pochhammer, ("3", "-1"), id="pochhammer-negative-n"),
+    pytest.param(certsf.pochhammer, ("-2", "2"), id="pochhammer-simultaneous-poles"),
     pytest.param(certsf.bessely, ("2.5+1j", "4.0"), id="bessel-complex-order"),
     pytest.param(certsf.pcfu, ("2.5+1j", "1.25"), id="pcf-complex-parameter"),
     pytest.param(certsf.pcfw, ("2.5", "1.25+0.5j"), id="pcfw-complex-argument"),
@@ -89,6 +93,16 @@ def test_loggamma_ratio_records_narrow_direct_arb_scope():
 
     assert result.diagnostics["certificate_scope"] == "direct_arb_loggamma_ratio"
     assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+    assert result.diagnostics["audit_status"] == "audited_direct"
+
+
+def test_pochhammer_records_narrow_finite_product_scope():
+    result = certsf.pochhammer("3.2", "4", dps=50, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.diagnostics["certificate_scope"] == "direct_arb_pochhammer_product"
+    assert result.diagnostics["certificate_level"] == "direct_arb_finite_product"
     assert result.diagnostics["audit_status"] == "audited_direct"
 
 
