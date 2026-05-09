@@ -3,6 +3,13 @@
 Function:
 `erf(z)`, `erfc(z)`.
 
+Public API:
+`erf` and `erfc` are exported from `certsf.__init__`, listed in
+`certsf.__all__`, registered in the dispatcher with `fast`, `high_precision`,
+and `certified` modes, and exposed through thin MCP tools named `special_erf`
+and `special_erfc`. No `erfi`, `erfinv`, `erfcinv`, or `erfcx` wrapper is part
+of this audit scope.
+
 Target mathematical definition:
 `erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt`.
 `erfc(z) = 1 - erf(z)`.
@@ -49,3 +56,10 @@ Certification status:
 Certified `erfc` results use `certificate_scope="direct_arb_erfc"` and enclose
 direct Arb `erfc` output, or the explicit Arb `1 - erf(z)` fallback when
 `formula="1-erf"` is present in diagnostics.
+
+Release hygiene:
+`pypi-smoke.yml` defaults to `0.2.0a5` after the published
+`v0.2.0-alpha.5` release and covers `erf` and `erfc` in base and certified
+Python API smoke calls, plus `special_erf` and `special_erfc` in MCP-certified
+smoke calls. The PyPI publish workflows continue to use
+`actions/upload-artifact@v6` and `actions/download-artifact@v6`.
