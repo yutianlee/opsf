@@ -27,6 +27,12 @@ _DIRECT_ARB_BETA_SCOPE = "direct_arb_beta"
 _DIRECT_ARB_BETA_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of Gamma(a) * Gamma(b) * rgamma(a+b) using direct Arb gamma primitives"
 )
+_DIRECT_ARB_POCHHAMMER_SCOPE = "direct_arb_pochhammer_product"
+_DIRECT_ARB_FINITE_PRODUCT_CERTIFICATE_LEVEL = "direct_arb_finite_product"
+_DIRECT_ARB_POCHHAMMER_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n"
+)
+_ARB_POCHHAMMER_MAX_PRODUCT_TERMS = 10000
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -272,6 +278,96 @@ def arb_beta(a, b, *, dps: int = 50):
         flint.ctx.prec = old_prec
 
 
+def arb_pochhammer(a, n, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    n_int, error = _nonnegative_integer_n(n)
+    if error is not None:
+        return _unavailable(
+            "pochhammer",
+            requested,
+            error,
+            diagnostics={"certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE},
+        )
+    if n_int > _ARB_POCHHAMMER_MAX_PRODUCT_TERMS:
+        return _unavailable(
+            "pochhammer",
+            requested,
+            (
+                "certified pochhammer currently uses the finite product path and "
+                f"supports n <= {_ARB_POCHHAMMER_MAX_PRODUCT_TERMS}"
+            ),
+            diagnostics={
+                "certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE,
+                "n": n_int,
+                "max_product_terms": _ARB_POCHHAMMER_MAX_PRODUCT_TERMS,
+            },
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(
+            "pochhammer",
+            requested,
+            str(exc),
+            diagnostics={"certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE},
+        )
+    try:
+        if n_int == 0:
+            return _certified_pochhammer_result(flint.arb(1), requested, bits, flint, n_int, terms_used=0)
+
+        pole_case = _pochhammer_pole_case(a, n_int)
+        if pole_case == "simultaneous_poles_not_certified":
+            return _unavailable(
+                "pochhammer",
+                requested,
+                "pochhammer certified mode does not certify simultaneous-pole limiting values.",
+                diagnostics={
+                    "certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE,
+                    "n": n_int,
+                    "pole_case": pole_case,
+                    "a_pole": True,
+                    "shifted_pole": True,
+                },
+            )
+
+        aa = _make_ball(a)
+        value = flint.acb(1) if isinstance(aa, flint.acb) else flint.arb(1)
+        for k in range(n_int):
+            factor = aa + k
+            if factor.is_zero():
+                zero = flint.acb(0) if isinstance(factor, flint.acb) else flint.arb(0)
+                return _certified_pochhammer_result(
+                    zero,
+                    requested,
+                    bits,
+                    flint,
+                    n_int,
+                    terms_used=k + 1,
+                    diagnostics={"pole_case": "zero_factor", "zero_factor_index": k},
+                )
+            value *= factor
+
+        return _certified_pochhammer_result(
+            value,
+            requested,
+            bits,
+            flint,
+            n_int,
+            terms_used=n_int,
+            diagnostics={"pole_case": pole_case},
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(
+            "pochhammer",
+            requested,
+            f"{_PHASE1_UNAVAILABLE} {exc}",
+            diagnostics={"certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
 def arb_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     try:
@@ -426,6 +522,72 @@ def _with_flint(function: str, dps: int, evaluate):
         return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}")
     finally:
         flint.ctx.prec = old_prec
+
+
+def _certified_pochhammer_result(
+    value,
+    requested_dps: int,
+    bits: int,
+    flint,
+    n_int: int,
+    *,
+    terms_used: int,
+    diagnostics=None,
+):
+    if not _is_finite_ball(value, flint):
+        return _unavailable("pochhammer", requested_dps, _NONFINITE_RESULT)
+    result_diagnostics = {
+        "mode": "certified",
+        "working_precision_bits": bits,
+        "certificate_scope": _DIRECT_ARB_POCHHAMMER_SCOPE,
+        "certificate_level": _DIRECT_ARB_FINITE_PRODUCT_CERTIFICATE_LEVEL,
+        "audit_status": _DIRECT_ARB_AUDIT_STATUS,
+        "certification_claim": _DIRECT_ARB_POCHHAMMER_CERTIFICATION_CLAIM,
+        "formula": "finite_product",
+        "n": n_int,
+        "n_domain": "nonnegative_integer",
+        "max_product_terms": _ARB_POCHHAMMER_MAX_PRODUCT_TERMS,
+    }
+    if diagnostics is not None:
+        result_diagnostics.update(diagnostics)
+    return make_result(
+        function="pochhammer",
+        value=_ball_value_string(value, flint),
+        abs_error_bound=_ball_abs_error_string(value),
+        rel_error_bound=_ball_rel_error_string(value),
+        certified=True,
+        method="arb_ball",
+        backend="python-flint",
+        requested_dps=requested_dps,
+        working_dps=_bits_to_dps(bits),
+        terms_used=terms_used,
+        diagnostics=result_diagnostics,
+    )
+
+
+def _nonnegative_integer_n(value: Any) -> tuple[int, str | None]:
+    text = _real_order_text(value)
+    if text is None:
+        return 0, "certified pochhammer requires integer n; analytic continuation in n is not certified."
+    decimal = Decimal(text)
+    if decimal != decimal.to_integral_value():
+        return 0, "certified pochhammer requires integer n; analytic continuation in n is not certified."
+    if decimal < 0:
+        return 0, "certified pochhammer currently supports n >= 0 only."
+    return int(decimal), None
+
+
+def _pochhammer_pole_case(a: Any, n_int: int) -> str:
+    a_text = _real_order_text(a)
+    if a_text is None:
+        return "regular"
+    decimal = Decimal(a_text)
+    a_pole = decimal <= 0 and decimal == decimal.to_integral_value()
+    shifted = decimal + Decimal(n_int)
+    shifted_pole = shifted <= 0 and shifted == shifted.to_integral_value()
+    if a_pole and shifted_pole:
+        return "simultaneous_poles_not_certified"
+    return "regular"
 
 
 def _arb_airy_component(component: str, z, derivative: int, *, dps: int):

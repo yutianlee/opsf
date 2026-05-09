@@ -21,12 +21,12 @@ certified surface remains archived in
 
 ## 0.2.0 Alpha Certified Scope
 
-The 0.2.0 alpha line adds ratio-oriented gamma-family wrappers. The current
-status matrix is:
+The 0.2.0 alpha line adds conservative gamma-family wrappers beyond the
+one-argument primitives. The current status matrix is:
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -43,8 +43,9 @@ Certified results set:
 - `abs_error_bound` to a rigorous absolute radius
 - `diagnostics["certificate_scope"]` to one of the scopes below
 - `diagnostics["certificate_level"]` to `direct_arb_primitive` for direct Arb
-  primitive paths or `formula_audited_experimental` for formula-backed
-  certificates with open formula audit work
+  primitive paths, `direct_arb_finite_product` for audited finite-product
+  paths, or `formula_audited_experimental` for formula-backed certificates
+  with open formula audit work
 - `diagnostics["audit_status"]` to `audited_direct` for direct Arb primitive
   paths or `experimental_formula` for formula-backed paths with open audit work
 - `diagnostics["certification_claim"]` to the precise claim wording for that
@@ -58,7 +59,7 @@ claiming certification.
 
 Function:
 `gamma(z)`, `loggamma(z)`, `rgamma(z)`, `gamma_ratio(a, b)`,
-`loggamma_ratio(a, b)`, `beta(a, b)`
+`loggamma_ratio(a, b)`, `beta(a, b)`, `pochhammer(a, n)`
 
 Certified domain:
 real or complex inputs accepted by Arb for the corresponding primitive, with
@@ -69,13 +70,17 @@ For `loggamma_ratio(a, b)`, both `loggamma(a)` and `loggamma(b)` must be
 finite.
 For `beta(a, b)`, `Gamma(a)` and `Gamma(b)` must be finite; non-positive
 integer poles in `a+b` certify to zero through reciprocal gamma.
+For `pochhammer(a, n)`, certified mode supports integer `n >= 0` through the
+finite product `product_{k=0}^{n-1} (a+k)`. The `n = 0` case certifies to `1`,
+and exact zero factors certify to zero.
 
 Backend primitive:
 `arb/acb.gamma`, `arb/acb.lgamma`, and `arb/acb.rgamma`. The certified
 `gamma_ratio` backend evaluates `Gamma(a) * rgamma(b)` using Arb gamma
 primitives rather than dividing by `Gamma(b)`. The certified
 `loggamma_ratio` backend evaluates Arb `lgamma(a) - lgamma(b)`. The certified
-`beta` backend evaluates `Gamma(a) * Gamma(b) * rgamma(a+b)`.
+`beta` backend evaluates `Gamma(a) * Gamma(b) * rgamma(a+b)`. The certified
+`pochhammer` backend evaluates the finite product with Arb ball arithmetic.
 
 Returned enclosure:
 Arb midpoint string plus absolute radius. `rgamma` returns an exact certified
@@ -84,6 +89,8 @@ zero at non-positive integer gamma poles when Arb reports that enclosure.
 `Gamma(a)` is finite and Arb reports the zero product.
 `beta` returns an exact certified zero for `Gamma(a+b)` denominator poles when
 `Gamma(a)` and `Gamma(b)` are finite and Arb reports the zero product.
+`pochhammer` returns Arb midpoint and radius for the finite product, including
+an exact certified zero when a product factor is exactly zero.
 
 Branch convention:
 `loggamma` follows the principal branch used by Arb. `loggamma_ratio` is the
@@ -96,6 +103,8 @@ handling. The one-argument gamma-family wrappers use no formula transformation.
 `loggamma_ratio(a, b)` is evaluated as a direct difference of Arb principal
 `lgamma` values. `beta(a, b)` is evaluated as
 `Gamma(a) * Gamma(b) * rgamma(a+b)` for denominator-pole handling.
+`pochhammer(a, n)` is evaluated as a finite product only for certified
+integer `n >= 0`.
 
 Known exclusions:
 `gamma` and `loggamma` at poles return non-certified failures because the
@@ -105,18 +114,24 @@ failure when `a` is a gamma pole, including the simultaneous pole case.
 gamma pole, including simultaneous pole cases.
 `beta` returns clean non-certified failures when `a` or `b` is a gamma pole,
 including simultaneous numerator and denominator pole interactions.
+`pochhammer` returns clean non-certified failures for non-integer `n`, negative
+`n`, product lengths above the documented ceiling, and simultaneous-pole
+limiting values not covered by the finite-product zero-factor proof.
 
 Validation tests:
 pole behavior, principal-branch checks on the negative real axis, gamma-ratio
 recurrence and composition identities, loggamma-ratio branch and identity
 checks, beta symmetry and recurrence identities, and comparison against mpmath
-away from singularities.
+away from singularities. Pochhammer tests cover finite-product special values,
+complex `a` with integer `n`, zero factors, certified recurrence, dispatch
+behavior, and rejected certified domains.
 
 Certificate scope:
 `direct_arb_primitive` for `gamma`, `loggamma`, and `rgamma`; the narrow
 `direct_arb_gamma_ratio` scope for `gamma_ratio`; and the narrow
 `direct_arb_loggamma_ratio` scope for `loggamma_ratio`; and the narrow
-`direct_arb_beta` scope for `beta`, recorded through `method="arb_ball"`.
+`direct_arb_beta` scope for `beta`; and `direct_arb_pochhammer_product` for
+`pochhammer`, recorded through `method="arb_ball"`.
 
 ## Airy Family
 

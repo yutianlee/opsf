@@ -20,7 +20,10 @@ HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| Custom Taylor/asymptotic methods | not yet |",
 )
 CURRENT_RELEASE_STATUS_ROWS = (
-    "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |",
+    (
+        "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | "
+        "alpha-certified, direct Arb gamma primitives and finite products |"
+    ),
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -45,7 +48,10 @@ HISTORICAL_0_1_0_SCOPE_ROWS = (
     "| Custom Taylor/asymptotic methods | none | not yet |",
 )
 CURRENT_0_2_0_SCOPE_ROWS = (
-    "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |",
+    (
+        "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, "
+        "`pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |"
+    ),
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -84,28 +90,32 @@ FORBIDDEN_CLAIM_PATTERNS = (
 )
 README_SUPPORT_MATRIX = {
     "gamma": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "loggamma": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "rgamma": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "gamma_ratio": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "loggamma_ratio": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "beta": (
-        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`",
-        "alpha-certified, direct Arb gamma primitives",
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
+    ),
+    "pochhammer": (
+        "`gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`",
+        "alpha-certified, direct Arb gamma primitives and finite products",
     ),
     "airy": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),
     "ai": ("`airy`, `ai`, `bi`", "alpha-certified, direct Arb primitive"),

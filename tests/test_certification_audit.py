@@ -36,6 +36,9 @@ DIRECT_ARB_LOGGAMMA_RATIO_CLAIM = (
 DIRECT_ARB_BETA_CLAIM = (
     "certified Arb enclosure of Gamma(a) * Gamma(b) * rgamma(a+b) using direct Arb gamma primitives"
 )
+DIRECT_ARB_POCHHAMMER_CLAIM = (
+    "certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n"
+)
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -96,6 +99,18 @@ def test_beta_certified_result_exposes_narrow_audited_claim():
     assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
     assert result.diagnostics["audit_status"] == "audited_direct"
     assert result.diagnostics["certification_claim"] == DIRECT_ARB_BETA_CLAIM
+
+
+def test_pochhammer_certified_result_exposes_narrow_audited_claim():
+    result = certsf.pochhammer("3.2", "4", dps=60, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "direct_arb_pochhammer_product"
+    assert result.diagnostics["certificate_level"] == "direct_arb_finite_product"
+    assert result.diagnostics["audit_status"] == "audited_direct"
+    assert result.diagnostics["certification_claim"] == DIRECT_ARB_POCHHAMMER_CLAIM
 
 
 @pytest.mark.parametrize(

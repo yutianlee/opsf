@@ -35,6 +35,7 @@ _FUNCTION_ORDER = (
     "gamma_ratio",
     "loggamma_ratio",
     "beta",
+    "pochhammer",
     "airy",
     "ai",
     "bi",
@@ -210,6 +211,33 @@ REGISTRY: dict[str, dict[Mode, MethodSpec]] = {
                 "Gamma(a+b) poles certify to zero"
             ),
             certificate_scope="direct_arb_beta",
+        ),
+    },
+    "pochhammer": {
+        "fast": _spec(
+            "pochhammer",
+            "fast",
+            "scipy",
+            scipy_backend.scipy_pochhammer,
+            certified=False,
+            domain="SciPy-supported double-precision inputs; finite-product fallback for complex integer-n cases",
+        ),
+        "high_precision": _spec(
+            "pochhammer",
+            "high_precision",
+            "mpmath",
+            mpmath_backend.mpmath_pochhammer,
+            certified=False,
+            domain=_HIGH_PRECISION_DOMAIN,
+        ),
+        "certified": _spec(
+            "pochhammer",
+            "certified",
+            "python-flint",
+            arb_backend.arb_pochhammer,
+            certified=True,
+            domain="Arb real or complex a with integer n >= 0; finite-product path only",
+            certificate_scope="direct_arb_pochhammer_product",
         ),
     },
     "airy": {

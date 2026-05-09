@@ -137,7 +137,7 @@ wording conservative and the parabolic-cylinder claims unchanged.
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -150,6 +150,7 @@ from certsf import (
     gamma,
     loggamma,
     loggamma_ratio,
+    pochhammer,
     rgamma,
     gamma_ratio,
     airy,
@@ -176,6 +177,7 @@ from certsf import (
 - `loggamma_ratio(a, b) = loggamma(a) - loggamma(b)`, using the principal
   `loggamma` branch
 - `beta(a, b) = Gamma(a) Gamma(b) / Gamma(a+b)`
+- `pochhammer(a, n) = (a)_n = Gamma(a+n) / Gamma(a)`
 
 `rgamma` is the safest wrapper near non-positive integer gamma poles. In
 certified mode, `rgamma` returns a rigorous zero at poles, while `gamma` and
@@ -228,6 +230,22 @@ clean non-certified failures. A pole in `Gamma(a+b)` certifies to zero only when
 both numerator gamma factors are finite and Arb returns the zero product. The
 wrapper does not claim limiting values at simultaneous singularities. See
 [`docs/beta.md`](docs/beta.md).
+
+```python
+from certsf import pochhammer
+
+r = pochhammer("0.5", "3", mode="certified", dps=50)
+print(r.value)
+print(r.certified)
+print(r.diagnostics)
+```
+
+Certified `pochhammer(a, n)` evaluates the finite product
+`product_{k=0}^{n-1} (a+k)` with Arb ball arithmetic for integer `n >= 0`.
+`n = 0` certifies to `1`, exact zero factors certify to zero, and non-integer
+or negative `n` returns a clean non-certified failure. The wrapper does not
+claim analytic continuation in `n` or simultaneous-pole limiting values. See
+[`docs/pochhammer.md`](docs/pochhammer.md).
 
 ### Airy Family
 
@@ -326,6 +344,7 @@ The repository also includes:
   policy.
 - `docs/beta.md` for beta-function pole policy and certified-backend
   rationale.
+- `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
