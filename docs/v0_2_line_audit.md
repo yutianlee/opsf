@@ -3,7 +3,7 @@
 Last reviewed: 2026-05-10.
 
 This audit records the v0.2 alpha gamma-family surface, error-function surface,
-and release hygiene checks after `v0.2.0-alpha.8`.
+and release hygiene checks after `v0.2.0-alpha.9`.
 
 ## Public API
 
@@ -32,12 +32,13 @@ The current error-function wrappers are:
 - `erfcx(z)`
 - `erfi(z)`
 - `dawson(z)`
+- `erfinv(x)`
 
-All five wrappers are exported from `certsf.__init__`, appear in
+All six wrappers are exported from `certsf.__init__`, appear in
 `certsf.__all__`, are registered in the dispatcher with `fast`,
 `high_precision`, and `certified` modes, and have thin MCP tools named
 `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`, and
-`special_dawson`.
+`special_dawson`, and `special_erfinv`.
 
 ## Certified Scope
 
@@ -73,6 +74,12 @@ The certified gamma-family policy remains intentionally narrow:
 Unsupported certified domains return `certified=False` with diagnostics; they
 do not silently fall back to mpmath while claiming certification.
 
+The certified `erfinv` policy is intentionally narrower than the entire error
+function family: it supports only real `x` with `-1 < x < 1`, rejects endpoints,
+out-of-interval real inputs, and complex inputs as clean non-certified
+failures, and does not claim `erfcinv`, complex inverse branches, or endpoint
+asymptotic certification.
+
 ## Documentation
 
 The README gamma-family section, dedicated docs for `gamma_ratio`,
@@ -94,7 +101,7 @@ broaden those claims.
 - `publish-pypi.yml` uses `actions/upload-artifact@v6`.
 - `publish-testpypi.yml` uses `actions/upload-artifact@v6`.
 - Both publish workflows keep `actions/download-artifact@v6`.
-- `pypi-smoke.yml` defaults to `0.2.0a8`.
+- `pypi-smoke.yml` defaults to `0.2.0a9`.
 - `pypi-smoke.yml` now covers all seven gamma-family wrappers in Python API
   smoke calls and all seven corresponding MCP tools in MCP smoke calls.
 - `pypi-smoke.yml` now covers `erf`, `erfc`, `special_erf`, and
@@ -108,10 +115,13 @@ broaden those claims.
 - `pypi-smoke.yml` now covers `dawson` in base and certified smoke calls and
   covers `special_dawson` in certified MCP smoke calls after the
   `v0.2.0-alpha.8` publication.
+- `pypi-smoke.yml` now covers `erfinv` in base and certified smoke calls and
+  covers `special_erfinv` in certified MCP smoke calls after the
+  `v0.2.0-alpha.9` publication.
 
 ## Audit Findings
 
-The audit found two non-source hygiene gaps:
+An earlier v0.2 audit found two non-source hygiene gaps:
 
 - `pypi-smoke.yml` did not smoke `loggamma`, `rgamma`, `special_loggamma`, or
   `special_rgamma` even though those wrappers are part of the public
@@ -124,7 +134,14 @@ Both gaps were corrected without source changes, package version changes,
 backend formula changes, public-wrapper changes, or certification-claim
 broadening.
 
-The post-release verification updates for `v0.2.0-alpha.8` corrected the
-current pypi-smoke target and added Dawson smoke coverage after the PyPI release
-was published and verified. Those documentation and workflow-only updates did
-not change runtime behavior or broaden any claim.
+The post-release verification updates for `v0.2.0-alpha.9` corrected the
+current pypi-smoke target and added `erfinv` smoke coverage after the PyPI
+release was published and verified. Those documentation, workflow, and audit
+test updates did not change runtime behavior or broaden any claim.
+
+This inverse-function audit found stale pre-publication wording that still
+described `erfinv(x)` as a future `v0.2.0-alpha.9` surface and described
+`pypi-smoke.yml` as intentionally excluding `erfinv`. The wording was updated
+to match the published `0.2.0a9` surface without source changes, package
+version changes, backend formula changes, public-wrapper changes, or
+certification-claim broadening.

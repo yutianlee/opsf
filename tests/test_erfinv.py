@@ -29,7 +29,7 @@ def test_erfinv_is_odd():
     _assert_close(_mp_number(negative.value), -_mp_number(positive.value), mp.mpf("1e-75"))
 
 
-@pytest.mark.parametrize("x", ["1", "-1", "1.1"])
+@pytest.mark.parametrize("x", ["1", "-1", "1.1", "-1.1"])
 def test_certified_erfinv_rejects_closed_or_outside_domain(x):
     result = erfinv(x, dps=50, mode="certified")
 
