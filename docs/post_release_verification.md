@@ -1,5 +1,103 @@
 # Post-release verification
 
+## v0.2.0-alpha.5 / certsf 0.2.0a5
+
+This records the verification evidence for the fifth 0.2.0 alpha PyPI
+prerelease artifact.
+
+### Published artifact
+
+- Git tag: `v0.2.0-alpha.5`
+- GitHub prerelease: <https://github.com/yutianlee/certsf/releases/tag/v0.2.0-alpha.5>
+- PyPI URL: <https://pypi.org/project/certsf/0.2.0a5/>
+- PyPI version: `certsf 0.2.0a5`
+- Publish workflow run: `25603708604`
+- Publish workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25603708604>
+- Publish trigger: GitHub `release` event for `v0.2.0-alpha.5`
+- Source commit: `59cf790a6eb21ebfc795bb64283db7123f5fdd5f`
+- Wheel SHA256:
+  `afbcd41c293fd53230e578324445b9e9d459198e0754c1b9594acf3232b1d63a`
+- sdist SHA256:
+  `e3ce2524bdc45c5f9cbf4ae800b50f8e797556476d0fa785c432b6a3ba686cad`
+
+The publish workflow build job passed checkout, Python 3.12 setup, tag/version
+parity check, build-tool installation, sdist/wheel build, `twine check`, and
+distribution artifact upload. The PyPI publish job passed after the `pypi`
+environment approval and published the distributions through trusted publishing.
+
+### PyPI confirmation
+
+The PyPI JSON endpoint for `certsf 0.2.0a5` returned the published version and
+the two uploaded files listed above. PyPI release metadata is tied to uploaded
+file data, so these hashes are the durable evidence for this public prerelease
+artifact.
+
+### Fresh install smoke test
+
+Final manual `pypi-smoke` run: `25604211944`
+
+Workflow URL:
+<https://github.com/yutianlee/certsf/actions/runs/25604211944>
+
+Install targets:
+
+```bash
+python -m pip install --pre "certsf==0.2.0a5"
+python -m pip install --pre "certsf[certified]==0.2.0a5"
+python -m pip install --pre "certsf[mcp,certified]==0.2.0a5"
+```
+
+Verified from fresh GitHub Actions environments:
+
+- Base installs passed on Python 3.10, 3.11, and 3.12.
+- Certified installs passed on Python 3.10, 3.11, and 3.12.
+- MCP certified installs passed on Python 3.10, 3.11, and 3.12.
+- Imports came from environment `site-packages`, not the checkout.
+- Smoke calls passed for `gamma`, `loggamma`, `rgamma`, `gamma_ratio`,
+  `loggamma_ratio`, `beta`, `pochhammer`, `ai`, `besselj`, and `pcfu`.
+- Certified smoke calls passed for `gamma`, `loggamma`, `rgamma`,
+  `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`, `ai`, `besselj`, and
+  `pcfu`.
+- MCP server import and `special_gamma` / `special_loggamma` /
+  `special_rgamma` / `special_gamma_ratio` / `special_loggamma_ratio` /
+  `special_beta` / `special_pochhammer` smoke calls passed.
+
+Two earlier manual smoke runs captured PyPI edge-cache propagation lag:
+
+- Run `25604145930` started immediately after publish. Some matrix jobs
+  installed successfully, but failed install logs on other runners saw only
+  versions through `0.2.0a4`.
+- Run `25604185744` followed shortly after. Most matrix jobs passed, but one
+  Python 3.12 MCP-certified install still saw only versions through
+  `0.2.0a4`.
+
+The final run above passed every matrix job after the PyPI edge cache caught up.
+
+After the successful smoke run, this follow-up PR updates the scheduled/manual
+`pypi-smoke` workflow default and fallback version from `0.2.0a4` to
+`0.2.0a5`. It also adds `erf` and `erfc` calls to the base and certified smoke
+paths and adds `special_erf` and `special_erfc` to the MCP-certified smoke path
+while preserving the existing gamma-family, Airy, Bessel, and
+parabolic-cylinder smoke coverage.
+
+### Validation summary
+
+- `v0.2.0-alpha.5` tag points at clean `main` commit
+  `59cf790a6eb21ebfc795bb64283db7123f5fdd5f`.
+- GitHub prerelease `v0.2.0-alpha.5` is marked prerelease.
+- `publish-pypi` run `25603708604` completed successfully.
+- PyPI confirms `certsf 0.2.0a5` is available at the release URL above.
+- PyPI file hashes match the wheel and sdist hashes recorded above.
+- Initial `pypi-smoke` runs `25604145930` and `25604185744` had PyPI
+  edge-cache propagation failures only; the failed install logs did not yet
+  list `0.2.0a5`.
+- Final `pypi-smoke` run `25604211944` completed successfully across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- No `src/`, mathematical implementation, backend formula, public-wrapper,
+  gamma-family behavior, or parabolic-cylinder claim changes were made during
+  publication or verification.
+
 ## v0.2.0-alpha.4 / certsf 0.2.0a4
 
 This records the verification evidence for the fourth 0.2.0 alpha PyPI
