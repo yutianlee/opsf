@@ -27,3 +27,7 @@ def dawson(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
 
 def erfinv(x, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("erfinv", x, dps=dps, mode=mode, certify=certify)
+
+
+def erfcinv(x, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("erfcinv", x, dps=dps, mode=mode, certify=certify)

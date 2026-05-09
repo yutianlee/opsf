@@ -117,6 +117,14 @@ def mpmath_erfinv(x, *, dps: int = 50):
         return _mp_result("erfinv", _mp_string(value, requested), requested, working)
 
 
+def mpmath_erfcinv(x, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        xx = _mp_number(x)
+        value = _mp_erfcinv_value(xx)
+        return _mp_result("erfcinv", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):
@@ -292,6 +300,19 @@ def _mp_erfinv_solve(value):
     first = 2 / (mp.pi * a) + log_term / 2
     guess = sign * mp.sqrt(mp.sqrt(first * first - log_term / a) - first)
     return mp.findroot(lambda y: mp.erf(y) - xx, guess)
+
+
+def _mp_erfcinv_value(value):
+    if not (mp.im(value) == 0 and 0 < mp.re(value) < 2):
+        raise ValueError("high-precision erfcinv supports real x in (0, 2)")
+
+    xx = mp.re(value)
+    method = getattr(mp, "erfcinv", None)
+    if method is not None:
+        return method(xx)
+
+    erfinv_method = getattr(mp, "erfinv", None)
+    return erfinv_method(1 - xx) if erfinv_method is not None else _mp_erfinv_solve(1 - xx)
 
 
 def _mp_result(

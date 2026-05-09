@@ -52,10 +52,16 @@ DIRECT_ARB_DAWSON_CLAIM = "certified Arb enclosure of dawson(z) using direct Arb
 DIRECT_ARB_ERFINV_CLAIM = (
     "certified Arb enclosure of real principal erfinv(x) using direct Arb inverse error-function primitive"
 )
+DIRECT_ARB_ERFCINV_CLAIM = (
+    "certified Arb enclosure of real principal erfcinv(x) using direct Arb inverse complementary error-function primitive"
+)
 ARB_ERFCX_FORMULA_CLAIM = "certified Arb enclosure of exp(z^2)*erfc(z)"
 ARB_ERFI_FORMULA_CLAIM = "certified Arb enclosure of -i*erf(i*z)"
 ARB_DAWSON_FORMULA_CLAIM = "certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)"
 ARB_ERFINV_REAL_ROOT_CLAIM = "certified real root enclosure for erf(y)-x=0 using monotonicity of real erf"
+ARB_ERFCINV_VIA_ERFINV_CLAIM = (
+    "certified real inverse enclosure for erfcinv(x)=erfinv(1-x) using monotonicity of real erfc"
+)
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -223,6 +229,25 @@ def test_erfinv_certified_result_exposes_narrow_inverse_claim():
         assert result.diagnostics["audit_status"] == "monotone_real_inverse"
         assert result.diagnostics["certification_claim"] == ARB_ERFINV_REAL_ROOT_CLAIM
         assert result.diagnostics["formula"] == "erf(y)-x=0"
+
+
+def test_erfcinv_certified_result_exposes_narrow_inverse_claim():
+    result = certsf.erfcinv("0.5", dps=60, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] in {"direct_arb_erfcinv", "arb_erfcinv_via_erfinv"}
+    assert result.diagnostics["domain"] == "real_x_in_open_interval_0_2"
+    if result.diagnostics["certificate_scope"] == "direct_arb_erfcinv":
+        assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+        assert result.diagnostics["audit_status"] == "audited_direct"
+        assert result.diagnostics["certification_claim"] == DIRECT_ARB_ERFCINV_CLAIM
+    else:
+        assert result.diagnostics["certificate_level"] == "certified_real_root"
+        assert result.diagnostics["audit_status"] == "monotone_real_inverse"
+        assert result.diagnostics["certification_claim"] == ARB_ERFCINV_VIA_ERFINV_CLAIM
+        assert result.diagnostics["formula"] == "erfinv(1-x)"
 
 
 @pytest.mark.parametrize(

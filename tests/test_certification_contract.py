@@ -16,6 +16,7 @@ SUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.erfi, ("1",), id="erfi"),
     pytest.param(certsf.dawson, ("1",), id="dawson"),
     pytest.param(certsf.erfinv, ("0.5",), id="erfinv"),
+    pytest.param(certsf.erfcinv, ("0.5",), id="erfcinv"),
     pytest.param(certsf.airy, ("1.0",), id="airy"),
     pytest.param(certsf.ai, ("1.0",), id="ai"),
     pytest.param(certsf.bi, ("1.0",), id="bi"),
@@ -47,6 +48,11 @@ UNSUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.erfinv, ("1.1",), id="erfinv-above-domain"),
     pytest.param(certsf.erfinv, ("-1.1",), id="erfinv-below-domain"),
     pytest.param(certsf.erfinv, ("0.5+0.25j",), id="erfinv-complex"),
+    pytest.param(certsf.erfcinv, ("0",), id="erfcinv-lower-endpoint"),
+    pytest.param(certsf.erfcinv, ("2",), id="erfcinv-upper-endpoint"),
+    pytest.param(certsf.erfcinv, ("-0.1",), id="erfcinv-below-domain"),
+    pytest.param(certsf.erfcinv, ("2.1",), id="erfcinv-above-domain"),
+    pytest.param(certsf.erfcinv, ("0.5+0.25j",), id="erfcinv-complex"),
     pytest.param(certsf.pcfu, ("2.5+1j", "1.25"), id="pcf-complex-parameter"),
     pytest.param(certsf.pcfw, ("2.5", "1.25+0.5j"), id="pcfw-complex-argument"),
 ]
@@ -179,6 +185,22 @@ def test_erfinv_records_direct_or_real_root_certified_scope():
         assert result.diagnostics["certificate_level"] == "certified_real_root"
         assert result.diagnostics["audit_status"] == "monotone_real_inverse"
         assert result.diagnostics["formula"] == "erf(y)-x=0"
+
+
+def test_erfcinv_records_direct_or_via_erfinv_certified_scope():
+    result = certsf.erfcinv("0.5", dps=50, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.diagnostics["certificate_scope"] in {"direct_arb_erfcinv", "arb_erfcinv_via_erfinv"}
+    assert result.diagnostics["domain"] == "real_x_in_open_interval_0_2"
+    if result.diagnostics["certificate_scope"] == "direct_arb_erfcinv":
+        assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+        assert result.diagnostics["audit_status"] == "audited_direct"
+    else:
+        assert result.diagnostics["certificate_level"] == "certified_real_root"
+        assert result.diagnostics["audit_status"] == "monotone_real_inverse"
+        assert result.diagnostics["formula"] == "erfinv(1-x)"
 
 
 @pytest.mark.parametrize(

@@ -3,7 +3,8 @@
 Last reviewed: 2026-05-10.
 
 This audit records the v0.2 alpha gamma-family surface, error-function surface,
-and release hygiene checks after `v0.2.0-alpha.9`.
+and release hygiene checks after the `erfcinv(x)` feature branch for the future
+`v0.2.0-alpha.10`.
 
 ## Public API
 
@@ -23,7 +24,7 @@ All seven wrappers are exported from `certsf.__init__`, appear in
 `special_<wrapper>`. The MCP tools call the Python wrapper and serialize the
 same `SFResult` payload.
 
-No new public wrappers were added by this audit.
+This feature branch adds one new public wrapper, `erfcinv(x)`.
 
 The current error-function wrappers are:
 
@@ -33,12 +34,13 @@ The current error-function wrappers are:
 - `erfi(z)`
 - `dawson(z)`
 - `erfinv(x)`
+- `erfcinv(x)`
 
-All six wrappers are exported from `certsf.__init__`, appear in
+All seven wrappers are exported from `certsf.__init__`, appear in
 `certsf.__all__`, are registered in the dispatcher with `fast`,
 `high_precision`, and `certified` modes, and have thin MCP tools named
 `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`, and
-`special_dawson`, and `special_erfinv`.
+`special_dawson`, `special_erfinv`, and `special_erfcinv`.
 
 ## Certified Scope
 
@@ -77,8 +79,14 @@ do not silently fall back to mpmath while claiming certification.
 The certified `erfinv` policy is intentionally narrower than the entire error
 function family: it supports only real `x` with `-1 < x < 1`, rejects endpoints,
 out-of-interval real inputs, and complex inputs as clean non-certified
-failures, and does not claim `erfcinv`, complex inverse branches, or endpoint
-asymptotic certification.
+failures, and does not claim complex inverse branches or endpoint asymptotic
+certification.
+
+The certified `erfcinv` policy is likewise narrow: it supports only real `x`
+with `0 < x < 2`, rejects endpoints, out-of-interval real inputs, and complex
+inputs as clean non-certified failures, and does not claim complex inverse
+branches, endpoint asymptotic certification, Faddeeva, plasma dispersion, or
+`wofz`.
 
 ## Documentation
 
@@ -118,6 +126,9 @@ broaden those claims.
 - `pypi-smoke.yml` now covers `erfinv` in base and certified smoke calls and
   covers `special_erfinv` in certified MCP smoke calls after the
   `v0.2.0-alpha.9` publication.
+- This `erfcinv` feature branch intentionally leaves `pypi-smoke.yml` at
+  `0.2.0a9` and does not add `erfcinv` or `special_erfcinv` smoke calls until
+  the future release is published.
 
 ## Audit Findings
 

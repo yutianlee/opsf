@@ -139,7 +139,7 @@ unchanged.
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |
+| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`, `erfcinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1); real erfcinv on (0, 2) |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -155,6 +155,7 @@ from certsf import (
     pochhammer,
     dawson,
     erfinv,
+    erfcinv,
     erf,
     erfc,
     erfcx,
@@ -264,9 +265,11 @@ claim analytic continuation in `n` or simultaneous-pole limiting values. See
 - `dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)`
 - `erfinv(x)`, the real principal inverse satisfying `erf(erfinv(x)) = x`
   for `-1 < x < 1`
+- `erfcinv(x)`, the real principal inverse satisfying `erfc(erfcinv(x)) = x`
+  for `0 < x < 2`
 
 ```python
-from certsf import dawson, erf, erfc, erfcx, erfi, erfinv
+from certsf import dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv
 
 r = erf("1.0", mode="certified", dps=50)
 c = erfc("1.0", mode="certified", dps=50)
@@ -274,6 +277,7 @@ x = erfcx("1.0", mode="certified", dps=50)
 i = erfi("1.0", mode="certified", dps=50)
 d = dawson("1.0", mode="certified", dps=50)
 v = erfinv("0.5", mode="certified", dps=50)
+w = erfcinv("0.5", mode="certified", dps=50)
 ```
 
 ```python
@@ -292,6 +296,12 @@ r = erfi("1.0", mode="certified", dps=50)
 from certsf import erfinv
 
 r = erfinv("0.5", mode="certified", dps=50)
+```
+
+```python
+from certsf import erfcinv
+
+r = erfcinv("0.5", mode="certified", dps=50)
 ```
 
 Certified `erf`, `erfc`, and `erfi` use direct Arb error-function primitives
@@ -314,9 +324,18 @@ monotone real-root enclosure for `erf(y)-x=0` and records
 `certificate_level="certified_real_root"`, and
 `audit_status="monotone_real_inverse"`. Certified mode rejects endpoints,
 out-of-interval values, and complex inputs as clean non-certified failures.
+Certified `erfcinv` is restricted to the real principal inverse on `0 < x < 2`.
+It prefers direct Arb `erfcinv` when available; otherwise it uses the existing
+certified real-inverse path for `erfinv(1-x)` and records
+`certificate_scope="arb_erfcinv_via_erfinv"`,
+`certificate_level="certified_real_root"`,
+`audit_status="monotone_real_inverse"`, and `formula="erfinv(1-x)"`.
+Certified mode rejects endpoints, out-of-interval values, and complex inputs as
+clean non-certified failures.
 No custom asymptotic certification is added. See
 [`docs/error_function.md`](docs/error_function.md) and
-[`docs/dawson.md`](docs/dawson.md) and [`docs/erfinv.md`](docs/erfinv.md).
+[`docs/dawson.md`](docs/dawson.md), [`docs/erfinv.md`](docs/erfinv.md), and
+[`docs/erfcinv.md`](docs/erfcinv.md).
 
 ### Airy Family
 
@@ -419,6 +438,8 @@ The repository also includes:
 - `docs/error_function.md` for error-function certified-domain policy.
 - `docs/dawson.md` for Dawson integral certified-domain policy.
 - `docs/erfinv.md` for inverse-error-function certified-domain policy.
+- `docs/erfcinv.md` for inverse-complementary-error-function certified-domain
+  policy.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
