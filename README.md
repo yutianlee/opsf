@@ -270,9 +270,9 @@ i = erfi("1.0", mode="certified", dps=50)
 ```
 
 ```python
-from certsf import erfcx
+from certsf import erfi
 
-r = erfcx("1.0", mode="certified", dps=50)
+r = erfi("1.0", mode="certified", dps=50)
 ```
 
 Certified `erf`, `erfc`, and `erfi` use direct Arb error-function primitives
@@ -391,6 +391,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.7.md` for v0.2.0-alpha.7 feature-alpha planning
+  notes.
 - `docs/release-0.2.0-alpha.6.md` for v0.2.0-alpha.6 feature-alpha planning
   notes.
 - `docs/release-0.2.0-alpha.5.md` for v0.2.0-alpha.5 feature-alpha planning

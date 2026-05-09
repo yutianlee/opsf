@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0-alpha.7 - 2026-05-09
+
+- Added the public `erfi(z)` wrapper.
+- Defined `erfi(z)` as `-i erf(i z)`.
+- Fast mode uses `scipy.special.erfi(z)` when available; otherwise it uses the
+  formula fallback `-1j * scipy.special.erf(1j*z)`.
+- High-precision mode uses `mpmath.erfi(z)` when available; otherwise it uses
+  the formula fallback `-i*mpmath.erf(i*z)`.
+- Certified mode prefers direct Arb `erfi` when available; otherwise it uses
+  the Arb formula `-i*erf(i*z)` with formula diagnostics.
+- No `erfinv`, `erfcinv`, Faddeeva, Dawson, or other error-function variants
+  are added.
+- No `erf`, `erfc`, or `erfcx` behavior changes are included.
+- No gamma-family behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.6 - 2026-05-09
 
 - Added the public `erfcx(z)` wrapper.
