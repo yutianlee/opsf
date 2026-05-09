@@ -66,6 +66,8 @@ certificate level or promote
 | `arb_erfcx_formula` | `erfcx` | `formula_audited_alpha` | Arb identity formula `exp(z^2)*erfc(z)` with `formula="exp(z^2)*erfc(z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; large-argument scaled-erfc stability claims beyond the backend-certified formula |
 | `direct_arb_erfi` | `erfi` | `direct_arb_primitive` | Direct Arb `erfi` primitive when exposed by python-flint; zero, oddness, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `arb_erfi_formula` | `erfi` | `formula_audited_alpha` | Arb identity formula `-i*erf(i*z)` with `formula="-i*erf(i*z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `direct_arb_dawson` | `dawson` | `direct_arb_primitive` | Direct Arb `dawson` primitive when exposed by python-flint; zero, oddness, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `arb_dawson_formula` | `dawson` | `formula_audited_alpha` | Arb identity formula `sqrt(pi)/2*exp(-z^2)*erfi(z)` with `formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`; zero, positive/negative real samples, complex sample, identity containment, MCP parity, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -113,6 +115,7 @@ certified Arb enclosure of erf(z) using direct Arb error-function primitive
 certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive
 certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive
 certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive
+certified Arb enclosure of dawson(z) using direct Arb Dawson primitive
 ```
 
 If certified `erfc` uses the allowed Arb fallback, diagnostics record
@@ -136,6 +139,14 @@ claim:
 
 ```text
 certified Arb enclosure of -i*erf(i*z)
+```
+
+If certified `dawson` uses the Arb identity fallback, diagnostics record
+`formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`, use
+`audit_status="formula_identity"`, and use the claim:
+
+```text
+certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:

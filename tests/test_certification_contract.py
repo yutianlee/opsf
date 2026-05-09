@@ -13,6 +13,8 @@ SUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.erf, ("1",), id="erf"),
     pytest.param(certsf.erfc, ("1",), id="erfc"),
     pytest.param(certsf.erfcx, ("1",), id="erfcx"),
+    pytest.param(certsf.erfi, ("1",), id="erfi"),
+    pytest.param(certsf.dawson, ("1",), id="dawson"),
     pytest.param(certsf.airy, ("1.0",), id="airy"),
     pytest.param(certsf.ai, ("1.0",), id="ai"),
     pytest.param(certsf.bi, ("1.0",), id="bi"),
@@ -124,19 +126,38 @@ def test_error_functions_record_narrow_direct_arb_scopes():
         assert result.diagnostics["audit_status"] == "audited_direct"
 
 
-def test_erfcx_records_direct_or_formula_certified_scope():
-    result = certsf.erfcx("1", dps=50, mode="certified")
+@pytest.mark.parametrize(
+    ("function", "direct_scope", "formula_scope", "formula"),
+    [
+        pytest.param(certsf.erfcx, "direct_arb_erfcx", "arb_erfcx_formula", "exp(z^2)*erfc(z)", id="erfcx"),
+        pytest.param(certsf.erfi, "direct_arb_erfi", "arb_erfi_formula", "-i*erf(i*z)", id="erfi"),
+        pytest.param(
+            certsf.dawson,
+            "direct_arb_dawson",
+            "arb_dawson_formula",
+            "sqrt(pi)/2*exp(-z^2)*erfi(z)",
+            id="dawson",
+        ),
+    ],
+)
+def test_error_formula_wrappers_record_direct_or_formula_certified_scope(
+    function,
+    direct_scope,
+    formula_scope,
+    formula,
+):
+    result = function("1", dps=50, mode="certified")
     if _backend_is_unavailable(result):
         pytest.skip(result.diagnostics["error"])
 
-    assert result.diagnostics["certificate_scope"] in {"direct_arb_erfcx", "arb_erfcx_formula"}
-    if result.diagnostics["certificate_scope"] == "direct_arb_erfcx":
+    assert result.diagnostics["certificate_scope"] in {direct_scope, formula_scope}
+    if result.diagnostics["certificate_scope"] == direct_scope:
         assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
         assert result.diagnostics["audit_status"] == "audited_direct"
     else:
         assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
         assert result.diagnostics["audit_status"] == "formula_identity"
-        assert result.diagnostics["formula"] == "exp(z^2)*erfc(z)"
+        assert result.diagnostics["formula"] == formula
 
 
 @pytest.mark.parametrize(

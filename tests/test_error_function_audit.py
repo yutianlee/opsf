@@ -11,49 +11,64 @@ from certsf.dispatcher import REGISTRY
 
 ROOT = Path(__file__).resolve().parents[1]
 
-ERROR_FUNCTIONS = ("erf", "erfc", "erfcx", "erfi")
+ERROR_FUNCTIONS = ("erf", "erfc", "erfcx", "erfi", "dawson")
 SAMPLE_ARGS = {
     "erf": ("0.5+0.25j",),
     "erfc": ("0.5+0.25j",),
     "erfcx": ("0.5+0.25j",),
     "erfi": ("0.5+0.25j",),
+    "dawson": ("0.5+0.25j",),
 }
 CERTIFIED_SCOPES = {
     "erf": "direct_arb_erf",
     "erfc": "direct_arb_erfc",
     "erfcx": "direct_arb_erfcx|arb_erfcx_formula",
     "erfi": "direct_arb_erfi|arb_erfi_formula",
+    "dawson": "direct_arb_dawson|arb_dawson_formula",
 }
 UNSUPPORTED_CERTIFIED_CASES = (
     ("erf", ("nan",)),
     ("erfc", ("nan",)),
     ("erfcx", ("nan",)),
     ("erfi", ("nan",)),
+    ("dawson", ("nan",)),
 )
-FORBIDDEN_ERROR_FUNCTION_WRAPPERS = ("erfinv", "erfcinv", "faddeeva", "dawson")
+FORBIDDEN_ERROR_FUNCTION_WRAPPERS = ("erfinv", "erfcinv", "faddeeva")
 DOC_EXPECTATIONS = {
     "README.md": (
-        "| `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |",
+        "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |",
         "Certified `erf`, `erfc`, and `erfi` use direct Arb error-function primitives",
         "Certified `erfcx` prefers direct Arb `erfcx` when available",
         "Certified `erfi` prefers direct Arb `erfi` when available",
+        "Certified `dawson` prefers direct Arb `dawson` when available",
         "`erfc` may evaluate `1 - erf(z)` and records `formula=\"1-erf\"`.",
         "`formula=\"exp(z^2)*erfc(z)\"`.",
         "`formula=\"-i*erf(i*z)\"`.",
+        "`formula=\"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`.",
         "No custom asymptotic certification is added.",
         "[`docs/error_function.md`](docs/error_function.md)",
+        "[`docs/dawson.md`](docs/dawson.md)",
     ),
     "docs/error_function.md": (
         "erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt",
         "erfc(z) = 1 - erf(z)",
         "erfcx(z) = exp(z^2) erfc(z)",
         "erfi(z) = -i erf(i z)",
+        "dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)",
         "direct Arb `erf` and `erfc` primitives",
         "record `diagnostics[\"formula\"] == \"1-erf\"`",
         "records `diagnostics[\"formula\"] == \"exp(z^2)*erfc(z)\"`",
         "records `diagnostics[\"formula\"] == \"-i*erf(i*z)\"`",
+        "records `diagnostics[\"formula\"] == \"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
         "`erfinv`, `erfcinv`, or Faddeeva functions",
         "No Taylor, asymptotic, or custom certification method",
+    ),
+    "docs/dawson.md": (
+        "dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)",
+        "direct Arb `dawson` primitive",
+        "`certificate_scope=\"arb_dawson_formula\"`",
+        "`certification_claim=\"certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
+        "`diagnostics[\"formula\"] == \"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
     ),
     "docs/audit/error_function.md": (
         "Last reviewed: 2026-05-10.",
@@ -63,6 +78,8 @@ DOC_EXPECTATIONS = {
         "`formula=\"exp(z^2)*erfc(z)\"`",
         "`erfi(z) = -i erf(i z)`",
         "`formula=\"-i*erf(i*z)\"`",
+        "`dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)`",
+        "`formula=\"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
         "No `erfinv`, `erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
@@ -77,28 +94,33 @@ DOC_EXPECTATIONS = {
         "`direct_arb_erfc` | `erfc` | `direct_arb_primitive`",
         "`arb_erfcx_formula` | `erfcx` | `formula_audited_alpha`",
         "`arb_erfi_formula` | `erfi` | `formula_audited_alpha`",
+        "`arb_dawson_formula` | `dawson` | `formula_audited_alpha`",
         "diagnostics record",
         "`formula=\"1-erf\"`",
         "`formula=\"exp(z^2)*erfc(z)\"`",
         "`formula=\"-i*erf(i*z)\"`",
+        "`formula=\"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
     ),
     "docs/certified_scope_0_2_0.md": (
-        "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`",
+        "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson`",
         "`erf(z)` and `erfc(z)` are the v0.2.0-alpha.5",
         "`erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.",
         "`erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.",
+        "`dawson(z)` is the v0.2.0-alpha.8 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
         "otherwise certified `erfi` may use `-i*erf(i*z)`",
+        "otherwise certified `dawson` may use `sqrt(pi)/2*exp(-z^2)*erfi(z)`",
         "Custom Taylor, asymptotic, or non-Arb certification methods are outside",
         "Parabolic-cylinder family",
         "experimental certified formula layer",
     ),
     "docs/release_claims.md": (
-        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas",
+        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas",
         "direct Arb `erfc` is preferred",
         "direct Arb `erfcx` is",
         "direct Arb `erfi` is",
+        "`dawson` is defined as `sqrt(pi)/2 * exp(-z^2) * erfi(z)`",
         "fallback must be visible in diagnostics",
         "Do not claim `erfinv`, `erfcinv`, Faddeeva",
         "Do not describe the parabolic-cylinder family as certified without the",
@@ -186,10 +208,18 @@ def test_error_function_certified_scopes_match_audit(name):
         assert result.diagnostics["audit_status"] == "formula_identity"
         assert result.diagnostics["certification_claim"] == "certified Arb enclosure of -i*erf(i*z)"
         assert result.diagnostics["formula"] == "-i*erf(i*z)"
+    elif result.diagnostics["certificate_scope"] == "arb_dawson_formula":
+        assert result.diagnostics["certificate_level"] == "formula_audited_alpha"
+        assert result.diagnostics["audit_status"] == "formula_identity"
+        assert (
+            result.diagnostics["certification_claim"]
+            == "certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)"
+        )
+        assert result.diagnostics["formula"] == "sqrt(pi)/2*exp(-z^2)*erfi(z)"
     else:
         assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
         assert result.diagnostics["audit_status"] == "audited_direct"
-        assert "error-function primitive" in result.diagnostics["certification_claim"]
+        assert "error-function primitive" in result.diagnostics["certification_claim"] or name == "dawson"
     if name == "erfc" and "formula" in result.diagnostics:
         assert result.diagnostics["formula"] == "1-erf"
 
@@ -291,7 +321,12 @@ def test_error_function_documentation_uses_current_audit_wording(path, expected_
 def test_external_reference_fixture_covers_error_function_surface():
     fixture_dir = ROOT / "tests" / "fixtures" / "external_reference"
     entries = []
-    for fixture_name in ("error_function_reference.json", "erfcx_reference.json", "erfi_reference.json"):
+    for fixture_name in (
+        "error_function_reference.json",
+        "erfcx_reference.json",
+        "erfi_reference.json",
+        "dawson_reference.json",
+    ):
         entries.extend(json.loads((fixture_dir / fixture_name).read_text(encoding="utf-8")))
     covered_cases = {(entry["function"], tuple(entry["parameters"])) for entry in entries}
 
@@ -310,6 +345,10 @@ def test_external_reference_fixture_covers_error_function_surface():
         ("erfc", ("0.5+0.25j",)),
         ("erfcx", ("0.5+0.25j",)),
         ("erfi", ("0.5+0.25j",)),
+        ("dawson", ("0",)),
+        ("dawson", ("1",)),
+        ("dawson", ("-1",)),
+        ("dawson", ("0.5+0.25j",)),
     } <= covered_cases
 
 

@@ -1,0 +1,34 @@
+[
+  {
+    "function": "dawson",
+    "parameters": ["0"],
+    "expected_value": "0.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "dawson(0)=0"
+  },
+  {
+    "function": "dawson",
+    "parameters": ["1"],
+    "expected_value": "0.5380795069127684191363874204075567547919750017539333188752190980025665033305271062973",
+    "source": "mpmath high precision using sqrt(pi)/2*exp(-z^2)*erfi(z)",
+    "digits": 60,
+    "note": "regular positive-real Dawson value"
+  },
+  {
+    "function": "dawson",
+    "parameters": ["-1"],
+    "expected_value": "-0.5380795069127684191363874204075567547919750017539333188752190980025665033305271062973",
+    "source": "mpmath high precision using sqrt(pi)/2*exp(-z^2)*erfi(z)",
+    "digits": 60,
+    "note": "regular negative-real Dawson value"
+  },
+  {
+    "function": "dawson",
+    "parameters": ["0.5+0.25j"],
+    "expected_value": "0.4705155336818814360119786307559297335229984894463220386471520245996952060150747227280+0.1461558477704735402379895258963850586963124140678401801458291377308840503675587454643j",
+    "source": "mpmath high precision using sqrt(pi)/2*exp(-z^2)*erfi(z)",
+    "digits": 60,
+    "note": "regular complex Dawson value"
+  }
+]

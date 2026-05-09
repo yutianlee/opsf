@@ -2,7 +2,7 @@
 
 from .airy import ai, airyai, airy, airybi, bi
 from .bessel import besseli, besselj, besselk, bessely
-from .error_function import erf, erfc, erfcx, erfi
+from .error_function import erf, erfc, erfcx, erfi, dawson
 from .gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
 from .parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -21,6 +21,7 @@ __all__ = [
     "erfc",
     "erfcx",
     "erfi",
+    "dawson",
     "gamma",
     "gamma_ratio",
     "loggamma",

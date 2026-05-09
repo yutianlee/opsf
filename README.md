@@ -139,7 +139,7 @@ unchanged.
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc`, `erfcx`, `erfi` | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |
+| `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -153,6 +153,7 @@ from certsf import (
     loggamma,
     loggamma_ratio,
     pochhammer,
+    dawson,
     erf,
     erfc,
     erfcx,
@@ -259,14 +260,16 @@ claim analytic continuation in `n` or simultaneous-pole limiting values. See
 - `erfc(z) = 1 - erf(z)`
 - `erfcx(z) = exp(z^2) erfc(z)`
 - `erfi(z) = -i erf(i z)`
+- `dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)`
 
 ```python
-from certsf import erf, erfc, erfcx, erfi
+from certsf import dawson, erf, erfc, erfcx, erfi
 
 r = erf("1.0", mode="certified", dps=50)
 c = erfc("1.0", mode="certified", dps=50)
 x = erfcx("1.0", mode="certified", dps=50)
 i = erfi("1.0", mode="certified", dps=50)
+d = dawson("1.0", mode="certified", dps=50)
 ```
 
 ```python
@@ -285,8 +288,12 @@ the Arb identity formula `exp(z^2)*erfc(z)` and records
 Certified `erfi` prefers direct Arb `erfi` when available; otherwise it uses
 the Arb identity formula `-i*erf(i*z)` and records
 `formula="-i*erf(i*z)"`.
+Certified `dawson` prefers direct Arb `dawson` when available; otherwise it
+uses the Arb identity formula `sqrt(pi)/2*exp(-z^2)*erfi(z)` and records
+`formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`.
 No custom asymptotic certification is added. See
-[`docs/error_function.md`](docs/error_function.md).
+[`docs/error_function.md`](docs/error_function.md) and
+[`docs/dawson.md`](docs/dawson.md).
 
 ### Airy Family
 
@@ -387,6 +394,7 @@ The repository also includes:
   rationale.
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
 - `docs/error_function.md` for error-function certified-domain policy.
+- `docs/dawson.md` for Dawson integral certified-domain policy.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support

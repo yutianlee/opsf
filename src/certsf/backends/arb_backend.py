@@ -39,6 +39,8 @@ _DIRECT_ARB_ERFCX_SCOPE = "direct_arb_erfcx"
 _ARB_ERFCX_FORMULA_SCOPE = "arb_erfcx_formula"
 _DIRECT_ARB_ERFI_SCOPE = "direct_arb_erfi"
 _ARB_ERFI_FORMULA_SCOPE = "arb_erfi_formula"
+_DIRECT_ARB_DAWSON_SCOPE = "direct_arb_dawson"
+_ARB_DAWSON_FORMULA_SCOPE = "arb_dawson_formula"
 _DIRECT_ARB_ERF_CERTIFICATION_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error-function primitive"
 _DIRECT_ARB_ERFC_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
@@ -52,6 +54,7 @@ _DIRECT_ARB_ERFCX_CERTIFICATION_CLAIM = (
 _DIRECT_ARB_ERFI_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive"
 )
+_DIRECT_ARB_DAWSON_CERTIFICATION_CLAIM = "certified Arb enclosure of dawson(z) using direct Arb Dawson primitive"
 _ARB_ERFCX_FORMULA = "exp(z^2)*erfc(z)"
 _ARB_ERFCX_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
 _ARB_ERFCX_FORMULA_AUDIT_STATUS = "formula_identity"
@@ -60,6 +63,10 @@ _ARB_ERFI_FORMULA = "-i*erf(i*z)"
 _ARB_ERFI_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
 _ARB_ERFI_FORMULA_AUDIT_STATUS = "formula_identity"
 _ARB_ERFI_FORMULA_CERTIFICATION_CLAIM = "certified Arb enclosure of -i*erf(i*z)"
+_ARB_DAWSON_FORMULA = "sqrt(pi)/2*exp(-z^2)*erfi(z)"
+_ARB_DAWSON_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
+_ARB_DAWSON_FORMULA_AUDIT_STATUS = "formula_identity"
+_ARB_DAWSON_FORMULA_CERTIFICATION_CLAIM = "certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)"
 _PHASE7_PCF_SCOPE = "phase7_hypergeometric_parabolic_cylinder"
 _PHASE7_PCF_REAL_PARAMETER_ONLY = "Phase 7 certified parabolic-cylinder supports real parameters only."
 _PHASE8_PCF_SCOPE = "phase8_parabolic_cylinder_connections"
@@ -349,6 +356,54 @@ def arb_erfi(z, *, dps: int = 50):
             requested,
             f"{_PHASE1_UNAVAILABLE} {exc}",
             diagnostics={"certificate_scope": _ARB_ERFI_FORMULA_SCOPE, "formula": _ARB_ERFI_FORMULA},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def arb_dawson(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(
+            "dawson",
+            requested,
+            str(exc),
+            diagnostics={"certificate_scope": _ARB_DAWSON_FORMULA_SCOPE},
+        )
+    try:
+        argument = _make_ball(z)
+        domain = "real" if isinstance(argument, flint.arb) else "complex"
+        method = getattr(argument, "dawson", None) or getattr(argument, "dawsn", None)
+        if method is not None:
+            result = _certified_result("dawson", method(), requested, bits, flint)
+            return _with_error_function_diagnostics(
+                result,
+                _DIRECT_ARB_DAWSON_SCOPE,
+                domain,
+                _DIRECT_ARB_DAWSON_CERTIFICATION_CLAIM,
+            )
+
+        erfi_value = _arb_erfi_value(argument, flint)
+        coefficient = flint.arb.pi().sqrt() / 2
+        value = coefficient * (-(argument * argument)).exp() * erfi_value
+        result = _certified_result("dawson", value, requested, bits, flint)
+        return _with_error_function_diagnostics(
+            result,
+            _ARB_DAWSON_FORMULA_SCOPE,
+            domain,
+            _ARB_DAWSON_FORMULA_CERTIFICATION_CLAIM,
+            formula=_ARB_DAWSON_FORMULA,
+            certificate_level=_ARB_DAWSON_FORMULA_CERTIFICATE_LEVEL,
+            audit_status=_ARB_DAWSON_FORMULA_AUDIT_STATUS,
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(
+            "dawson",
+            requested,
+            f"{_PHASE1_UNAVAILABLE} {exc}",
+            diagnostics={"certificate_scope": _ARB_DAWSON_FORMULA_SCOPE, "formula": _ARB_DAWSON_FORMULA},
         )
     finally:
         flint.ctx.prec = old_prec
@@ -723,6 +778,22 @@ def _arb_error_function(function: str, z, *, dps: int):
         return _unavailable(function, requested, f"{_PHASE1_UNAVAILABLE} {exc}", diagnostics={"certificate_scope": scope})
     finally:
         flint.ctx.prec = old_prec
+
+
+def _arb_erfi_value(argument, flint):
+    method = getattr(argument, "erfi", None)
+    if method is not None:
+        return method()
+
+    erf_argument = flint.acb(argument) if isinstance(argument, flint.arb) else argument
+    imaginary_unit = flint.acb(0, 1)
+    erf_method = getattr(imaginary_unit * erf_argument, "erf", None)
+    if erf_method is None:
+        raise ValueError("python-flint does not expose an Arb erfi or erf primitive for this value.")
+    value = -imaginary_unit * erf_method()
+    if isinstance(argument, flint.arb):
+        return value.real
+    return value
 
 
 def _with_error_function_diagnostics(

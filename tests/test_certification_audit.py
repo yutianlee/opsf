@@ -48,8 +48,10 @@ DIRECT_ARB_ERFCX_CLAIM = (
     "certified Arb enclosure of erfcx(z) using direct Arb scaled complementary error-function primitive"
 )
 DIRECT_ARB_ERFI_CLAIM = "certified Arb enclosure of erfi(z) using direct Arb imaginary error-function primitive"
+DIRECT_ARB_DAWSON_CLAIM = "certified Arb enclosure of dawson(z) using direct Arb Dawson primitive"
 ARB_ERFCX_FORMULA_CLAIM = "certified Arb enclosure of exp(z^2)*erfc(z)"
 ARB_ERFI_FORMULA_CLAIM = "certified Arb enclosure of -i*erf(i*z)"
+ARB_DAWSON_FORMULA_CLAIM = "certified Arb enclosure of sqrt(pi)/2*exp(-z^2)*erfi(z)"
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
 
@@ -163,6 +165,15 @@ def test_error_function_certified_results_expose_narrow_audited_claim(function, 
             ARB_ERFI_FORMULA_CLAIM,
             "-i*erf(i*z)",
             id="erfi",
+        ),
+        pytest.param(
+            certsf.dawson,
+            "direct_arb_dawson",
+            DIRECT_ARB_DAWSON_CLAIM,
+            "arb_dawson_formula",
+            ARB_DAWSON_FORMULA_CLAIM,
+            "sqrt(pi)/2*exp(-z^2)*erfi(z)",
+            id="dawson",
         ),
     ],
 )
