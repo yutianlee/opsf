@@ -33,7 +33,14 @@ UNSUPPORTED_CERTIFIED_CASES = (
     ("erfi", ("nan",)),
     ("dawson", ("nan",)),
 )
-FORBIDDEN_ERROR_FUNCTION_WRAPPERS = ("erfinv", "erfcinv", "faddeeva")
+FORBIDDEN_ERROR_FUNCTION_WRAPPERS = (
+    "erfinv",
+    "erfcinv",
+    "faddeeva",
+    "plasma_dispersion",
+    "plasma_dispersion_function",
+    "wofz",
+)
 DOC_EXPECTATIONS = {
     "README.md": (
         "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |",
@@ -87,14 +94,19 @@ DOC_EXPECTATIONS = {
         "certified `special_erf`",
         "`special_erfcx`, `special_erfi`, and",
         "`special_dawson` calls in the MCP-certified",
+        "This audit found no implementation inconsistency",
+        "Release infrastructure remains unchanged",
         "Current v0.2 audit result:",
         "No public API, dispatcher, backend formula, MCP, or certified-scope",
     ),
     "docs/certification_audit.md": (
         "`direct_arb_erf` | `erf` | `direct_arb_primitive`",
         "`direct_arb_erfc` | `erfc` | `direct_arb_primitive`",
+        "`direct_arb_erfcx` | `erfcx` | `direct_arb_primitive`",
         "`arb_erfcx_formula` | `erfcx` | `formula_audited_alpha`",
+        "`direct_arb_erfi` | `erfi` | `direct_arb_primitive`",
         "`arb_erfi_formula` | `erfi` | `formula_audited_alpha`",
+        "`direct_arb_dawson` | `dawson` | `direct_arb_primitive`",
         "`arb_dawson_formula` | `dawson` | `formula_audited_alpha`",
         "diagnostics record",
         "`formula=\"1-erf\"`",
@@ -385,6 +397,11 @@ def test_pypi_smoke_covers_error_function_release_surface():
     assert 'special_erfcx("1.0", mode="certified", dps=50)' in text
     assert 'special_erfi("1.0", mode="certified", dps=50)' in text
     assert 'special_dawson("1.0", mode="certified", dps=50)' in text
+    assert 'assert erf_result["function"] == "erf"' in text
+    assert 'assert erfc_result["function"] == "erfc"' in text
+    assert 'assert erfcx_result["function"] == "erfcx"' in text
+    assert 'assert erfi_result["function"] == "erfi"' in text
+    assert 'assert dawson_result["function"] == "dawson"' in text
     assert 'assert erf_result["certified"]' in text
     assert 'assert erfc_result["certified"]' in text
     assert 'assert erfcx_result["certified"]' in text
@@ -400,6 +417,16 @@ def test_publish_workflow_artifact_actions_remain_on_v6():
         assert "actions/download-artifact@v6" in text
         assert "actions/upload-artifact@v5" not in text
         assert "actions/download-artifact@v5" not in text
+
+
+def test_release_policy_and_pypi_smoke_alpha8_guardrails_remain_current():
+    smoke = _read(".github/workflows/pypi-smoke.yml")
+    policy = _read("docs/release_policy.md")
+
+    assert 'default: "0.2.0a8"' in smoke
+    assert "inputs.version || '0.2.0a8'" in smoke
+    assert "Routine feature alpha releases may skip TestPyPI" in policy
+    assert "The `publish-testpypi` workflow must remain `workflow_dispatch` only." in policy
 
 
 def test_error_function_release_docs_do_not_keep_pre_publication_alpha7_wording():
