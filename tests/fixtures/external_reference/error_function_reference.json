@@ -1,0 +1,50 @@
+[
+  {
+    "function": "erf",
+    "parameters": ["0"],
+    "expected_value": "0.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "erf(0)=0"
+  },
+  {
+    "function": "erfc",
+    "parameters": ["0"],
+    "expected_value": "1.0",
+    "source": "definition special value",
+    "digits": 60,
+    "note": "erfc(0)=1"
+  },
+  {
+    "function": "erf",
+    "parameters": ["1"],
+    "expected_value": "0.84270079294971486934122063508260925929606699796630290845993789783471725409601084",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular real error-function value"
+  },
+  {
+    "function": "erfc",
+    "parameters": ["1"],
+    "expected_value": "0.15729920705028513065877936491739074070393300203369709154006210216528274590398916",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular real complementary error-function value"
+  },
+  {
+    "function": "erf",
+    "parameters": ["0.5+0.25j"],
+    "expected_value": "0.54868936055376218414591884070037735133301470830860022429799355965205536139634264+0.2219909542883733480840717883018321329488884548569543448750452503110791661706841j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex error-function value"
+  },
+  {
+    "function": "erfc",
+    "parameters": ["0.5+0.25j"],
+    "expected_value": "0.45131063944623781585408115929962264866698529169139977570200644034794463860365736-0.2219909542883733480840717883018321329488884548569543448750452503110791661706841j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex complementary error-function value"
+  }
+]

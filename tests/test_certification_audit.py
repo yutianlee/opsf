@@ -22,6 +22,7 @@ AUDIT_FIELDS = (
 )
 AUDIT_FILES = (
     "gamma.md",
+    "error_function.md",
     "airy.md",
     "bessel.md",
     "parabolic_cylinder.md",
@@ -38,6 +39,10 @@ DIRECT_ARB_BETA_CLAIM = (
 )
 DIRECT_ARB_POCHHAMMER_CLAIM = (
     "certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n"
+)
+DIRECT_ARB_ERF_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error-function primitive"
+DIRECT_ARB_ERFC_CLAIM = (
+    "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
 )
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
 
@@ -111,6 +116,25 @@ def test_pochhammer_certified_result_exposes_narrow_audited_claim():
     assert result.diagnostics["certificate_level"] == "direct_arb_finite_product"
     assert result.diagnostics["audit_status"] == "audited_direct"
     assert result.diagnostics["certification_claim"] == DIRECT_ARB_POCHHAMMER_CLAIM
+
+
+@pytest.mark.parametrize(
+    ("function", "args", "scope", "claim"),
+    [
+        pytest.param(certsf.erf, ("1",), "direct_arb_erf", DIRECT_ARB_ERF_CLAIM, id="erf"),
+        pytest.param(certsf.erfc, ("1",), "direct_arb_erfc", DIRECT_ARB_ERFC_CLAIM, id="erfc"),
+    ],
+)
+def test_error_function_certified_results_expose_narrow_audited_claim(function, args, scope, claim):
+    result = function(*args, dps=60, mode="certified")
+    if _backend_is_unavailable(result):
+        pytest.skip(result.diagnostics["error"])
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == scope
+    assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+    assert result.diagnostics["audit_status"] == "audited_direct"
+    assert result.diagnostics["certification_claim"] == claim
 
 
 @pytest.mark.parametrize(

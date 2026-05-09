@@ -22,11 +22,13 @@ certified surface remains archived in
 ## 0.2.0 Alpha Certified Scope
 
 The 0.2.0 alpha line adds conservative gamma-family wrappers beyond the
-one-argument primitives. The current status matrix is:
+one-argument primitives plus direct Arb error-function wrappers. The current
+status matrix is:
 
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
+| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -132,6 +134,45 @@ Certificate scope:
 `direct_arb_loggamma_ratio` scope for `loggamma_ratio`; and the narrow
 `direct_arb_beta` scope for `beta`; and `direct_arb_pochhammer_product` for
 `pochhammer`, recorded through `method="arb_ball"`.
+
+## Error-Function Family
+
+Function:
+`erf(z)`, `erfc(z)`
+
+Certified domain:
+real or complex inputs accepted by Arb for the corresponding error-function
+primitive, with non-finite target values reported as clean failures.
+
+Backend primitive:
+`arb/acb.erf` and `arb/acb.erfc`. If a supported python-flint build exposes
+direct `erf` but not direct `erfc`, the certified `erfc` backend may evaluate
+the Arb expression `1 - erf(z)` and records `formula="1-erf"`.
+
+Returned enclosure:
+Arb midpoint string plus absolute radius.
+
+Branch convention:
+`erf` and `erfc` are entire functions. The wrappers follow Arb's complex
+primitive conventions.
+
+Formula transformations:
+none for `erf`; direct `erfc` is preferred. The only allowed certified `erfc`
+fallback is the explicit Arb expression `1 - erf(z)`.
+
+Known exclusions:
+non-finite Arb input or output enclosures and any domain where Arb does not
+return a finite enclosure. No asymptotic or custom certification path is
+included.
+
+Validation tests:
+zero values, regular real and complex samples, `erf(-z) = -erf(z)`,
+`erfc(z) = 1 - erf(z)`, auto dispatch, MCP parity, external fixtures, and
+certified ball containment for `erf(z) + erfc(z) = 1` and
+`erf(-z) + erf(z) = 0`.
+
+Certificate scopes:
+`direct_arb_erf`, `direct_arb_erfc`.
 
 ## Airy Family
 

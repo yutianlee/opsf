@@ -132,12 +132,14 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.2.0 alpha line adds gamma-family wrappers while keeping the release
-wording conservative and the parabolic-cylinder claims unchanged.
+The 0.2.0 alpha line adds gamma-family wrappers and error functions while
+keeping the release wording conservative and the parabolic-cylinder claims
+unchanged.
 
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
+| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -151,6 +153,8 @@ from certsf import (
     loggamma,
     loggamma_ratio,
     pochhammer,
+    erf,
+    erfc,
     rgamma,
     gamma_ratio,
     airy,
@@ -246,6 +250,18 @@ Certified `pochhammer(a, n)` evaluates the finite product
 or negative `n` returns a clean non-certified failure. The wrapper does not
 claim analytic continuation in `n` or simultaneous-pole limiting values. See
 [`docs/pochhammer.md`](docs/pochhammer.md).
+
+### Error Functions
+
+- `erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt`
+- `erfc(z) = 1 - erf(z)`
+
+Certified `erf` and `erfc` use direct Arb error-function primitives for real or
+complex inputs when Arb returns finite enclosures. If a supported
+`python-flint` build lacks direct `erfc` but exposes direct `erf`, certified
+`erfc` may evaluate `1 - erf(z)` and records `formula="1-erf"`.
+No custom asymptotic certification is added. See
+[`docs/error_function.md`](docs/error_function.md).
 
 ### Airy Family
 
@@ -345,6 +361,7 @@ The repository also includes:
 - `docs/beta.md` for beta-function pole policy and certified-backend
   rationale.
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
+- `docs/error_function.md` for error-function certified-domain policy.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support

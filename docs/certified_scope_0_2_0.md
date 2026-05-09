@@ -4,13 +4,15 @@ This document records the current public certified surface for the 0.2.0 alpha
 line. The 0.1.0 surface remains frozen in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The gamma-family
 additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, `beta(a, b)`, and
-`pochhammer(a, n)`.
+`pochhammer(a, n)`. The v0.2.0-alpha.5 feature branch adds `erf(z)` and
+`erfc(z)`.
 
 ## Release Status Matrix
 
 | Area | Public wrappers or surface | Release status |
 | --- | --- | --- |
 | Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
+| Error-function family | `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |
 | Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -29,6 +31,8 @@ gamma_ratio
 loggamma_ratio
 beta
 pochhammer
+erf
+erfc
 airy
 ai
 bi
@@ -52,6 +56,7 @@ for `ai` and `bi`, not additional certified functions.
 - `loggamma_ratio(a, b)` is the v0.2.0-alpha.2 API expansion.
 - `beta(a, b)` is the v0.2.0-alpha.3 API expansion.
 - `pochhammer(a, n)` is the v0.2.0-alpha.4 API expansion.
+- `erf(z)` and `erfc(z)` are the v0.2.0-alpha.5 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.
@@ -71,6 +76,11 @@ for `ai` and `bi`, not additional certified functions.
 - Certified `pochhammer` returns `1` for `n = 0`, certifies exact zero factors
   to zero, rejects non-integer or negative `n`, and does not claim analytic
   continuation in `n` or simultaneous-pole limiting values.
+- Certified `erf` and `erfc` use direct Arb error-function primitives where
+  available, support real or complex inputs when Arb returns finite enclosures,
+  and do not add custom asymptotic certification.
+- If direct Arb `erfc` is unavailable but direct Arb `erf` is available,
+  certified `erfc` may use `1 - erf(z)` and must record `formula="1-erf"`.
 - Direct Arb primitive families are alpha-certified only on the domains where
   Arb returns finite enclosures and the wrapper records the documented
   certificate scope.
