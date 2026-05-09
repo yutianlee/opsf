@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf import ai, besselj, beta, gamma, gamma_ratio, loggamma_ratio, pcfu, pochhammer
+          from certsf import ai, besselj, beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -49,6 +49,8 @@ jobs:
           print(certsf.__all__)
           print(certsf_path)
           print(gamma("3.2", mode="fast").to_mcp_dict())
+          print(loggamma("3.2", mode="fast").to_mcp_dict())
+          print(rgamma("3.2", mode="fast").to_mcp_dict())
           print(gamma_ratio("3.2", "1.2", mode="fast").to_mcp_dict())
           print(loggamma_ratio("3.2", "1.2", mode="fast").to_mcp_dict())
           print(beta("2", "3", mode="fast").to_mcp_dict())
@@ -62,10 +64,12 @@ jobs:
         if: matrix.extras == '[certified]'
         run: |
           python - <<'PY'
-          from certsf import ai, besselj, beta, gamma, gamma_ratio, loggamma_ratio, pcfu, pochhammer
+          from certsf import ai, besselj, beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           cases = [
               gamma("3.2", mode="certified", dps=50),
+              loggamma("3.2", mode="certified", dps=50),
+              rgamma("0", mode="certified", dps=50),
               gamma_ratio("3.2", "1.2", mode="certified", dps=50),
               loggamma_ratio("3.2", "1.2", mode="certified", dps=50),
               beta("2", "3", mode="certified", dps=50),
@@ -105,7 +109,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf.mcp_server import build_server, special_beta, special_gamma, special_gamma_ratio, special_loggamma_ratio, special_pochhammer
+          from certsf.mcp_server import build_server, special_beta, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -115,6 +119,8 @@ jobs:
           assert any(certsf_path.is_relative_to(path) for path in install_paths), certsf_path
 
           result = special_gamma("3.2", mode="fast")
+          loggamma_result = special_loggamma("3.2", mode="fast")
+          rgamma_result = special_rgamma("3.2", mode="fast")
           ratio_result = special_gamma_ratio("3.2", "1.2", mode="fast")
           log_ratio_result = special_loggamma_ratio("3.2", "1.2", mode="fast")
           beta_result = special_beta("2", "3", mode="fast")
@@ -123,17 +129,23 @@ jobs:
           print(certsf_path)
           print(build_server)
           print(result)
+          print(loggamma_result)
+          print(rgamma_result)
           print(ratio_result)
           print(log_ratio_result)
           print(beta_result)
           print(pochhammer_result)
           assert callable(build_server)
           assert isinstance(result, dict)
+          assert isinstance(loggamma_result, dict)
+          assert isinstance(rgamma_result, dict)
           assert isinstance(ratio_result, dict)
           assert isinstance(log_ratio_result, dict)
           assert isinstance(beta_result, dict)
           assert isinstance(pochhammer_result, dict)
           assert result["function"] == "gamma"
+          assert loggamma_result["function"] == "loggamma"
+          assert rgamma_result["function"] == "rgamma"
           assert ratio_result["function"] == "gamma_ratio"
           assert log_ratio_result["function"] == "loggamma_ratio"
           assert beta_result["function"] == "beta"
