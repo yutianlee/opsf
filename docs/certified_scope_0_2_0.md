@@ -3,8 +3,8 @@
 This document records the current public certified surface for the 0.2.0 alpha
 line. The 0.1.0 surface remains frozen in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The ratio-oriented
-gamma-family additions are `gamma_ratio(a, b)` and, for the v0.2.0-alpha.2
-feature branch, `loggamma_ratio(a, b)`.
+gamma-family additions are `gamma_ratio(a, b)` and, for v0.2.0-alpha.2,
+`loggamma_ratio(a, b)`.
 
 ## Release Status Matrix
 
@@ -47,8 +47,7 @@ for `ai` and `bi`, not additional certified functions.
 ## Boundary Notes
 
 - `gamma_ratio(a, b)` is the only 0.2.0-alpha.1 API expansion.
-- `loggamma_ratio(a, b)` is a future v0.2.0-alpha.2 feature-branch API
-  expansion.
+- `loggamma_ratio(a, b)` is the v0.2.0-alpha.2 API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.

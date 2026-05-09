@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.0-alpha.2 - 2026-05-09
+
+- Added the public `loggamma_ratio(a, b)` wrapper as the only public API
+  expansion since `0.2.0-alpha.1`.
+- Defined `loggamma_ratio(a, b)` as principal `loggamma(a) - loggamma(b)`;
+  for complex inputs, this is not necessarily principal
+  `log(gamma_ratio(a, b))`.
+- Added SciPy, mpmath, and Arb backends for `loggamma_ratio`.
+- Certified `loggamma_ratio` uses Arb `lgamma(a) - lgamma(b)` in the
+  `direct_arb_loggamma_ratio` scope.
+- Numerator poles, denominator poles, and simultaneous poles fail cleanly.
+- Added the MCP tool `special_loggamma_ratio`.
+- Added external fixtures and certified identity tests for the loggamma-ratio
+  behavior.
+- No `gamma_ratio` behavior change is included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.1 - 2026-05-08
 
 - Added the public `gamma_ratio(a, b)` wrapper as the only public API expansion

@@ -41,7 +41,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.1
+python scripts/check_release_version.py v0.2.0-alpha.2
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -66,8 +66,40 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
-  `v0.2.0-alpha.1` maps to `0.2.0a1`, `v0.1.0-alpha.3` maps to
-  `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+  `v0.2.0-alpha.2` maps to `0.2.0a2`, `v0.2.0-alpha.1` maps to
+  `0.2.0a1`, `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to
+  `0.1.0`.
+
+## v0.2.0-alpha.2 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0a2`.
+- [ ] `CITATION.cff` version is `0.2.0-alpha.2`.
+- [ ] `CHANGELOG.md` records `loggamma_ratio(a, b)` as the only public API
+  expansion since `0.2.0-alpha.1`.
+- [ ] `docs/release-0.2.0-alpha.2.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0-alpha.2`.
+- [ ] PyPI smoke workflow still targets `0.2.0a1` until `0.2.0a2` is
+  published.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes beyond the already-merged `loggamma_ratio` are
+  included.
+- [ ] `loggamma_ratio` certified scope remains `direct_arb_loggamma_ratio`.
+- [ ] `loggamma_ratio` release copy describes only the narrow Arb
+  `lgamma(a) - lgamma(b)` principal-loggamma difference.
+- [ ] Release copy does not imply that complex `loggamma_ratio` is the
+  principal logarithm of `gamma_ratio(a, b)`.
+- [ ] Release copy does not imply that pole limiting values are certified.
+- [ ] No `gamma_ratio` behavior change is included.
+- [ ] No parabolic-cylinder claim broadening is included.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] Custom Taylor/asymptotic methods are still not included.
+- [ ] `python scripts/check_release_version.py v0.2.0-alpha.2` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.1 Checklist
 

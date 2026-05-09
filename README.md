@@ -310,6 +310,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.2.md` for v0.2.0-alpha.2 feature-alpha planning
+  notes.
 - `docs/release-0.2.0-alpha.1.md` for v0.2.0-alpha.1 feature-alpha planning
   notes.
 - `docs/release-0.1.0.md` for conservative 0.1.0 release notes and example
