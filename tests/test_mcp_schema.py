@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from certsf import beta, pochhammer
+from certsf import beta, erf, erfc, pochhammer
 from certsf import mcp_server
 
 
@@ -65,6 +65,20 @@ def test_special_pochhammer_returns_json_object_payload():
     assert payload["certified"] is False
     assert payload["backend"] == "mpmath"
     assert isinstance(payload["diagnostics"], dict)
+
+
+def test_special_error_functions_return_json_object_payloads():
+    erf_payload = mcp_server.special_erf("1", dps=50, mode="high_precision")
+    erfc_payload = mcp_server.special_erfc("1", dps=50, mode="high_precision")
+
+    assert json.loads(json.dumps(erf_payload)) == erf_payload
+    assert json.loads(json.dumps(erfc_payload)) == erfc_payload
+    assert erf_payload == erf("1", dps=50, mode="high_precision").to_mcp_dict()
+    assert erfc_payload == erfc("1", dps=50, mode="high_precision").to_mcp_dict()
+    assert erf_payload["function"] == "erf"
+    assert erfc_payload["function"] == "erfc"
+    assert erf_payload["backend"] == "mpmath"
+    assert erfc_payload["backend"] == "mpmath"
 
 
 @pytest.mark.parametrize(

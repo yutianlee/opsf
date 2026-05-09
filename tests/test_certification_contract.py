@@ -10,6 +10,8 @@ SUPPORTED_CERTIFIED_CASES = [
     pytest.param(certsf.gamma_ratio, ("3.2", "1.2"), id="gamma_ratio"),
     pytest.param(certsf.loggamma_ratio, ("3.2", "1.2"), id="loggamma_ratio"),
     pytest.param(certsf.pochhammer, ("3.2", "4"), id="pochhammer"),
+    pytest.param(certsf.erf, ("1",), id="erf"),
+    pytest.param(certsf.erfc, ("1",), id="erfc"),
     pytest.param(certsf.airy, ("1.0",), id="airy"),
     pytest.param(certsf.ai, ("1.0",), id="ai"),
     pytest.param(certsf.bi, ("1.0",), id="bi"),
@@ -104,6 +106,21 @@ def test_pochhammer_records_narrow_finite_product_scope():
     assert result.diagnostics["certificate_scope"] == "direct_arb_pochhammer_product"
     assert result.diagnostics["certificate_level"] == "direct_arb_finite_product"
     assert result.diagnostics["audit_status"] == "audited_direct"
+
+
+def test_error_functions_record_narrow_direct_arb_scopes():
+    cases = (
+        (certsf.erf, "direct_arb_erf"),
+        (certsf.erfc, "direct_arb_erfc"),
+    )
+    for function, scope in cases:
+        result = function("1", dps=50, mode="certified")
+        if _backend_is_unavailable(result):
+            pytest.skip(result.diagnostics["error"])
+
+        assert result.diagnostics["certificate_scope"] == scope
+        assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
+        assert result.diagnostics["audit_status"] == "audited_direct"
 
 
 @pytest.mark.parametrize(

@@ -26,6 +26,7 @@ Release-facing support matrices must keep these status phrases:
 | Surface | Required wording |
 | --- | --- |
 | Gamma family | alpha-certified, direct Arb gamma primitives and finite products |
+| Error-function family | alpha-certified, direct Arb error-function primitives |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -49,6 +50,9 @@ Release-facing support matrices must keep these status phrases:
 - Say that `pochhammer` is certified only through the finite product for
   integer `n >= 0`, with no analytic continuation in `n` and no simultaneous
   pole-limit claim.
+- Say that `erf` and `erfc` are certified only where Arb returns finite
+  enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
+  fallback must be visible in diagnostics.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of
   `gamma_ratio` or that it certifies pole-limiting values.
 - Say that Bessel certified mode is restricted to real-valued order.

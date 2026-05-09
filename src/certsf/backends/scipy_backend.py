@@ -74,6 +74,18 @@ def scipy_gamma_ratio(a, b, *, dps: int = 50):
     return _fast_result("gamma_ratio", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_erf(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.erf(scipy_number(z))
+    return _fast_result("erf", number_to_string(value, digits=float_digits(requested)), requested)
+
+
+def scipy_erfc(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.erfc(scipy_number(z))
+    return _fast_result("erfc", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

@@ -32,6 +32,8 @@ CURRENT_0_2_0_FUNCTIONS = (
     "loggamma_ratio",
     "beta",
     "pochhammer",
+    "erf",
+    "erfc",
     "airy",
     "ai",
     "bi",
@@ -63,6 +65,7 @@ CURRENT_0_2_0_STATUS_ROWS = (
         "| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | "
         "alpha-certified, direct Arb gamma primitives and finite products |"
     ),
+    "| `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| `besselj`, `bessely`, `besseli`, `besselk` | "
@@ -93,6 +96,7 @@ CURRENT_0_2_0_SCOPE_ROWS = (
         "| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, "
         "`pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |"
     ),
+    "| Error-function family | `erf`, `erfc` | alpha-certified, direct Arb error-function primitives |",
     "| Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
     (
         "| Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | "

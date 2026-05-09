@@ -63,6 +63,20 @@ def mpmath_gamma_ratio(a, b, *, dps: int = 50):
         return _mp_result("gamma_ratio", _mp_string(value, requested), requested, working)
 
 
+def mpmath_erf(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.erf(_mp_number(z))
+        return _mp_result("erf", _mp_string(value, requested), requested, working)
+
+
+def mpmath_erfc(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        value = mp.erfc(_mp_number(z))
+        return _mp_result("erfc", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):

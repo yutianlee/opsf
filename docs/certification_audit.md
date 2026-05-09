@@ -35,14 +35,16 @@ The certificate levels mean:
 Family-level checklists:
 
 - [`audit/gamma.md`](audit/gamma.md)
+- [`audit/error_function.md`](audit/error_function.md)
 - [`audit/airy.md`](audit/airy.md)
 - [`audit/bessel.md`](audit/bessel.md)
 - [`audit/parabolic_cylinder.md`](audit/parabolic_cylinder.md)
 
 Static external-reference fixtures in `tests/fixtures/external_reference/`
-provide an additional containment check for selected gamma-family, Airy, Bessel, and
-parabolic-cylinder values. This fixture coverage supplements the scope evidence
-below; it does not broaden any certificate level or promote
+provide an additional containment check for selected gamma-family,
+error-function, Airy, Bessel, and parabolic-cylinder values. This fixture
+coverage supplements the scope evidence below; it does not broaden any
+certificate level or promote
 `experimental_formula` scopes.
 
 ## Scope Matrix
@@ -54,6 +56,8 @@ below; it does not broaden any certificate level or promote
 | `direct_arb_loggamma_ratio` | `loggamma_ratio` | `direct_arb_primitive` | Arb `lgamma(a) - lgamma(b)` principal-branch difference; pole clean-failure tests; branch convention test; recurrence and composition identity checks | Gamma poles in either argument; simultaneous-pole limiting values; principal-log-of-ratio claims |
 | `direct_arb_beta` | `beta` | `direct_arb_primitive` | Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; symmetry and recurrence identity checks | Non-finite `Gamma(a)` or `Gamma(b)` targets; simultaneous pole interactions and limiting-value claims |
 | `direct_arb_pochhammer_product` | `pochhammer` | `direct_arb_finite_product` | Arb finite product `prod_{k=0}^{n-1}(a+k)`; special-value tests; zero-factor test; recurrence identity check; integer-domain rejection tests | Non-integer `n`; negative `n`; analytic continuation in `n`; simultaneous-pole limiting values; product paths above the documented term ceiling |
+| `direct_arb_erf` | `erf` | `direct_arb_primitive` | Direct Arb `erf` primitive; zero, oddness, complex sample, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
+| `direct_arb_erfc` | `erfc` | `direct_arb_primitive` | Direct Arb `erfc` primitive, or explicit Arb `1-erf` fallback with `formula="1-erf"`; zero, complement identity, complex sample, and external-reference containment tests | Non-finite Arb enclosures; unrecorded cancellation-prone fallback formulas; custom asymptotic certification paths |
 | `phase3_real_airy` | `airy`, `ai`, `bi` on real arguments | `direct_arb_primitive` | Direct Arb Airy primitive; component contract tests; real Wronskian and large-argument checks | Derivatives beyond 1 |
 | `arb_complex_airy` | `airy`, `ai`, `bi` on complex arguments | `direct_arb_primitive` | Direct Arb Airy primitive; complex component comparisons and result-contract checks | Derivatives beyond 1 |
 | `phase4_integer_real_bessel` | `besselj`, `bessely`, `besseli`, `besselk` with integer order and real argument | `direct_arb_primitive` | Direct Arb Bessel primitives; integer recurrence tests and near-zero checks | Complex order |
@@ -92,6 +96,20 @@ The `direct_arb_pochhammer_product` scope uses finite-product wording:
 
 ```text
 certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n
+```
+
+The error-function scopes use narrow audited-direct wording:
+
+```text
+certified Arb enclosure of erf(z) using direct Arb error-function primitive
+certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive
+```
+
+If certified `erfc` uses the allowed Arb fallback, diagnostics record
+`formula="1-erf"` and use the claim:
+
+```text
+certified Arb enclosure of 1 - erf(z) using direct Arb error-function primitive
 ```
 
 For `experimental_formula` scopes, runtime diagnostics use:
