@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from .functions.airy import ai, airy, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
-from .functions.error_function import erf, erfc, erfcx, erfi
+from .functions.error_function import erf, erfc, erfcx, erfi, dawson
 from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
@@ -51,6 +51,10 @@ def special_erfcx(z: str, dps: int = 50, mode: str = "auto", certify: bool = Fal
 
 def special_erfi(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
     return erfi(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+
+
+def special_dawson(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dawson(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
 
 
 def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
@@ -113,6 +117,7 @@ _MCP_TOOLS = (
     special_erfc,
     special_erfcx,
     special_erfi,
+    special_dawson,
     special_airy,
     special_ai,
     special_bi,

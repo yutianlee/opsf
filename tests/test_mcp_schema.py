@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from certsf import beta, erf, erfc, erfcx, erfi, pochhammer
+from certsf import beta, dawson, erf, erfc, erfcx, erfi, pochhammer
 from certsf import mcp_server
 
 
@@ -72,23 +72,28 @@ def test_special_error_functions_return_json_object_payloads():
     erfc_payload = mcp_server.special_erfc("1", dps=50, mode="high_precision")
     erfcx_payload = mcp_server.special_erfcx("1", dps=50, mode="high_precision")
     erfi_payload = mcp_server.special_erfi("1", dps=50, mode="high_precision")
+    dawson_payload = mcp_server.special_dawson("1", dps=50, mode="high_precision")
 
     assert json.loads(json.dumps(erf_payload)) == erf_payload
     assert json.loads(json.dumps(erfc_payload)) == erfc_payload
     assert json.loads(json.dumps(erfcx_payload)) == erfcx_payload
     assert json.loads(json.dumps(erfi_payload)) == erfi_payload
+    assert json.loads(json.dumps(dawson_payload)) == dawson_payload
     assert erf_payload == erf("1", dps=50, mode="high_precision").to_mcp_dict()
     assert erfc_payload == erfc("1", dps=50, mode="high_precision").to_mcp_dict()
     assert erfcx_payload == erfcx("1", dps=50, mode="high_precision").to_mcp_dict()
     assert erfi_payload == erfi("1", dps=50, mode="high_precision").to_mcp_dict()
+    assert dawson_payload == dawson("1", dps=50, mode="high_precision").to_mcp_dict()
     assert erf_payload["function"] == "erf"
     assert erfc_payload["function"] == "erfc"
     assert erfcx_payload["function"] == "erfcx"
     assert erfi_payload["function"] == "erfi"
+    assert dawson_payload["function"] == "dawson"
     assert erf_payload["backend"] == "mpmath"
     assert erfc_payload["backend"] == "mpmath"
     assert erfcx_payload["backend"] == "mpmath"
     assert erfi_payload["backend"] == "mpmath"
+    assert dawson_payload["backend"] == "mpmath"
 
 
 @pytest.mark.parametrize(

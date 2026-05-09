@@ -103,6 +103,30 @@ def scipy_erfi(z, *, dps: int = 50):
     return _fast_result("erfi", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_dawson(z, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    zz = scipy_number(z)
+    method = getattr(special, "dawsn", None)
+    if method is not None:
+        value = method(zz)
+        return _fast_result("dawson", number_to_string(value, digits=float_digits(requested)), requested)
+
+    erfi_method = getattr(special, "erfi", None)
+    if erfi_method is None:
+        return _fast_unavailable(
+            "dawson",
+            requested,
+            "SciPy does not expose special.dawsn or special.erfi in this environment.",
+        )
+    value = np.sqrt(np.pi) / 2 * np.exp(-zz * zz) * erfi_method(zz)
+    return _fast_result(
+        "dawson",
+        number_to_string(value, digits=float_digits(requested)),
+        requested,
+        diagnostics={"formula": "sqrt(pi)/2*exp(-z^2)*erfi(z)"},
+    )
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

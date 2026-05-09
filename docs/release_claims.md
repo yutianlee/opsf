@@ -26,7 +26,7 @@ Release-facing support matrices must keep these status phrases:
 | Surface | Required wording |
 | --- | --- |
 | Gamma family | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx/erfi identity formulas |
+| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -59,10 +59,14 @@ Release-facing support matrices must keep these status phrases:
 - Say that `erfi` is defined as `-i erf(i z)`; direct Arb `erfi` is preferred
   when available, and any allowed `-i*erf(i*z)` fallback must be visible in
   diagnostics.
+- Say that `dawson` is defined as `sqrt(pi)/2 * exp(-z^2) * erfi(z)`; direct Arb `dawson` is preferred when
+  available, and any allowed `sqrt(pi)/2*exp(-z^2)*erfi(z)` fallback must be
+  visible in diagnostics.
 - Do not claim scaled-erfc stability for large arguments beyond what the
   selected backend certifies.
-- Do not claim `erfinv`, `erfcinv`, Faddeeva, Dawson, or other error-function
-  variant support until those wrappers, backends, tests, and audit docs exist.
+- Do not claim `erfinv`, `erfcinv`, Faddeeva, plasma dispersion, or other
+  error-function variant support until those wrappers, backends, tests, and
+  audit docs exist.
 - Do not claim Taylor, asymptotic, or custom certification methods for the
   error-function family.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of

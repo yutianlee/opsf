@@ -94,6 +94,20 @@ def mpmath_erfi(z, *, dps: int = 50):
         return _mp_result("erfi", _mp_string(value, requested), requested, working)
 
 
+def mpmath_dawson(z, *, dps: int = 50):
+    requested, working = _precisions(dps)
+    with mp.workdps(working):
+        zz = _mp_number(z)
+        method = getattr(mp, "dawson", None) or getattr(mp, "dawsn", None)
+        if method is not None:
+            value = method(zz)
+        else:
+            erfi_method = getattr(mp, "erfi", None)
+            erfi_value = erfi_method(zz) if erfi_method is not None else -mp.j * mp.erf(mp.j * zz)
+            value = mp.sqrt(mp.pi) / 2 * mp.exp(-zz * zz) * erfi_value
+        return _mp_result("dawson", _mp_string(value, requested), requested, working)
+
+
 def mpmath_airy(z, *, dps: int = 50):
     requested, working = _precisions(dps)
     with mp.workdps(working):
