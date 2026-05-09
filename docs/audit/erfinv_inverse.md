@@ -3,7 +3,7 @@
 Last reviewed: 2026-05-10.
 
 This audit covers only the public inverse-error wrapper `erfinv(x)`. It does
-not add `erfcinv`, complex inverse branches, Faddeeva/`wofz`, plasma
+not broaden `erfcinv`, complex inverse branches, Faddeeva/`wofz`, plasma
 dispersion, or endpoint asymptotic certification.
 
 ## Public Surface

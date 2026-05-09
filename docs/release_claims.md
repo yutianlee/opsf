@@ -26,7 +26,7 @@ Release-facing support matrices must keep these status phrases:
 | Surface | Required wording |
 | --- | --- |
 | Gamma family | alpha-certified, direct Arb gamma primitives and finite products |
-| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |
+| Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1); real erfcinv on (0, 2) |
 | Airy family | alpha-certified, direct Arb primitive |
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
@@ -65,11 +65,15 @@ Release-facing support matrices must keep these status phrases:
 - Say that `erfinv` is only the real principal inverse on `-1 < x < 1`;
   direct Arb `erfinv` is preferred when available, and any allowed
   `erf(y)-x=0` real-root fallback must be visible in diagnostics.
+- Say that `erfcinv` is only the real principal inverse on `0 < x < 2`;
+  direct Arb `erfcinv` is preferred when available, and any allowed
+  `erfinv(1-x)` fallback must be visible in diagnostics.
 - Do not claim scaled-erfc stability for large arguments beyond what the
   selected backend certifies.
-- Do not claim `erfcinv`, Faddeeva, plasma dispersion, or other error-function
+- Do not claim Faddeeva, plasma dispersion, `wofz`, or other error-function
   variant support until those wrappers, backends, tests, and audit docs exist.
 - Do not claim complex inverse branches or endpoint asymptotic certification for `erfinv`.
+- Do not claim complex inverse branches or endpoint asymptotic certification for `erfcinv`.
 - Do not claim Taylor or asymptotic certification methods for the
   error-function family.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of

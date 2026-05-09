@@ -133,6 +133,12 @@ def scipy_erfinv(x, *, dps: int = 50):
     return _fast_result("erfinv", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_erfcinv(x, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    value = special.erfcinv(scipy_number(x))
+    return _fast_result("erfcinv", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_airy(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     ai, aip, bi, bip = special.airy(scipy_number(z))

@@ -3,15 +3,17 @@
 Last reviewed: 2026-05-10.
 
 Function:
-`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`, `dawson(z)`, `erfinv(x)`.
+`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`, `dawson(z)`, `erfinv(x)`,
+`erfcinv(x)`.
 
 Public API:
-`erf`, `erfc`, `erfcx`, `erfi`, `dawson`, and `erfinv` are exported from
-`certsf.__init__`, listed in `certsf.__all__`, registered in the dispatcher
-with `fast`, `high_precision`, and `certified` modes, and exposed through thin
-MCP tools named `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`,
-`special_dawson`, and `special_erfinv`. No `erfcinv`, Faddeeva wrapper, plasma
-dispersion wrapper, or `wofz` wrapper is part of this audit scope.
+`erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`, and `erfcinv` are exported
+from `certsf.__init__`, listed in `certsf.__all__`, registered in the
+dispatcher with `fast`, `high_precision`, and `certified` modes, and exposed
+through thin MCP tools named `special_erf`, `special_erfc`, `special_erfcx`,
+`special_erfi`, `special_dawson`, `special_erfinv`, and `special_erfcinv`. No
+additional inverse-error wrapper, Faddeeva wrapper, plasma dispersion wrapper,
+or `wofz` wrapper is part of this audit scope.
 
 Target mathematical definition:
 `erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt`.
@@ -21,6 +23,8 @@ Target mathematical definition:
 `dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)`.
 `erfinv(x)` is the real principal inverse satisfying `erf(erfinv(x)) = x` for
 real `-1 < x < 1`.
+`erfcinv(x)` is the real principal inverse satisfying `erfc(erfcinv(x)) = x`
+for real `0 < x < 2`, with `erfcinv(x) = erfinv(1-x)`.
 
 Backend primitive or formula:
 Direct Arb error-function primitives through python-flint: `arb/acb.erf` and
@@ -41,20 +45,26 @@ For `erfinv`, the certified path supports only real `x` with `-1 < x < 1`.
 It prefers direct Arb `erfinv` when available. Otherwise it brackets the unique
 real root of `erf(y)-x=0`, uses monotonicity of real `erf`, and records
 `formula="erf(y)-x=0"`.
+For `erfcinv`, the certified path supports only real `x` with `0 < x < 2`.
+It prefers direct Arb `erfcinv` when available. Otherwise it uses the certified
+real-inverse path for `erfinv(1-x)` and records `formula="erfinv(1-x)"`.
 
 Accepted domain:
 For `erf`, `erfc`, `erfcx`, `erfi`, and `dawson`, real or complex inputs
 accepted by Arb for the corresponding error-function primitive or identity
 formula, when the requested target value has a finite Arb enclosure. For
-`erfinv`, real `x` only with `-1 < x < 1`.
+`erfinv`, real `x` only with `-1 < x < 1`. For `erfcinv`, real `x` only with
+`0 < x < 2`.
 
 Excluded domain:
 Non-finite input or output enclosures and any domain where Arb does not return a
 finite enclosure. Certified `erfinv` also excludes `x <= -1`, `x >= 1`,
-complex inverse branches, `erfcinv`, and endpoint asymptotic certification. No
-custom asymptotic or Taylor certification path is included, and no
-large-argument scaled-erfc stability claim is made beyond backend certification
-of the selected expression.
+complex inverse branches, and endpoint asymptotic certification. Certified
+`erfcinv` excludes `x <= 0`, `x >= 2`, complex inverse branches, endpoint
+asymptotic certification, Faddeeva, plasma dispersion, and `wofz`. No custom
+asymptotic or Taylor certification path is included, and no large-argument
+scaled-erfc stability claim is made beyond backend certification of the
+selected expression.
 No custom asymptotic or Taylor certification path is added for the
 error-function family.
 
@@ -63,12 +73,15 @@ The direct and formula error-function entries here are entire. The certified
 wrappers follow Arb's complex elementary-function conventions for the direct
 primitives and the `exp(z^2)*erfc(z)`, `-i*erf(i*z)`, and
 `sqrt(pi)/2*exp(-z^2)*erfi(z)` formulas. Certified `erfinv` uses only the real
-principal inverse branch on `(-1, 1)`.
+principal inverse branch on `(-1, 1)`. Certified `erfcinv` uses only the real
+principal inverse branch on `(0, 2)`.
 
 Singularities:
 No finite singularities for `erf`, `erfc`, `erfcx`, `erfi`, or `dawson`;
 failures are limited to unsupported or non-finite Arb enclosure cases.
 Certified `erfinv` has excluded endpoints at `x = -1` and `x = 1`; this audit
+does not certify endpoint asymptotics.
+Certified `erfcinv` has excluded endpoints at `x = 0` and `x = 2`; this audit
 does not certify endpoint asymptotics.
 
 Validation identities:
@@ -88,6 +101,11 @@ positive and negative near-endpoint samples, external-reference containment,
 endpoint and out-of-interval rejection, complex rejection, auto dispatch, MCP
 parity, forced real-root fallback diagnostics, and certified residual
 containment for `erf(erfinv(x))-x = 0`.
+`erfcinv` tests cover `erfcinv(1) = 0`, real composition with `erfc`, the
+relation `erfcinv(x) = erfinv(1-x)`, monotonic orientation, near-endpoint
+samples, external-reference containment, endpoint and out-of-interval
+rejection, complex rejection, auto dispatch, MCP parity, forced fallback
+diagnostics, and certified residual containment for `erfc(erfcinv(x))-x = 0`.
 
 Reference equations:
 DLMF 7.2 for definitions and DLMF 7.4 for symmetry. Arb/python-flint error
@@ -101,6 +119,9 @@ when available and only records the `1-erf` formula fallback explicitly.
 asymptotic certification or claim stability outside the selected backend
 enclosure.
 `erfinv` is restricted to real `x in (-1, 1)`. Values near endpoints can have
+large derivative amplification; this PR does not add endpoint asymptotic
+certification.
+`erfcinv` is restricted to real `x in (0, 2)`. Values near endpoints can have
 large derivative amplification; this PR does not add endpoint asymptotic
 certification.
 
@@ -136,6 +157,13 @@ available. The real-root fallback uses
 `audit_status="monotone_real_inverse"`,
 `certification_claim="certified real root enclosure for erf(y)-x=0 using monotonicity of real erf"`,
 `domain="real_x_in_open_interval_minus1_1"`, and `formula="erf(y)-x=0"`.
+Certified `erfcinv` results use `certificate_scope="direct_arb_erfcinv"` with
+`certificate_level="direct_arb_primitive"` if a direct Arb primitive is
+available. The fallback uses `certificate_scope="arb_erfcinv_via_erfinv"`,
+`certificate_level="certified_real_root"`,
+`audit_status="monotone_real_inverse"`,
+`certification_claim="certified real inverse enclosure for erfcinv(x)=erfinv(1-x) using monotonicity of real erfc"`,
+`domain="real_x_in_open_interval_0_2"`, and `formula="erfinv(1-x)"`.
 
 Release hygiene:
 `pypi-smoke.yml` defaults to `0.2.0a9` after the published
@@ -143,16 +171,18 @@ Release hygiene:
 `erfi`, `dawson`, and `erfinv` in base and certified Python API smoke calls,
 plus certified `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`,
 `special_dawson`, and `special_erfinv` calls in the MCP-certified smoke job.
+This feature branch intentionally leaves `pypi-smoke.yml` at `0.2.0a9` and
+does not add `erfcinv` smoke calls until the future release is published.
 The PyPI publish workflows continue to use
 `actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
 Audit evidence:
-This audit found no implementation inconsistency in the six-wrapper
+This audit found no implementation inconsistency in the seven-wrapper
 error-function surface. The Python API, dispatcher registry, certified method
 scopes, MCP thin wrappers, external-reference fixtures, identity tests, and
 formula-diagnostics tests are in lockstep. The audit also checked that
-`erfcinv`, Faddeeva, plasma dispersion, and `wofz` wrappers are not exported,
-registered, or exposed as MCP tools.
+Faddeeva, plasma dispersion, and `wofz` wrappers are not exported, registered,
+or exposed as MCP tools.
 
 Release infrastructure remains version-stable: this audit keeps the package
 version fixed, keeps `pypi-smoke.yml` on the published `0.2.0a9` default, keeps
@@ -162,14 +192,14 @@ feature alphas may still skip TestPyPI under `docs/release_policy.md` when the
 documented release-policy conditions are met.
 
 Current v0.2 audit result:
-The published `v0.2.0-alpha.9` surface includes `erfinv(x)` as the only new
-public error-function-family wrapper after `v0.2.0-alpha.8`. It keeps the
-inverse scope to the real principal branch on `-1 < x < 1` and does not add
-`erfcinv`, complex inverse branches, endpoint asymptotic certification,
-Faddeeva, plasma dispersion, or `wofz`. Tests keep the six wrappers, MCP
-parity, fixture containment, formula diagnostics, and real inverse-root
-diagnostics in lockstep. No `erf`, `erfc`, `erfcx`, `erfi`, `dawson`,
-gamma-family, or parabolic-cylinder behavior or claim changes are part of this
-audit update.
+The future `v0.2.0-alpha.10` feature surface adds `erfcinv(x)` as one new
+public error-function-family wrapper after `v0.2.0-alpha.9`. It keeps inverse
+scope to real principal branches: `erfinv` on `-1 < x < 1` and `erfcinv` on
+`0 < x < 2`. It does not add complex inverse branches, endpoint asymptotic
+certification, Faddeeva, plasma dispersion, or `wofz`. Tests keep the seven
+wrappers, MCP parity, fixture containment, formula diagnostics, and real
+inverse-root diagnostics in lockstep. No `erfinv`, `erf`, `erfc`, `erfcx`,
+`erfi`, `dawson`, gamma-family, or parabolic-cylinder behavior or claim changes
+are part of this audit update.
 No public API, dispatcher, backend formula, MCP, or certified-scope
-inconsistency was found after the erfinv surface and audit docs were updated.
+inconsistency was found after the erfcinv surface and audit docs were updated.

@@ -2,7 +2,7 @@
 
 from .functions.airy import ai, airyai, airy, airybi, bi
 from .functions.bessel import besseli, besselj, besselk, bessely
-from .functions.error_function import dawson, erf, erfc, erfcx, erfi, erfinv
+from .functions.error_function import dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv
 from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio, pochhammer, rgamma
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 from .result import SFResult
@@ -25,6 +25,7 @@ __all__ = [
     "erfi",
     "dawson",
     "erfinv",
+    "erfcinv",
     "gamma",
     "gamma_ratio",
     "loggamma",

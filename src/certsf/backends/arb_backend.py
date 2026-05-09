@@ -44,6 +44,9 @@ _ARB_DAWSON_FORMULA_SCOPE = "arb_dawson_formula"
 _DIRECT_ARB_ERFINV_SCOPE = "direct_arb_erfinv"
 _ARB_ERFINV_REAL_ROOT_SCOPE = "arb_erfinv_real_root"
 _ARB_ERFINV_REAL_DOMAIN = "real_x_in_open_interval_minus1_1"
+_DIRECT_ARB_ERFCINV_SCOPE = "direct_arb_erfcinv"
+_ARB_ERFCINV_VIA_ERFINV_SCOPE = "arb_erfcinv_via_erfinv"
+_ARB_ERFCINV_REAL_DOMAIN = "real_x_in_open_interval_0_2"
 _DIRECT_ARB_ERF_CERTIFICATION_CLAIM = "certified Arb enclosure of erf(z) using direct Arb error-function primitive"
 _DIRECT_ARB_ERFC_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of erfc(z) using direct Arb complementary error-function primitive"
@@ -61,10 +64,16 @@ _DIRECT_ARB_DAWSON_CERTIFICATION_CLAIM = "certified Arb enclosure of dawson(z) u
 _DIRECT_ARB_ERFINV_CERTIFICATION_CLAIM = (
     "certified Arb enclosure of real principal erfinv(x) using direct Arb inverse error-function primitive"
 )
+_DIRECT_ARB_ERFCINV_CERTIFICATION_CLAIM = (
+    "certified Arb enclosure of real principal erfcinv(x) using direct Arb inverse complementary error-function primitive"
+)
 _ARB_ERFINV_REAL_ROOT_CERTIFICATE_LEVEL = "certified_real_root"
 _ARB_ERFINV_REAL_ROOT_AUDIT_STATUS = "monotone_real_inverse"
 _ARB_ERFINV_REAL_ROOT_CERTIFICATION_CLAIM = (
     "certified real root enclosure for erf(y)-x=0 using monotonicity of real erf"
+)
+_ARB_ERFCINV_VIA_ERFINV_CERTIFICATION_CLAIM = (
+    "certified real inverse enclosure for erfcinv(x)=erfinv(1-x) using monotonicity of real erfc"
 )
 _ARB_ERFCX_FORMULA = "exp(z^2)*erfc(z)"
 _ARB_ERFCX_FORMULA_CERTIFICATE_LEVEL = "formula_audited_alpha"
@@ -475,6 +484,62 @@ def arb_erfinv(x, *, dps: int = 50):
         flint.ctx.prec = old_prec
 
 
+def arb_erfcinv(x, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    x_text, domain_error = _erfcinv_real_input_text(x)
+    if domain_error is not None:
+        return _unavailable(
+            "erfcinv",
+            requested,
+            domain_error,
+            diagnostics=_erfcinv_domain_diagnostics(),
+        )
+
+    try:
+        flint, old_prec, bits = _enter_flint_context(requested)
+    except ImportError as exc:
+        return _unavailable(
+            "erfcinv",
+            requested,
+            str(exc),
+            diagnostics=_erfcinv_domain_diagnostics(),
+        )
+    try:
+        argument = flint.arb(x_text)
+        method = _direct_arb_erfcinv_method(argument)
+        if method is not None:
+            result = _certified_result("erfcinv", method(), requested, bits, flint)
+            return _with_erfcinv_diagnostics(
+                result,
+                _DIRECT_ARB_ERFCINV_SCOPE,
+                _DIRECT_ARB_CERTIFICATE_LEVEL,
+                _DIRECT_ARB_AUDIT_STATUS,
+                _DIRECT_ARB_ERFCINV_CERTIFICATION_CLAIM,
+            )
+
+        target = flint.arb(1) - argument
+        value, iterations = _arb_erfinv_real_root(target, requested, bits, flint)
+        result = _certified_result("erfcinv", value, requested, bits, flint)
+        return _with_erfcinv_diagnostics(
+            result,
+            _ARB_ERFCINV_VIA_ERFINV_SCOPE,
+            _ARB_ERFINV_REAL_ROOT_CERTIFICATE_LEVEL,
+            _ARB_ERFINV_REAL_ROOT_AUDIT_STATUS,
+            _ARB_ERFCINV_VIA_ERFINV_CERTIFICATION_CLAIM,
+            iterations=iterations,
+            formula="erfinv(1-x)",
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable(
+            "erfcinv",
+            requested,
+            f"{_PHASE1_UNAVAILABLE} {exc}",
+            diagnostics=_erfcinv_domain_diagnostics(),
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
 def arb_beta(a, b, *, dps: int = 50):
     requested = ensure_dps(dps)
     a_pole = _is_gamma_pole(a)
@@ -866,6 +931,10 @@ def _direct_arb_erfinv_method(argument):
     return getattr(argument, "erfinv", None)
 
 
+def _direct_arb_erfcinv_method(argument):
+    return getattr(argument, "erfcinv", None)
+
+
 def _erfinv_real_input_text(value: Any) -> tuple[str | None, str | None]:
     if isinstance(value, complex):
         return None, "certified erfinv supports real x only; complex inverse branches are not certified in this PR."
@@ -887,6 +956,30 @@ def _erfinv_real_input_text(value: Any) -> tuple[str | None, str | None]:
         return None, "certified erfinv requires a finite real x with -1 < x < 1."
     if decimal <= Decimal(-1) or decimal >= Decimal(1):
         return None, "certified erfinv supports real x only with -1 < x < 1."
+    return format(decimal, "f"), None
+
+
+def _erfcinv_real_input_text(value: Any) -> tuple[str | None, str | None]:
+    if isinstance(value, complex):
+        return None, "certified erfcinv supports real x only; complex inverse branches are not certified in this PR."
+    try:
+        if isinstance(value, str):
+            text = value.strip()
+            lowered = text.lower()
+            if "j" in lowered or lowered.endswith("i"):
+                return (
+                    None,
+                    "certified erfcinv supports real x only; complex inverse branches are not certified in this PR.",
+                )
+            value = text
+        decimal = Decimal(str(value))
+    except (InvalidOperation, ValueError):
+        return None, "certified erfcinv requires a finite real x with 0 < x < 2."
+
+    if not decimal.is_finite():
+        return None, "certified erfcinv requires a finite real x with 0 < x < 2."
+    if decimal <= Decimal(0) or decimal >= Decimal(2):
+        return None, "certified erfcinv supports real x only with 0 < x < 2."
     return format(decimal, "f"), None
 
 
@@ -955,6 +1048,14 @@ def _erfinv_domain_diagnostics():
     }
 
 
+def _erfcinv_domain_diagnostics():
+    return {
+        "certificate_scope": _ARB_ERFCINV_VIA_ERFINV_SCOPE,
+        "domain": _ARB_ERFCINV_REAL_DOMAIN,
+        "branch": "real_principal_inverse",
+    }
+
+
 def _with_erfinv_diagnostics(
     result,
     scope: str,
@@ -969,6 +1070,51 @@ def _with_erfinv_diagnostics(
     diagnostics.update(
         {
             "domain": _ARB_ERFINV_REAL_DOMAIN,
+            "branch": "real_principal_inverse",
+            "certificate_scope": scope,
+        }
+    )
+    if result.certified:
+        diagnostics.update(
+            {
+                "certificate_level": certificate_level,
+                "audit_status": audit_status,
+                "certification_claim": claim,
+            }
+        )
+    if iterations is not None:
+        diagnostics["iterations"] = iterations
+    if formula is not None:
+        diagnostics["formula"] = formula
+    return make_result(
+        function=result.function,
+        value=result.value,
+        abs_error_bound=result.abs_error_bound,
+        rel_error_bound=result.rel_error_bound,
+        certified=result.certified,
+        method=result.method,
+        backend=result.backend,
+        requested_dps=result.requested_dps,
+        working_dps=result.working_dps,
+        terms_used=result.terms_used,
+        diagnostics=diagnostics,
+    )
+
+
+def _with_erfcinv_diagnostics(
+    result,
+    scope: str,
+    certificate_level: str,
+    audit_status: str,
+    claim: str,
+    *,
+    iterations: int | None = None,
+    formula: str | None = None,
+):
+    diagnostics = dict(result.diagnostics)
+    diagnostics.update(
+        {
+            "domain": _ARB_ERFCINV_REAL_DOMAIN,
             "branch": "real_principal_inverse",
             "certificate_scope": scope,
         }

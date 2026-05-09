@@ -11,7 +11,7 @@ from certsf.dispatcher import REGISTRY
 
 ROOT = Path(__file__).resolve().parents[1]
 
-ERROR_FUNCTIONS = ("erf", "erfc", "erfcx", "erfi", "dawson", "erfinv")
+ERROR_FUNCTIONS = ("erf", "erfc", "erfcx", "erfi", "dawson", "erfinv", "erfcinv")
 SAMPLE_ARGS = {
     "erf": ("0.5+0.25j",),
     "erfc": ("0.5+0.25j",),
@@ -19,6 +19,7 @@ SAMPLE_ARGS = {
     "erfi": ("0.5+0.25j",),
     "dawson": ("0.5+0.25j",),
     "erfinv": ("0.5",),
+    "erfcinv": ("0.5",),
 }
 CERTIFIED_SCOPES = {
     "erf": "direct_arb_erf",
@@ -27,6 +28,7 @@ CERTIFIED_SCOPES = {
     "erfi": "direct_arb_erfi|arb_erfi_formula",
     "dawson": "direct_arb_dawson|arb_dawson_formula",
     "erfinv": "direct_arb_erfinv|arb_erfinv_real_root",
+    "erfcinv": "direct_arb_erfcinv|arb_erfcinv_via_erfinv",
 }
 UNSUPPORTED_CERTIFIED_CASES = (
     ("erf", ("nan",)),
@@ -39,9 +41,13 @@ UNSUPPORTED_CERTIFIED_CASES = (
     ("erfinv", ("1.1",)),
     ("erfinv", ("-1.1",)),
     ("erfinv", ("0.5+0.25j",)),
+    ("erfcinv", ("0",)),
+    ("erfcinv", ("2",)),
+    ("erfcinv", ("-0.1",)),
+    ("erfcinv", ("2.1",)),
+    ("erfcinv", ("0.5+0.25j",)),
 )
 FORBIDDEN_ERROR_FUNCTION_WRAPPERS = (
-    "erfcinv",
     "faddeeva",
     "plasma_dispersion",
     "plasma_dispersion_function",
@@ -49,12 +55,13 @@ FORBIDDEN_ERROR_FUNCTION_WRAPPERS = (
 )
 DOC_EXPECTATIONS = {
     "README.md": (
-        "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |",
+        "| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`, `erfcinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1); real erfcinv on (0, 2) |",
         "Certified `erf`, `erfc`, and `erfi` use direct Arb error-function primitives",
         "Certified `erfcx` prefers direct Arb `erfcx` when available",
         "Certified `erfi` prefers direct Arb `erfi` when available",
         "Certified `dawson` prefers direct Arb `dawson` when available",
         "Certified `erfinv` is restricted to the real principal inverse on `-1 < x < 1`",
+        "Certified `erfcinv` is restricted to the real principal inverse on `0 < x < 2`",
         "`erfc` may evaluate `1 - erf(z)` and records `formula=\"1-erf\"`.",
         "`formula=\"exp(z^2)*erfc(z)\"`.",
         "`formula=\"-i*erf(i*z)\"`.",
@@ -63,6 +70,7 @@ DOC_EXPECTATIONS = {
         "[`docs/error_function.md`](docs/error_function.md)",
         "[`docs/dawson.md`](docs/dawson.md)",
         "[`docs/erfinv.md`](docs/erfinv.md)",
+        "[`docs/erfcinv.md`](docs/erfcinv.md)",
     ),
     "docs/error_function.md": (
         "erf(z) = 2/sqrt(pi) * integral_0^z exp(-t^2) dt",
@@ -71,6 +79,7 @@ DOC_EXPECTATIONS = {
         "erfi(z) = -i erf(i z)",
         "dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)",
         "erf(erfinv(x)) = x for real -1 < x < 1",
+        "erfc(erfcinv(x)) = x for real 0 < x < 2",
         "direct Arb `erf` and `erfc` primitives",
         "record `diagnostics[\"formula\"] == \"1-erf\"`",
         "records `diagnostics[\"formula\"] == \"exp(z^2)*erfc(z)\"`",
@@ -78,7 +87,9 @@ DOC_EXPECTATIONS = {
         "records `diagnostics[\"formula\"] == \"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
         "`certificate_scope=\"direct_arb_erfinv\"`",
         "`certificate_scope=\"arb_erfinv_real_root\"`",
-        "`erfcinv` or Faddeeva functions",
+        "`certificate_scope=\"direct_arb_erfcinv\"`",
+        "`certificate_scope=\"arb_erfcinv_via_erfinv\"`",
+        "Faddeeva functions",
         "No Taylor or asymptotic certification method",
     ),
     "docs/erfinv.md": (
@@ -89,7 +100,17 @@ DOC_EXPECTATIONS = {
         "`certificate_scope=\"arb_erfinv_real_root\"`",
         "`certificate_level=\"certified_real_root\"`",
         "`audit_status=\"monotone_real_inverse\"`",
-        "No `erfcinv`, complex",
+        "No complex",
+    ),
+    "docs/erfcinv.md": (
+        "erfcinv(x, *, dps=50, mode=\"auto\", certify=False)",
+        "real principal inverse of `erfc` on `x in (0, 2)`",
+        "`scipy.special.erfcinv(x)`",
+        "`erfinv(1-x)`",
+        "`certificate_scope=\"arb_erfcinv_via_erfinv\"`",
+        "`certificate_level=\"certified_real_root\"`",
+        "`audit_status=\"monotone_real_inverse\"`",
+        "No complex inverse branches, Faddeeva, plasma dispersion, or endpoint asymptotic certification",
     ),
     "docs/audit/erfinv_inverse.md": (
         "This audit covers only the public inverse-error wrapper `erfinv(x)`.",
@@ -120,13 +141,15 @@ DOC_EXPECTATIONS = {
         "`dawson(z) = sqrt(pi)/2 * exp(-z^2) * erfi(z)`",
         "`formula=\"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
         "`erfinv(x)`",
-        "No `erfcinv`",
+        "`erfcinv(x)`",
+        "`special_erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
         "`pypi-smoke.yml` defaults to `0.2.0a9`",
         "certified `special_erf`",
         "`special_erfcx`, `special_erfi`,",
         "`special_dawson`, and `special_erfinv` calls in the MCP-certified",
+        "does not add `erfcinv` smoke calls until the future release is published",
         "This audit found no implementation inconsistency",
         "Release infrastructure remains version-stable",
         "Current v0.2 audit result:",
@@ -143,6 +166,8 @@ DOC_EXPECTATIONS = {
         "`arb_dawson_formula` | `dawson` | `formula_audited_alpha`",
         "`direct_arb_erfinv` | `erfinv` | `direct_arb_primitive`",
         "`arb_erfinv_real_root` | `erfinv` | `certified_real_root`",
+        "`direct_arb_erfcinv` | `erfcinv` | `direct_arb_primitive`",
+        "`arb_erfcinv_via_erfinv` | `erfcinv` | `certified_real_root`",
         "diagnostics record",
         "`formula=\"1-erf\"`",
         "`formula=\"exp(z^2)*erfc(z)\"`",
@@ -150,31 +175,35 @@ DOC_EXPECTATIONS = {
         "`formula=\"sqrt(pi)/2*exp(-z^2)*erfi(z)\"`",
     ),
     "docs/certified_scope_0_2_0.md": (
-        "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`",
+        "Error-function family | `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`, `erfcinv`",
         "`erf(z)` and `erfc(z)` are the v0.2.0-alpha.5",
         "`erfcx(z)` is the v0.2.0-alpha.6 feature-branch API expansion.",
         "`erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.",
         "`dawson(z)` is the v0.2.0-alpha.8 feature-branch API expansion.",
         "`erfinv(x)` is the v0.2.0-alpha.9 feature-branch API expansion.",
+        "`erfcinv(x)` is the future v0.2.0-alpha.10 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
         "otherwise certified `erfi` may use `-i*erf(i*z)`",
         "otherwise certified `dawson` may use `sqrt(pi)/2*exp(-z^2)*erfi(z)`",
         "Certified `erfinv` supports only real `x` with `-1 < x < 1`",
+        "Certified `erfcinv` supports only real `x` with `0 < x < 2`",
         "Custom Taylor, asymptotic, or non-Arb certification methods are outside",
         "Parabolic-cylinder family",
         "experimental certified formula layer",
     ),
     "docs/release_claims.md": (
-        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1)",
+        "Error-function family | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1); real erfcinv on (0, 2)",
         "direct Arb `erfc` is preferred",
         "direct Arb `erfcx` is",
         "direct Arb `erfi` is",
         "`dawson` is defined as `sqrt(pi)/2 * exp(-z^2) * erfi(z)`",
         "`erfinv` is only the real principal inverse on `-1 < x < 1`",
+        "`erfcinv` is only the real principal inverse on `0 < x < 2`",
         "fallback must be visible in diagnostics",
-        "Do not claim `erfcinv`, Faddeeva",
+        "Do not claim Faddeeva",
         "Do not claim complex inverse branches or endpoint asymptotic certification for `erfinv`",
+        "Do not claim complex inverse branches or endpoint asymptotic certification for `erfcinv`",
         "Do not describe the parabolic-cylinder family as certified without the",
     ),
     "docs/release-0.2.0-alpha.7.md": (
@@ -249,7 +278,7 @@ def test_error_function_mcp_tools_match_python_api_in_every_concrete_mode(name, 
 
 @pytest.mark.parametrize("name", ERROR_FUNCTIONS)
 def test_error_function_certified_scopes_match_audit(name):
-    args = ("0.5",) if name == "erfinv" else ("1",)
+    args = ("0.5",) if name in {"erfinv", "erfcinv"} else ("1",)
     result = getattr(certsf, name)(*args, dps=50, mode="certified")
     if _backend_is_unavailable(result):
         pytest.skip(result.diagnostics["error"])
@@ -281,6 +310,11 @@ def test_error_function_certified_scopes_match_audit(name):
         assert result.diagnostics["audit_status"] == "monotone_real_inverse"
         assert result.diagnostics["domain"] == "real_x_in_open_interval_minus1_1"
         assert result.diagnostics["formula"] == "erf(y)-x=0"
+    elif result.diagnostics["certificate_scope"] == "arb_erfcinv_via_erfinv":
+        assert result.diagnostics["certificate_level"] == "certified_real_root"
+        assert result.diagnostics["audit_status"] == "monotone_real_inverse"
+        assert result.diagnostics["domain"] == "real_x_in_open_interval_0_2"
+        assert result.diagnostics["formula"] == "erfinv(1-x)"
     else:
         assert result.diagnostics["certificate_level"] == "direct_arb_primitive"
         assert result.diagnostics["audit_status"] == "audited_direct"
@@ -392,6 +426,7 @@ def test_external_reference_fixture_covers_error_function_surface():
         "erfi_reference.json",
         "dawson_reference.json",
         "erfinv_reference.json",
+        "erfcinv_reference.json",
     ):
         entries.extend(json.loads((fixture_dir / fixture_name).read_text(encoding="utf-8")))
     covered_cases = {(entry["function"], tuple(entry["parameters"])) for entry in entries}
@@ -420,6 +455,11 @@ def test_external_reference_fixture_covers_error_function_surface():
         ("erfinv", ("-0.5",)),
         ("erfinv", ("0.9",)),
         ("erfinv", ("-0.9",)),
+        ("erfcinv", ("1",)),
+        ("erfcinv", ("0.5",)),
+        ("erfcinv", ("1.5",)),
+        ("erfcinv", ("0.1",)),
+        ("erfcinv", ("1.9",)),
     } <= covered_cases
 
 
@@ -464,6 +504,8 @@ def test_pypi_smoke_covers_error_function_release_surface():
     assert 'assert erfi_result["certified"]' in text
     assert 'assert erfinv_result["certified"]' in text
     assert 'assert dawson_result["certified"]' in text
+    assert "erfcinv(" not in text
+    assert "special_erfcinv" not in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():

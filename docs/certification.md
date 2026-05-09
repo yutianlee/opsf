@@ -28,7 +28,7 @@ status matrix is:
 | Area | Release status |
 | --- | --- |
 | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer` | alpha-certified, direct Arb gamma primitives and finite products |
-| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1) |
+| `erf`, `erfc`, `erfcx`, `erfi`, `dawson`, `erfinv`, `erfcinv` | alpha-certified, direct Arb error-function primitives plus erfcx, erfi, and dawson identity formulas; real erfinv on (-1, 1); real erfcinv on (0, 2) |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -142,7 +142,8 @@ Certificate scope:
 ## Error-Function Family
 
 Function:
-`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`, `dawson(z)`, `erfinv(x)`
+`erf(z)`, `erfc(z)`, `erfcx(z)`, `erfi(z)`, `dawson(z)`, `erfinv(x)`,
+`erfcinv(x)`
 
 Certified domain:
 `erf`, `erfc`, `erfcx`, `erfi`, and `dawson` accept real or complex inputs
@@ -150,7 +151,9 @@ accepted by Arb for the corresponding error-function primitive or identity
 formula, with non-finite target values reported as clean failures. Certified
 `erfinv` is restricted to real `x` with `-1 < x < 1` on the real principal
 inverse branch; endpoints, out-of-interval values, and complex inputs are clean
-non-certified failures.
+non-certified failures. Certified `erfcinv` is restricted to real `x` with
+`0 < x < 2` on the real principal inverse branch; endpoints, out-of-interval
+values, and complex inputs are clean non-certified failures.
 
 Backend primitive:
 `arb/acb.erf` and `arb/acb.erfc`. If a supported python-flint build exposes
@@ -168,6 +171,9 @@ and records `formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`.
 Certified `erfinv` prefers direct Arb `erfinv` if exposed by python-flint;
 otherwise it brackets the unique real root of `erf(y)-x=0` using monotonicity
 of real `erf` and records `formula="erf(y)-x=0"`.
+Certified `erfcinv` prefers direct Arb `erfcinv` if exposed by python-flint;
+otherwise it uses the certified real-inverse path for `erfinv(1-x)` and
+records `formula="erfinv(1-x)"`.
 
 Returned enclosure:
 Arb midpoint string plus absolute radius.
@@ -176,6 +182,7 @@ Branch convention:
 `erf`, `erfc`, `erfcx`, `erfi`, and `dawson` are entire functions. These
 wrappers follow Arb's complex primitive and elementary-function conventions.
 `erfinv` uses only the real principal inverse branch on `(-1, 1)`.
+`erfcinv` uses only the real principal inverse branch on `(0, 2)`.
 
 Formula transformations:
 none for `erf`; direct `erfc` is preferred. The only allowed certified `erfc`
@@ -189,14 +196,17 @@ formula fallback is the explicit Arb expression
 `sqrt(pi)/2*exp(-z^2)*erfi(z)`.
 For `erfinv`, direct Arb `erfinv` is preferred when available. The allowed
 fallback is a certified monotone real-root enclosure for `erf(y)-x=0`.
+For `erfcinv`, direct Arb `erfcinv` is preferred when available. The allowed
+fallback is the certified real-inverse path for `erfinv(1-x)`.
 
 Known exclusions:
 non-finite Arb input or output enclosures and any domain where Arb does not
 return a finite enclosure. Certified `erfinv` also excludes complex inverse
-branches, `x <= -1`, `x >= 1`, `erfcinv`, and endpoint asymptotic
-certification. No Taylor or asymptotic certification path is included. The
-scaled wrapper does not claim large-argument stability beyond what the selected
-backend certifies.
+branches, `x <= -1`, `x >= 1`, and endpoint asymptotic certification.
+Certified `erfcinv` excludes complex inverse branches, `x <= 0`, `x >= 2`,
+endpoint asymptotic certification, Faddeeva, plasma dispersion, and `wofz`.
+No Taylor or asymptotic certification path is included. The scaled wrapper does
+not claim large-argument stability beyond what the selected backend certifies.
 
 Validation tests:
 zero values, regular real and complex samples, `erf(-z) = -erf(z)`,
@@ -218,6 +228,12 @@ but not too close to endpoints, endpoint and out-of-interval rejection, complex
 rejection in certified mode, auto dispatch, MCP parity, external fixtures,
 forced real-root fallback diagnostics, and certified residual containment for
 `erf(erfinv(x))-x = 0`.
+`erfcinv` tests cover `erfcinv(1) = 0`, real composition with `erfc`, the
+relation `erfcinv(x) = erfinv(1-x)`, monotonic orientation, values near but not
+too close to endpoints, endpoint and out-of-interval rejection, complex
+rejection in certified mode, auto dispatch, MCP parity, external fixtures,
+forced fallback diagnostics, and certified residual containment for
+`erfc(erfcinv(x))-x = 0`.
 
 Certificate scopes:
 `direct_arb_erf`, `direct_arb_erfc`, and either `direct_arb_erfcx` or
@@ -228,7 +244,9 @@ backend. `dawson` uses either `direct_arb_dawson` or
 `arb_dawson_formula`, depending on the Arb primitive exposed by the installed
 backend. `erfinv` uses either `direct_arb_erfinv` or
 `arb_erfinv_real_root`, depending on the Arb primitive exposed by the installed
-backend.
+backend. `erfcinv` uses either `direct_arb_erfcinv` or
+`arb_erfcinv_via_erfinv`, depending on the Arb primitive exposed by the
+installed backend.
 
 ## Airy Family
 
