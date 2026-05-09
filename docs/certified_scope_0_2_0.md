@@ -2,15 +2,15 @@
 
 This document records the current public certified surface for the 0.2.0 alpha
 line. The 0.1.0 surface remains frozen in
-[`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The ratio-oriented
-gamma-family additions are `gamma_ratio(a, b)` and, for v0.2.0-alpha.2,
-`loggamma_ratio(a, b)`.
+[`certified_scope_0_1_0.md`](certified_scope_0_1_0.md). The gamma-family
+additions are `gamma_ratio(a, b)`, `loggamma_ratio(a, b)`, and, for the future
+v0.2.0-alpha.3 feature branch, `beta(a, b)`.
 
 ## Release Status Matrix
 
 | Area | Public wrappers or surface | Release status |
 | --- | --- | --- |
-| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |
+| Gamma family | `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |
 | Airy family | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -27,6 +27,7 @@ loggamma
 rgamma
 gamma_ratio
 loggamma_ratio
+beta
 airy
 ai
 bi
@@ -48,6 +49,7 @@ for `ai` and `bi`, not additional certified functions.
 
 - `gamma_ratio(a, b)` is the only 0.2.0-alpha.1 API expansion.
 - `loggamma_ratio(a, b)` is the v0.2.0-alpha.2 API expansion.
+- `beta(a, b)` is the future v0.2.0-alpha.3 feature-branch API expansion.
 - Certified `gamma_ratio` uses Arb `Gamma(a) * rgamma(b)`, not direct division
   by `Gamma(b)`.
 - Denominator gamma poles certify to zero when `Gamma(a)` is finite.
@@ -57,6 +59,11 @@ for `ai` and `bi`, not additional certified functions.
   `loggamma` branches and `certificate_scope="direct_arb_loggamma_ratio"`.
 - `loggamma_ratio` does not claim the principal logarithm of `gamma_ratio` for
   complex inputs and does not certify pole-limiting values.
+- Certified `beta` uses Arb `Gamma(a) * Gamma(b) * rgamma(a+b)`, not direct
+  division by `Gamma(a+b)`.
+- Certified `beta` returns clean non-certified failures when `Gamma(a)` or
+  `Gamma(b)` has a pole, and does not claim limiting values at simultaneous
+  singularities.
 - Direct Arb primitive families are alpha-certified only on the domains where
   Arb returns finite enclosures and the wrapper records the documented
   certificate scope.

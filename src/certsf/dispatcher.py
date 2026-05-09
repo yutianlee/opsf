@@ -34,6 +34,7 @@ _FUNCTION_ORDER = (
     "rgamma",
     "gamma_ratio",
     "loggamma_ratio",
+    "beta",
     "airy",
     "ai",
     "bi",
@@ -186,6 +187,29 @@ REGISTRY: dict[str, dict[Mode, MethodSpec]] = {
             certified=True,
             domain="Arb real or complex inputs with finite principal loggamma(a) and loggamma(b) targets",
             certificate_scope="direct_arb_loggamma_ratio",
+        ),
+    },
+    "beta": {
+        "fast": _spec("beta", "fast", "scipy", scipy_backend.scipy_beta, certified=False, domain=_FAST_DOMAIN),
+        "high_precision": _spec(
+            "beta",
+            "high_precision",
+            "mpmath",
+            mpmath_backend.mpmath_beta,
+            certified=False,
+            domain=_HIGH_PRECISION_DOMAIN,
+        ),
+        "certified": _spec(
+            "beta",
+            "certified",
+            "python-flint",
+            arb_backend.arb_beta,
+            certified=True,
+            domain=(
+                "Arb real or complex inputs with finite Gamma(a) and Gamma(b); "
+                "Gamma(a+b) poles certify to zero"
+            ),
+            certificate_scope="direct_arb_beta",
         ),
     },
     "airy": {

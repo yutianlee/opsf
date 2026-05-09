@@ -1,0 +1,50 @@
+[
+  {
+    "function": "beta",
+    "parameters": ["1", "1"],
+    "expected_value": "1.0",
+    "source": "Euler beta integral",
+    "digits": 60,
+    "note": "B(1,1)=1"
+  },
+  {
+    "function": "beta",
+    "parameters": ["0.5", "0.5"],
+    "expected_value": "3.14159265358979323846264338327950288419716939937510582097494459230781641",
+    "source": "DLMF special value",
+    "digits": 60,
+    "note": "B(1/2,1/2)=pi"
+  },
+  {
+    "function": "beta",
+    "parameters": ["2", "3"],
+    "expected_value": "0.0833333333333333333333333333333333333333333333333333333333333333",
+    "source": "Euler beta recurrence",
+    "digits": 60,
+    "note": "B(2,3)=1/12"
+  },
+  {
+    "function": "beta",
+    "parameters": ["3.2", "1.2"],
+    "expected_value": "0.219572511110773196565832651231755942954334791850019411663325305572",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular real noninteger beta value"
+  },
+  {
+    "function": "beta",
+    "parameters": ["2.5+0.25j", "1.5-0.5j"],
+    "expected_value": "0.156381291590065313214747832943534472518596818889730720685893903+0.0766956258843200004257011377686321435437960419346169442366249943j",
+    "source": "mpmath high precision",
+    "digits": 60,
+    "note": "regular complex beta value"
+  },
+  {
+    "function": "beta",
+    "parameters": ["0.5", "-0.5"],
+    "expected_value": "0.0",
+    "source": "DLMF gamma pole and reciprocal gamma zero",
+    "digits": 60,
+    "note": "denominator pole gives Gamma(1/2) * Gamma(-1/2) * rgamma(0) = 0"
+  }
+]

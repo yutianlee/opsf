@@ -42,6 +42,10 @@ Release-facing support matrices must keep these status phrases:
 - Say that `loggamma_ratio` is certified through the narrow principal
   `loggamma(a) - loggamma(b)` Arb difference, with clean failures for poles in
   either argument.
+- Say that `beta` is certified through the narrow
+  `Gamma(a) * Gamma(b) * rgamma(a+b)` Arb product, with `Gamma(a+b)` pole zeros
+  only when both numerator gamma factors are finite and clean failures for
+  numerator poles or simultaneous singularities.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of
   `gamma_ratio` or that it certifies pole-limiting values.
 - Say that Bessel certified mode is restricted to real-valued order.

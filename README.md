@@ -132,12 +132,12 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.2.0 alpha line adds ratio-oriented gamma-family wrappers while keeping
-the release wording conservative and the parabolic-cylinder claims unchanged.
+The 0.2.0 alpha line adds gamma-family wrappers while keeping the release
+wording conservative and the parabolic-cylinder claims unchanged.
 
 | Area | Release status |
 | --- | --- |
-| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio` | alpha-certified, direct Arb gamma primitives |
+| `gamma`, `loggamma`, `rgamma`, `gamma_ratio`, `loggamma_ratio`, `beta` | alpha-certified, direct Arb gamma primitives |
 | `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
@@ -146,6 +146,7 @@ the release wording conservative and the parabolic-cylinder claims unchanged.
 
 ```python
 from certsf import (
+    beta,
     gamma,
     loggamma,
     loggamma_ratio,
@@ -174,6 +175,7 @@ from certsf import (
 - `gamma_ratio(a, b) = Gamma(a) / Gamma(b)`
 - `loggamma_ratio(a, b) = loggamma(a) - loggamma(b)`, using the principal
   `loggamma` branch
+- `beta(a, b) = Gamma(a) Gamma(b) / Gamma(a+b)`
 
 `rgamma` is the safest wrapper near non-positive integer gamma poles. In
 certified mode, `rgamma` returns a rigorous zero at poles, while `gamma` and
@@ -210,6 +212,22 @@ argument returns a clean non-certified failure. For complex values, the result
 is the difference of principal `loggamma` values, not necessarily the principal
 logarithm of `gamma_ratio(a, b)`. See
 [`docs/loggamma_ratio.md`](docs/loggamma_ratio.md).
+
+```python
+from certsf import beta
+
+r = beta("3.2", "1.2", mode="certified", dps=50)
+print(r.value)
+print(r.certified)
+print(r.diagnostics)
+```
+
+Certified `beta(a, b)` evaluates `Gamma(a) * Gamma(b) * rgamma(a+b)` with
+`certificate_scope="direct_arb_beta"`. Poles in `Gamma(a)` or `Gamma(b)` return
+clean non-certified failures. A pole in `Gamma(a+b)` certifies to zero only when
+both numerator gamma factors are finite and Arb returns the zero product. The
+wrapper does not claim limiting values at simultaneous singularities. See
+[`docs/beta.md`](docs/beta.md).
 
 ### Airy Family
 
@@ -306,6 +324,8 @@ The repository also includes:
   rationale.
 - `docs/loggamma_ratio.md` for loggamma-ratio branch convention and pole
   policy.
+- `docs/beta.md` for beta-function pole policy and certified-backend
+  rationale.
 - `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support

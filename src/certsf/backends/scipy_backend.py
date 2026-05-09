@@ -37,6 +37,17 @@ def scipy_loggamma_ratio(a, b, *, dps: int = 50):
     return _fast_result("loggamma_ratio", number_to_string(value, digits=float_digits(requested)), requested)
 
 
+def scipy_beta(a, b, *, dps: int = 50):
+    requested = ensure_dps(dps)
+    aa = scipy_number(a)
+    bb = scipy_number(b)
+    try:
+        value = special.beta(aa, bb)
+    except (AttributeError, TypeError, ValueError):
+        value = np.exp(special.loggamma(aa) + special.loggamma(bb) - special.loggamma(aa + bb))
+    return _fast_result("beta", number_to_string(value, digits=float_digits(requested)), requested)
+
+
 def scipy_rgamma(z, *, dps: int = 50):
     requested = ensure_dps(dps)
     value = special.rgamma(scipy_number(z))

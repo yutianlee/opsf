@@ -5,6 +5,10 @@ from __future__ import annotations
 from certsf.dispatcher import dispatch
 
 
+def beta(a, b, *, dps: int = 50, mode: str = "auto", certify: bool = False):
+    return dispatch("beta", a, b, dps=dps, mode=mode, certify=certify)
+
+
 def gamma(z, *, dps: int = 50, mode: str = "auto", certify: bool = False):
     return dispatch("gamma", z, dps=dps, mode=mode, certify=certify)
 
