@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.2.0-alpha.3 - 2026-05-09
+
+- Added the public `beta(a, b)` wrapper as the only public API expansion since
+  `0.2.0-alpha.2`.
+- Defined `beta(a, b)` as `Gamma(a) Gamma(b) / Gamma(a+b)`.
+- Added SciPy, mpmath, and Arb backends for `beta`.
+- Certified `beta` uses Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` in the
+  `direct_arb_beta` scope.
+- Sum-pole denominator zeros certify when `Gamma(a)` and `Gamma(b)` are finite.
+- Numerator poles and simultaneous singularities fail cleanly.
+- Added the MCP tool `special_beta`.
+- Added external fixtures and certified identity tests for beta behavior.
+- No `gamma_ratio` or `loggamma_ratio` behavior changes are included.
+- No parabolic-cylinder claim broadening is included; those wrappers remain
+  `experimental_formula`.
+
 ## 0.2.0-alpha.2 - 2026-05-09
 
 - Added the public `loggamma_ratio(a, b)` wrapper as the only public API

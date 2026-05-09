@@ -216,7 +216,7 @@ logarithm of `gamma_ratio(a, b)`. See
 ```python
 from certsf import beta
 
-r = beta("3.2", "1.2", mode="certified", dps=50)
+r = beta("2", "3", mode="certified", dps=50)
 print(r.value)
 print(r.certified)
 print(r.diagnostics)
@@ -330,6 +330,8 @@ The repository also includes:
   support matrix.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
+- `docs/release-0.2.0-alpha.3.md` for v0.2.0-alpha.3 feature-alpha planning
+  notes.
 - `docs/release-0.2.0-alpha.2.md` for v0.2.0-alpha.2 feature-alpha planning
   notes.
 - `docs/release-0.2.0-alpha.1.md` for v0.2.0-alpha.1 feature-alpha planning
