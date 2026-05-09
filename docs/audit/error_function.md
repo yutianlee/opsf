@@ -166,14 +166,13 @@ available. The fallback uses `certificate_scope="arb_erfcinv_via_erfinv"`,
 `domain="real_x_in_open_interval_0_2"`, and `formula="erfinv(1-x)"`.
 
 Release hygiene:
-`pypi-smoke.yml` defaults to `0.2.0a9` after the published
-`v0.2.0-alpha.9` release. The smoke workflow covers `erf`, `erfc`, `erfcx`,
-`erfi`, `dawson`, and `erfinv` in base and certified Python API smoke calls,
-plus certified `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`,
-`special_dawson`, and `special_erfinv` calls in the MCP-certified smoke job.
-This feature branch intentionally leaves `pypi-smoke.yml` at `0.2.0a9` and
-does not add `erfcinv` smoke calls until the future release is published.
-The PyPI publish workflows continue to use
+`pypi-smoke.yml` defaults to `0.2.0a10` after the published
+`v0.2.0-alpha.10` release. The smoke workflow covers `erf`, `erfc`,
+`erfcinv`, `erfcx`, `erfi`, `erfinv`, and `dawson` in base and certified
+Python API smoke calls, plus certified `special_erf`, `special_erfc`,
+`special_erfcinv`, `special_erfcx`, `special_erfi`, `special_erfinv`, and
+`special_dawson` calls in the MCP-certified smoke job. The PyPI publish
+workflows continue to use
 `actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
 Audit evidence:
@@ -185,21 +184,20 @@ Faddeeva, plasma dispersion, and `wofz` wrappers are not exported, registered,
 or exposed as MCP tools.
 
 Release infrastructure remains version-stable: this audit keeps the package
-version fixed, keeps `pypi-smoke.yml` on the published `0.2.0a9` default, keeps
-upload/download artifact actions on v6, and leaves the TestPyPI policy wording
-unchanged. Routine
-feature alphas may still skip TestPyPI under `docs/release_policy.md` when the
-documented release-policy conditions are met.
+version fixed, keeps `pypi-smoke.yml` on the published `0.2.0a10` default,
+keeps upload/download artifact actions on v6, and leaves the TestPyPI policy
+wording unchanged. Routine feature alphas may still skip TestPyPI under
+`docs/release_policy.md` when the documented release-policy conditions are met.
 
 Current v0.2 audit result:
-The future `v0.2.0-alpha.10` feature surface adds `erfcinv(x)` as one new
-public error-function-family wrapper after `v0.2.0-alpha.9`. It keeps inverse
-scope to real principal branches: `erfinv` on `-1 < x < 1` and `erfcinv` on
-`0 < x < 2`. It does not add complex inverse branches, endpoint asymptotic
-certification, Faddeeva, plasma dispersion, or `wofz`. Tests keep the seven
-wrappers, MCP parity, fixture containment, formula diagnostics, and real
-inverse-root diagnostics in lockstep. No `erfinv`, `erf`, `erfc`, `erfcx`,
-`erfi`, `dawson`, gamma-family, or parabolic-cylinder behavior or claim changes
-are part of this audit update.
+The published `v0.2.0-alpha.10` feature surface includes `erfcinv(x)` as one
+new public error-function-family wrapper after `v0.2.0-alpha.9`. It keeps
+inverse scope to real principal branches: `erfinv` on `-1 < x < 1` and
+`erfcinv` on `0 < x < 2`. It does not add complex inverse branches, endpoint
+asymptotic certification, Faddeeva, plasma dispersion, or `wofz`. Tests keep
+the seven wrappers, MCP parity, fixture containment, formula diagnostics, and
+real inverse-root diagnostics in lockstep. No `erfinv`, `erfcinv`, `erf`,
+`erfc`, `erfcx`, `erfi`, `dawson`, gamma-family, or parabolic-cylinder behavior
+or claim changes are part of this audit update.
 No public API, dispatcher, backend formula, MCP, or certified-scope
 inconsistency was found after the erfcinv surface and audit docs were updated.

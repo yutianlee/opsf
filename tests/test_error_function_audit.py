@@ -113,14 +113,20 @@ DOC_EXPECTATIONS = {
         "No complex inverse branches, Faddeeva, plasma dispersion, or endpoint asymptotic certification",
     ),
     "docs/audit/erfinv_inverse.md": (
-        "This audit covers only the public inverse-error wrapper `erfinv(x)`.",
-        "`erfinv` is exported from `certsf.__init__`",
+        "This audit covers the public inverse-error wrappers `erfinv(x)` and",
+        "`erfinv` and `erfcinv` are exported from `certsf.__init__`",
         "`special_erfinv`",
+        "`special_erfcinv`",
         "certificate_scope=\"direct_arb_erfinv\"",
         "certificate_scope=\"arb_erfinv_real_root\"",
         "formula=\"erf(y)-x=0\"",
+        "certificate_scope=\"direct_arb_erfcinv\"",
+        "certificate_scope=\"arb_erfcinv_via_erfinv\"",
+        "formula=\"erfinv(1-x)\"",
         "Certified mode rejects `x = -1`, `x = 1`, real `x < -1`, real `x > 1`, and",
+        "`x = 0`, `x = 2`, real `x < 0`, real `x > 2`, and complex inputs",
         "never fall back to mpmath while",
+        "`pypi-smoke.yml` defaults to `0.2.0a10`",
         "No public-wrapper, backend-formula, package-version, gamma-family, existing",
     ),
     "docs/dawson.md": (
@@ -145,11 +151,10 @@ DOC_EXPECTATIONS = {
         "`special_erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
-        "`pypi-smoke.yml` defaults to `0.2.0a9`",
+        "`pypi-smoke.yml` defaults to `0.2.0a10`",
         "certified `special_erf`",
-        "`special_erfcx`, `special_erfi`,",
-        "`special_dawson`, and `special_erfinv` calls in the MCP-certified",
-        "does not add `erfcinv` smoke calls until the future release is published",
+        "`special_erfcinv`, `special_erfcx`, `special_erfi`, `special_erfinv`, and",
+        "`special_dawson` calls in the MCP-certified smoke job",
         "This audit found no implementation inconsistency",
         "Release infrastructure remains version-stable",
         "Current v0.2 audit result:",
@@ -181,7 +186,7 @@ DOC_EXPECTATIONS = {
         "`erfi(z)` is the v0.2.0-alpha.7 feature-branch API expansion.",
         "`dawson(z)` is the v0.2.0-alpha.8 feature-branch API expansion.",
         "`erfinv(x)` is the v0.2.0-alpha.9 feature-branch API expansion.",
-        "`erfcinv(x)` is the future v0.2.0-alpha.10 feature-branch API expansion.",
+        "`erfcinv(x)` is the v0.2.0-alpha.10 feature-branch API expansion.",
         "certified `erfc` may use `1 - erf(z)` and must record `formula=\"1-erf\"`",
         "otherwise certified `erfcx` may use",
         "otherwise certified `erfi` may use `-i*erf(i*z)`",
@@ -511,6 +516,7 @@ def test_pypi_smoke_covers_error_function_release_surface():
     assert 'assert erfinv_result["certified"]' in text
     assert 'assert dawson_result["certified"]' in text
 
+
 def test_publish_workflow_artifact_actions_remain_on_v6():
     for path in (".github/workflows/publish-pypi.yml", ".github/workflows/publish-testpypi.yml"):
         text = _read(path)
@@ -531,11 +537,20 @@ def test_release_policy_and_pypi_smoke_alpha10_guardrails_remain_current():
     assert "The `publish-testpypi` workflow must remain `workflow_dispatch` only." in policy
 
 
-def test_error_function_release_docs_do_not_keep_pre_publication_alpha7_wording():
+def test_error_function_release_docs_do_not_keep_pre_publication_wording():
     current_scope = _read("docs/certified_scope_0_2_0.md")
+    current_audit = _read("docs/audit/error_function.md")
+    inverse_audit = _read("docs/audit/erfinv_inverse.md")
     alpha7_release = _read("docs/release-0.2.0-alpha.7.md")
 
     assert "future v0.2.0-alpha.7" not in current_scope
+    assert "future v0.2.0-alpha.10" not in current_scope
+    assert "future v0.2.0-alpha.10" not in current_audit
+    stale_smoke_guardrail = "does not add `erfcinv` smoke calls until the future release is published"
+    stale_inverse_scope = "This audit covers only the public inverse-error wrapper `erfinv(x)`."
+
+    assert stale_smoke_guardrail not in current_audit
+    assert stale_inverse_scope not in inverse_audit
     assert "should continue to target `0.2.0a6` until" not in alpha7_release
 
 
