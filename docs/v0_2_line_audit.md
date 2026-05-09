@@ -1,9 +1,9 @@
 # v0.2 Line Audit
 
-Last reviewed: 2026-05-09.
+Last reviewed: 2026-05-10.
 
-This audit records the v0.2 alpha gamma-family surface and release hygiene
-checks after `v0.2.0-alpha.7`.
+This audit records the v0.2 alpha gamma-family surface, error-function surface,
+and release hygiene checks after `v0.2.0-alpha.7`.
 
 ## Public API
 
@@ -24,6 +24,18 @@ All seven wrappers are exported from `certsf.__init__`, appear in
 same `SFResult` payload.
 
 No new public wrappers were added by this audit.
+
+The current error-function wrappers are:
+
+- `erf(z)`
+- `erfc(z)`
+- `erfcx(z)`
+- `erfi(z)`
+
+All four wrappers are exported from `certsf.__init__`, appear in
+`certsf.__all__`, are registered in the dispatcher with `fast`,
+`high_precision`, and `certified` modes, and have thin MCP tools named
+`special_erf`, `special_erfc`, `special_erfcx`, and `special_erfi`.
 
 ## Certified Scope
 
@@ -106,3 +118,9 @@ The audit found two non-source hygiene gaps:
 Both gaps were corrected without source changes, package version changes,
 backend formula changes, public-wrapper changes, or certification-claim
 broadening.
+
+The error-function audit also found stale post-publication wording: the current
+0.2 scope doc still described `erfi(z)` as a future alpha.7 expansion, and the
+alpha.7 release note still described the pre-publication pypi-smoke default.
+Those documentation-only inconsistencies were corrected without changing
+runtime behavior or broadening any claim.
