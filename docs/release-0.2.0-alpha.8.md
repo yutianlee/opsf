@@ -67,9 +67,11 @@ may skip TestPyPI when build, `twine check`, tag/version parity, protected PyPI
 publishing, and real PyPI smoke all pass. This release-planning PR does not
 introduce packaging or workflow-risk changes that require TestPyPI staging.
 
-The PyPI smoke workflow must continue to target `0.2.0a7` until `0.2.0a8` is
-actually published. A post-release verification PR should update pypi-smoke
-after the real PyPI release is available and smoke-tested.
+Before publication, the PyPI smoke workflow continued to target `0.2.0a7`.
+After post-release verification, `pypi-smoke.yml` targets `0.2.0a8` and covers
+`dawson`, certified `dawson`, and certified MCP `special_dawson` smoke calls.
+The verification evidence is recorded in
+[`post_release_verification.md`](post_release_verification.md).
 
 ## Validation Before Tagging
 

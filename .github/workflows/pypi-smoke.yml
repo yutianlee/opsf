@@ -6,7 +6,7 @@ on:
       version:
         description: "Published certsf version to test"
         required: true
-        default: "0.2.0a7"
+        default: "0.2.0a8"
   schedule:
     - cron: "0 3 * * 1"
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a7' }}"
+          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.2.0a8' }}"
 
       - name: Smoke test import and calls
         run: |
@@ -37,7 +37,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf import ai, besselj, beta, erf, erfc, erfcx, erfi, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcx, erfi, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -59,6 +59,7 @@ jobs:
           print(erfc("1.0", mode="fast").to_mcp_dict())
           print(erfcx("1.0", mode="fast").to_mcp_dict())
           print(erfi("1.0", mode="fast").to_mcp_dict())
+          print(dawson("1.0", mode="fast").to_mcp_dict())
           print(ai("1.0", mode="high_precision", dps=60).to_mcp_dict())
           print(besselj("2", "4.0", mode="fast").to_mcp_dict())
           print(pcfu("2.5", "1.25", mode="high_precision", dps=60).to_mcp_dict())
@@ -68,7 +69,7 @@ jobs:
         if: matrix.extras == '[certified]'
         run: |
           python - <<'PY'
-          from certsf import ai, besselj, beta, erf, erfc, erfcx, erfi, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
+          from certsf import ai, besselj, beta, dawson, erf, erfc, erfcx, erfi, gamma, gamma_ratio, loggamma, loggamma_ratio, pcfu, pochhammer, rgamma
 
           cases = [
               gamma("3.2", mode="certified", dps=50),
@@ -82,6 +83,7 @@ jobs:
               erfc("1.0", mode="certified", dps=50),
               erfcx("1.0", mode="certified", dps=50),
               erfi("1.0", mode="certified", dps=50),
+              dawson("1.0", mode="certified", dps=50),
               ai("1.0", mode="certified", dps=50),
               besselj("2", "4.0", mode="certified", dps=50),
               pcfu("2.5", "1.25", mode="certified", dps=50),
@@ -108,7 +110,7 @@ jobs:
       - name: Install MCP extra from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a7' }}"
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.2.0a8' }}"
 
       - name: MCP smoke test
         run: |
@@ -117,7 +119,7 @@ jobs:
           from pathlib import Path
 
           import certsf
-          from certsf.mcp_server import build_server, special_beta, special_erf, special_erfc, special_erfcx, special_erfi, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
+          from certsf.mcp_server import build_server, special_beta, special_dawson, special_erf, special_erfc, special_erfcx, special_erfi, special_gamma, special_gamma_ratio, special_loggamma, special_loggamma_ratio, special_pochhammer, special_rgamma
 
           certsf_path = Path(certsf.__file__).resolve()
           install_paths = [
@@ -137,6 +139,7 @@ jobs:
           erfc_result = special_erfc("1.0", mode="certified", dps=50)
           erfcx_result = special_erfcx("1.0", mode="certified", dps=50)
           erfi_result = special_erfi("1.0", mode="certified", dps=50)
+          dawson_result = special_dawson("1.0", mode="certified", dps=50)
 
           print(certsf_path)
           print(build_server)
@@ -151,6 +154,7 @@ jobs:
           print(erfc_result)
           print(erfcx_result)
           print(erfi_result)
+          print(dawson_result)
           assert callable(build_server)
           assert isinstance(result, dict)
           assert isinstance(loggamma_result, dict)
@@ -163,6 +167,7 @@ jobs:
           assert isinstance(erfc_result, dict)
           assert isinstance(erfcx_result, dict)
           assert isinstance(erfi_result, dict)
+          assert isinstance(dawson_result, dict)
           assert result["function"] == "gamma"
           assert loggamma_result["function"] == "loggamma"
           assert rgamma_result["function"] == "rgamma"
@@ -174,8 +179,10 @@ jobs:
           assert erfc_result["function"] == "erfc"
           assert erfcx_result["function"] == "erfcx"
           assert erfi_result["function"] == "erfi"
+          assert dawson_result["function"] == "dawson"
           assert erf_result["certified"]
           assert erfc_result["certified"]
           assert erfcx_result["certified"]
           assert erfi_result["certified"]
+          assert dawson_result["certified"]
           PY

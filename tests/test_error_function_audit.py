@@ -83,9 +83,10 @@ DOC_EXPECTATIONS = {
         "No `erfinv`, `erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
-        "`pypi-smoke.yml` defaults to `0.2.0a7`",
+        "`pypi-smoke.yml` defaults to `0.2.0a8`",
         "certified `special_erf`",
-        "`special_erfcx`, and `special_erfi` calls in the MCP-certified",
+        "`special_erfcx`, `special_erfi`, and",
+        "`special_dawson` calls in the MCP-certified",
         "Current v0.2 audit result:",
         "No public API, dispatcher, backend formula, MCP, or certified-scope",
     ),
@@ -129,6 +130,13 @@ DOC_EXPECTATIONS = {
         "The release-planning PR was metadata and documentation only.",
         "Before publication, the PyPI smoke workflow continued to target `0.2.0a6`.",
         "After post-release verification, `pypi-smoke.yml` targets `0.2.0a7`",
+        "[`post_release_verification.md`](post_release_verification.md)",
+    ),
+    "docs/release-0.2.0-alpha.8.md": (
+        "The release-planning PR is metadata and documentation only.",
+        "Before publication, the PyPI smoke workflow continued to target `0.2.0a7`.",
+        "After post-release verification, `pypi-smoke.yml` targets `0.2.0a8`",
+        "certified MCP `special_dawson` smoke calls",
         "[`post_release_verification.md`](post_release_verification.md)",
     ),
 }
@@ -355,28 +363,33 @@ def test_external_reference_fixture_covers_error_function_surface():
 def test_pypi_smoke_covers_error_function_release_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0a7"' in text
-    assert "inputs.version || '0.2.0a7'" in text
+    assert 'default: "0.2.0a8"' in text
+    assert "inputs.version || '0.2.0a8'" in text
     assert 'erf("1.0", mode="fast"' in text
     assert 'erfc("1.0", mode="fast"' in text
     assert 'erfcx("1.0", mode="fast"' in text
     assert 'erfi("1.0", mode="fast"' in text
+    assert 'dawson("1.0", mode="fast"' in text
     assert 'erf("1.0", mode="certified"' in text
     assert 'erfc("1.0", mode="certified"' in text
     assert 'erfcx("1.0", mode="certified"' in text
     assert 'erfi("1.0", mode="certified"' in text
+    assert 'dawson("1.0", mode="certified"' in text
     assert "special_erf" in text
     assert "special_erfc" in text
     assert "special_erfcx" in text
     assert "special_erfi" in text
+    assert "special_dawson" in text
     assert 'special_erf("1.0", mode="certified", dps=50)' in text
     assert 'special_erfc("1.0", mode="certified", dps=50)' in text
     assert 'special_erfcx("1.0", mode="certified", dps=50)' in text
     assert 'special_erfi("1.0", mode="certified", dps=50)' in text
+    assert 'special_dawson("1.0", mode="certified", dps=50)' in text
     assert 'assert erf_result["certified"]' in text
     assert 'assert erfc_result["certified"]' in text
     assert 'assert erfcx_result["certified"]' in text
     assert 'assert erfi_result["certified"]' in text
+    assert 'assert dawson_result["certified"]' in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():
