@@ -131,6 +131,19 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - [ ] `python -m build` passes.
 - [ ] `python -m twine check dist/*` passes.
 
+Post-release verification note:
+
+- TestPyPI staging run `25612987386` passed with `ref=v0.2.0` and
+  `confirm=publish-testpypi`.
+- Normal GitHub release `v0.2.0` triggered `publish-pypi` run `25613028613`,
+  which passed.
+- First `pypi-smoke` run `25613047701` captured PyPI edge-cache propagation
+  failures where some runners did not yet list `0.2.0`.
+- Final `pypi-smoke` run `25613084716` passed across base, certified, and
+  MCP-certified install paths.
+- Post-release verification is recorded in
+  [`post_release_verification.md`](post_release_verification.md).
+
 ## v0.2.0-alpha.10 Checklist
 
 - [ ] `pyproject.toml` version is `0.2.0a10`.

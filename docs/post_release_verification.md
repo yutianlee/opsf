@@ -1,5 +1,134 @@
 # Post-release verification
 
+## v0.2.0 / certsf 0.2.0
+
+This records the verification evidence for the first non-prerelease 0.2 line
+PyPI artifact.
+
+### Published artifact
+
+- Git tag: `v0.2.0`
+- GitHub release: <https://github.com/yutianlee/certsf/releases/tag/v0.2.0>
+- GitHub release type: normal release, not prerelease.
+- PyPI URL: <https://pypi.org/project/certsf/0.2.0/>
+- PyPI version: `certsf 0.2.0`
+- TestPyPI URL: <https://test.pypi.org/project/certsf/0.2.0/>
+- TestPyPI workflow run: `25612987386`
+- TestPyPI workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25612987386>
+- TestPyPI result: passed after manual `publish-testpypi` dispatch with
+  `ref=v0.2.0` and `confirm=publish-testpypi`.
+- Publish workflow run: `25613028613`
+- Publish workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25613028613>
+- Publish trigger: GitHub `release` event for `v0.2.0`
+- Source commit: `8ce58cd750bf43e959073a606cb2014bf3c38141`
+- Wheel SHA256:
+  `17a1bd49fad77dcd693c0d29e512d6711dc8ef13a64e232f9084583a470082cd`
+- sdist SHA256:
+  `84434f98e43a001e90afe442c312bb3f7f85a6682706d511b66c14a03fb99b0e`
+
+The TestPyPI workflow build job passed checkout, Python 3.12 setup,
+tag/version parity check, build-tool installation, sdist/wheel build,
+`twine check`, and distribution artifact upload. The TestPyPI publish job
+completed through trusted publishing after the explicit confirmation guard.
+
+The real PyPI publish workflow build job passed checkout, Python 3.12 setup,
+tag/version parity check, build-tool installation, sdist/wheel build,
+`twine check`, and distribution artifact upload. The PyPI publish job
+completed through trusted publishing from the normal GitHub release event.
+
+### TestPyPI smoke
+
+A basic local TestPyPI install smoke passed using TestPyPI as the package index
+and PyPI as the dependency fallback:
+
+```bash
+python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple certsf==0.2.0
+```
+
+The smoke imported `certsf` from the temporary virtual environment and exercised
+`gamma`, `erf`, `erfc`, `erfinv`, and `erfcinv` in fast mode. TestPyPI remains
+staging evidence only; real PyPI plus the `pypi-smoke` workflow are the main
+install proof.
+
+### PyPI confirmation
+
+The PyPI JSON endpoint for `certsf 0.2.0` returned the published version and
+the two uploaded files listed above. The TestPyPI JSON endpoint returned the
+same version and matching wheel/sdist hashes for the staged artifacts.
+
+### Fresh install smoke test
+
+Final manual `pypi-smoke` run: `25613084716`
+
+Workflow URL:
+<https://github.com/yutianlee/certsf/actions/runs/25613084716>
+
+Install targets:
+
+```bash
+python -m pip install --pre "certsf==0.2.0"
+python -m pip install --pre "certsf[certified]==0.2.0"
+python -m pip install --pre "certsf[mcp,certified]==0.2.0"
+```
+
+Verified from fresh GitHub Actions environments:
+
+- Base installs passed on Python 3.10, 3.11, and 3.12.
+- Certified installs passed on Python 3.10, 3.11, and 3.12.
+- MCP certified installs passed on Python 3.10, 3.11, and 3.12.
+- Imports came from environment `site-packages`, not the checkout.
+- Smoke calls passed for `gamma`, `loggamma`, `rgamma`, `gamma_ratio`,
+  `loggamma_ratio`, `beta`, `pochhammer`, `erf`, `erfc`, `erfcinv`, `erfcx`,
+  `erfi`, `erfinv`, `dawson`, `ai`, `besselj`, and `pcfu`.
+- Certified smoke calls passed for `gamma`, `loggamma`, `rgamma`,
+  `gamma_ratio`, `loggamma_ratio`, `beta`, `pochhammer`, `erf`, `erfc`,
+  `erfcinv`, `erfcx`, `erfi`, `erfinv`, `dawson`, `ai`, `besselj`, and
+  `pcfu`.
+- MCP server import and `special_gamma` / `special_loggamma` /
+  `special_rgamma` / `special_gamma_ratio` / `special_loggamma_ratio` /
+  `special_beta` / `special_pochhammer` / `special_erf` / `special_erfc` /
+  `special_erfcinv` / `special_erfcx` / `special_erfi` / `special_erfinv` /
+  `special_dawson` smoke calls passed.
+
+One earlier manual smoke run captured PyPI edge-cache propagation lag:
+
+- Run `25613047701` started immediately after publish. Several matrix jobs
+  installed successfully, but the failed install logs on other runners saw only
+  versions through `0.2.0a10` and did not yet list `0.2.0`.
+
+The final run above passed every matrix job after the PyPI edge cache caught up.
+
+After the successful smoke run, this follow-up PR updates the scheduled/manual
+`pypi-smoke` workflow default and fallback version from `0.2.0a10` to
+`0.2.0` while preserving the existing gamma-family, error-function,
+inverse-error, Airy, Bessel, parabolic-cylinder, and MCP-certified smoke
+coverage.
+
+### Validation summary
+
+- `v0.2.0` tag points at clean `main` commit
+  `8ce58cd750bf43e959073a606cb2014bf3c38141`.
+- GitHub release `v0.2.0` is not marked prerelease.
+- TestPyPI staging run `25612987386` completed successfully.
+- Basic TestPyPI install smoke passed with PyPI dependency fallback.
+- `publish-pypi` run `25613028613` completed successfully.
+- PyPI confirms `certsf 0.2.0` is available at the release URL above.
+- PyPI file hashes match the wheel and sdist hashes recorded above.
+- Initial `pypi-smoke` run `25613047701` had PyPI edge-cache propagation
+  failures only; failed install logs did not yet list `0.2.0`.
+- Final `pypi-smoke` run `25613084716` completed successfully across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- Pre-publication validation passed:
+  `python scripts/check_release_version.py v0.2.0`,
+  `python -m ruff check .`, `python -m mypy`, `python -m pytest`,
+  `python -m build`, and `python -m twine check dist/*`.
+- No `src/`, mathematical implementation, backend formula, public-wrapper,
+  runtime behavior, certification-scope, gamma-family behavior,
+  inverse/error-function behavior, or parabolic-cylinder claim changes were
+  made during publication or verification.
+
 ## v0.2.0-alpha.10 / certsf 0.2.0a10
 
 This records the verification evidence for the tenth 0.2.0 alpha PyPI

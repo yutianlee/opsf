@@ -104,14 +104,14 @@ rejection, complex input rejection, direct-or-`erfinv(1-x)` certificate scopes,
 fallback diagnostics, residual containment, external-reference fixture
 containment, and Python API/MCP parity.
 
-The release-hygiene audit checks that `pypi-smoke.yml` defaults to `0.2.0a10`
+The release-hygiene audit checks that `pypi-smoke.yml` defaults to `0.2.0`
 and covers `erfinv`, `erfcinv`, `special_erfinv`, and `special_erfcinv` in the
 base, certified, and MCP-certified smoke paths.
 
 This audit corrected stale documentation that still described `erfcinv(x)` as
 future alpha.10 work after `0.2.0a10` was published. The public API,
 dispatcher, backend, MCP wrappers, certification diagnostics, and release
-workflow are consistent with the published `0.2.0a10` surface.
+workflow are consistent with the published `0.2.0` surface.
 
 No public-wrapper, backend-formula, package-version, gamma-family, existing
 error-function behavior, or parabolic-cylinder claim change is part of this
