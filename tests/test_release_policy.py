@@ -52,7 +52,7 @@ def test_publish_testpypi_workflow_requires_manual_confirmation():
     assert "Refusing to publish to TestPyPI without confirm=publish-testpypi." in text
     assert "actions/upload-artifact@v6" in text
     assert "actions/download-artifact@v6" in text
-    assert 'default: "v0.2.0-alpha.8"' in text
+    assert 'default: "v0.2.0-alpha.9"' in text
 
 
 def _read(path: str) -> str:

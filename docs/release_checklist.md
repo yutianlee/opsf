@@ -46,7 +46,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0-alpha.8
+python scripts/check_release_version.py v0.2.0-alpha.9
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -73,6 +73,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.2.0-alpha.9` maps to `0.2.0a9`,
   `v0.2.0-alpha.8` maps to `0.2.0a8`,
   `v0.2.0-alpha.7` maps to `0.2.0a7`,
   `v0.2.0-alpha.6` maps to `0.2.0a6`,
@@ -82,6 +83,48 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.2.0-alpha.9 Checklist
+
+- [ ] `pyproject.toml` version is `0.2.0a9`.
+- [ ] `CITATION.cff` version is `0.2.0-alpha.9`.
+- [ ] `CITATION.cff` date-released is `2026-05-09`.
+- [ ] `CHANGELOG.md` records `erfinv(x)` as the only public API expansion
+  since `0.2.0-alpha.8`.
+- [ ] `docs/release-0.2.0-alpha.9.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.2.0-alpha.9`.
+- [ ] PyPI smoke workflow still targets `0.2.0a8` until `0.2.0a9` is
+  published.
+- [ ] TestPyPI staging is skipped for this routine feature alpha unless
+  packaging or workflow risk is introduced under `release_policy.md`.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No backend formula changes are included.
+- [ ] No public-wrapper changes beyond the already-merged `erfinv(x)` are
+  included.
+- [ ] Release copy defines `erfinv(x)` as the real principal inverse of `erf`
+  on `x in (-1, 1)`.
+- [ ] Release copy says fast mode uses `scipy.special.erfinv(x)`.
+- [ ] Release copy says high-precision mode uses `mpmath.erfinv(x)` when
+  available and otherwise solves `erf(y) = x` numerically.
+- [ ] Release copy says certified mode supports real `x` only with
+  `-1 < x < 1`.
+- [ ] Release copy says certified mode prefers direct Arb `erfinv` when
+  available and otherwise uses a certified monotone real-root enclosure for
+  `erf(y)-x=0`.
+- [ ] Release copy says endpoints, out-of-domain real inputs, and complex
+  inputs fail cleanly in certified mode.
+- [ ] Release copy does not imply `erfcinv`, complex inverse branches,
+  Faddeeva/wofz, plasma dispersion, or endpoint asymptotic certification.
+- [ ] No error-function-family behavior change outside `erfinv` is included.
+- [ ] No gamma-family behavior change is included.
+- [ ] No parabolic-cylinder claim broadening is included.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] `python scripts/check_release_version.py v0.2.0-alpha.9` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
 
 ## v0.2.0-alpha.8 Checklist
 
