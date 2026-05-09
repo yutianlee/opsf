@@ -412,40 +412,44 @@ def test_external_reference_fixture_covers_error_function_surface():
 def test_pypi_smoke_covers_error_function_release_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0a8"' in text
-    assert "inputs.version || '0.2.0a8'" in text
+    assert 'default: "0.2.0a9"' in text
+    assert "inputs.version || '0.2.0a9'" in text
     assert 'erf("1.0", mode="fast"' in text
     assert 'erfc("1.0", mode="fast"' in text
     assert 'erfcx("1.0", mode="fast"' in text
     assert 'erfi("1.0", mode="fast"' in text
+    assert 'erfinv("0.5", mode="fast"' in text
     assert 'dawson("1.0", mode="fast"' in text
     assert 'erf("1.0", mode="certified"' in text
     assert 'erfc("1.0", mode="certified"' in text
     assert 'erfcx("1.0", mode="certified"' in text
     assert 'erfi("1.0", mode="certified"' in text
+    assert 'erfinv("0.5", mode="certified"' in text
     assert 'dawson("1.0", mode="certified"' in text
     assert "special_erf" in text
     assert "special_erfc" in text
     assert "special_erfcx" in text
     assert "special_erfi" in text
+    assert "special_erfinv" in text
     assert "special_dawson" in text
     assert 'special_erf("1.0", mode="certified", dps=50)' in text
     assert 'special_erfc("1.0", mode="certified", dps=50)' in text
     assert 'special_erfcx("1.0", mode="certified", dps=50)' in text
     assert 'special_erfi("1.0", mode="certified", dps=50)' in text
+    assert 'special_erfinv("0.5", mode="certified", dps=50)' in text
     assert 'special_dawson("1.0", mode="certified", dps=50)' in text
     assert 'assert erf_result["function"] == "erf"' in text
     assert 'assert erfc_result["function"] == "erfc"' in text
     assert 'assert erfcx_result["function"] == "erfcx"' in text
     assert 'assert erfi_result["function"] == "erfi"' in text
+    assert 'assert erfinv_result["function"] == "erfinv"' in text
     assert 'assert dawson_result["function"] == "dawson"' in text
     assert 'assert erf_result["certified"]' in text
     assert 'assert erfc_result["certified"]' in text
     assert 'assert erfcx_result["certified"]' in text
     assert 'assert erfi_result["certified"]' in text
+    assert 'assert erfinv_result["certified"]' in text
     assert 'assert dawson_result["certified"]' in text
-    assert "erfinv(" not in text
-    assert "special_erfinv" not in text
 
 
 def test_publish_workflow_artifact_actions_remain_on_v6():
@@ -458,12 +462,12 @@ def test_publish_workflow_artifact_actions_remain_on_v6():
         assert "actions/download-artifact@v5" not in text
 
 
-def test_release_policy_and_pypi_smoke_alpha8_guardrails_remain_current():
+def test_release_policy_and_pypi_smoke_alpha9_guardrails_remain_current():
     smoke = _read(".github/workflows/pypi-smoke.yml")
     policy = _read("docs/release_policy.md")
 
-    assert 'default: "0.2.0a8"' in smoke
-    assert "inputs.version || '0.2.0a8'" in smoke
+    assert 'default: "0.2.0a9"' in smoke
+    assert "inputs.version || '0.2.0a9'" in smoke
     assert "Routine feature alpha releases may skip TestPyPI" in policy
     assert "The `publish-testpypi` workflow must remain `workflow_dispatch` only." in policy
 
