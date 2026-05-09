@@ -108,21 +108,21 @@ available. The formula fallback uses `certificate_scope="arb_dawson_formula"`,
 and `formula="sqrt(pi)/2*exp(-z^2)*erfi(z)"`.
 
 Release hygiene:
-`pypi-smoke.yml` defaults to `0.2.0a7` after the published
-`v0.2.0-alpha.7` release. This Dawson feature branch intentionally does not
-update the PyPI smoke workflow before a future release is published. The
-existing smoke workflow covers `erf`, `erfc`, `erfcx`, and `erfi` in base and
-certified Python API smoke calls, plus certified `special_erf`, `special_erfc`,
-`special_erfcx`, and `special_erfi` calls in the MCP-certified smoke job. The
-PyPI publish workflows continue to use
+`pypi-smoke.yml` defaults to `0.2.0a8` after the published
+`v0.2.0-alpha.8` release. The smoke workflow covers `erf`, `erfc`, `erfcx`,
+`erfi`, and `dawson` in base and certified Python API smoke calls, plus
+certified `special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`, and
+`special_dawson` calls in the MCP-certified smoke job. The PyPI publish
+workflows continue to use
 `actions/upload-artifact@v6` and `actions/download-artifact@v6`.
 
 Current v0.2 audit result:
-The Dawson feature branch adds `dawson(z)` as the only new public
-error-function-family wrapper and keeps pypi-smoke pinned to `0.2.0a7` until a
-future release is published. Tests keep the five wrappers, MCP parity, fixture
-containment, and formula diagnostics in lockstep. No `erf`, `erfc`, `erfcx`,
-`erfi`, gamma-family, or parabolic-cylinder behavior or claim changes are part
-of this feature branch.
+The published `v0.2.0-alpha.8` release includes `dawson(z)` as the only new
+public error-function-family wrapper since `v0.2.0-alpha.7`. Post-release
+verification updates pypi-smoke to target `0.2.0a8` and adds Dawson smoke
+coverage without changing source behavior. Tests keep the five wrappers, MCP
+parity, fixture containment, and formula diagnostics in lockstep. No `erf`,
+`erfc`, `erfcx`, `erfi`, gamma-family, or parabolic-cylinder behavior or claim
+changes are part of this verification update.
 No public API, dispatcher, backend formula, MCP, or certified-scope
 inconsistency was found after the Dawson surface and audit docs were updated.

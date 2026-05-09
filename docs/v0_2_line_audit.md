@@ -3,7 +3,7 @@
 Last reviewed: 2026-05-10.
 
 This audit records the v0.2 alpha gamma-family surface, error-function surface,
-and release hygiene checks after `v0.2.0-alpha.7`.
+and release hygiene checks after `v0.2.0-alpha.8`.
 
 ## Public API
 
@@ -31,11 +31,13 @@ The current error-function wrappers are:
 - `erfc(z)`
 - `erfcx(z)`
 - `erfi(z)`
+- `dawson(z)`
 
-All four wrappers are exported from `certsf.__init__`, appear in
+All five wrappers are exported from `certsf.__init__`, appear in
 `certsf.__all__`, are registered in the dispatcher with `fast`,
 `high_precision`, and `certified` modes, and have thin MCP tools named
-`special_erf`, `special_erfc`, `special_erfcx`, and `special_erfi`.
+`special_erf`, `special_erfc`, `special_erfcx`, `special_erfi`, and
+`special_dawson`.
 
 ## Certified Scope
 
@@ -92,7 +94,7 @@ broaden those claims.
 - `publish-pypi.yml` uses `actions/upload-artifact@v6`.
 - `publish-testpypi.yml` uses `actions/upload-artifact@v6`.
 - Both publish workflows keep `actions/download-artifact@v6`.
-- `pypi-smoke.yml` defaults to `0.2.0a7`.
+- `pypi-smoke.yml` defaults to `0.2.0a8`.
 - `pypi-smoke.yml` now covers all seven gamma-family wrappers in Python API
   smoke calls and all seven corresponding MCP tools in MCP smoke calls.
 - `pypi-smoke.yml` now covers `erf`, `erfc`, `special_erf`, and
@@ -103,6 +105,9 @@ broaden those claims.
 - `pypi-smoke.yml` now covers `erfi` in base and certified smoke calls and
   covers `special_erfi` in certified MCP smoke calls after the
   `v0.2.0-alpha.7` publication.
+- `pypi-smoke.yml` now covers `dawson` in base and certified smoke calls and
+  covers `special_dawson` in certified MCP smoke calls after the
+  `v0.2.0-alpha.8` publication.
 
 ## Audit Findings
 
@@ -119,8 +124,7 @@ Both gaps were corrected without source changes, package version changes,
 backend formula changes, public-wrapper changes, or certification-claim
 broadening.
 
-The error-function audit also found stale post-publication wording: the current
-0.2 scope doc still described `erfi(z)` as a future alpha.7 expansion, and the
-alpha.7 release note still described the pre-publication pypi-smoke default.
-Those documentation-only inconsistencies were corrected without changing
-runtime behavior or broadening any claim.
+The post-release verification updates for `v0.2.0-alpha.8` corrected the
+current pypi-smoke target and added Dawson smoke coverage after the PyPI release
+was published and verified. Those documentation and workflow-only updates did
+not change runtime behavior or broaden any claim.
