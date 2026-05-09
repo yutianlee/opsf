@@ -11,7 +11,7 @@ error bounds, and diagnostics explaining how the result was produced.
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
 the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
-the current 0.2.0 alpha support matrix lives in
+the current 0.2.0 support matrix lives in
 [`docs/certified_scope_0_2_0.md`](docs/certified_scope_0_2_0.md). The frozen
 0.1.0 matrix remains archived in
 [`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the
@@ -39,8 +39,8 @@ For MCP tooling plus certified mode:
 python -m pip install "certsf[mcp,certified]"
 ```
 
-Prerelease versions such as `0.1.0a3` require `--pre` unless installing an exact
-version, for example `certsf==0.1.0a3`.
+Prerelease versions such as `0.2.0a10` require `--pre` unless installing an
+exact version, for example `certsf==0.2.0a10`.
 
 For local development:
 
@@ -132,9 +132,9 @@ API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.2.0 alpha line adds gamma-family wrappers and error functions while
-keeping the release wording conservative and the parabolic-cylinder claims
-unchanged.
+The 0.2 line includes gamma-family wrappers and error functions while keeping
+the release wording conservative and the parabolic-cylinder claims unchanged.
+The package remains alpha-quality in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -342,6 +342,7 @@ No custom asymptotic certification is added. See
 - `airy(z)` returns Ai, Ai', Bi, and Bi' in one JSON payload.
 - `ai(z, derivative=0)` and `ai(z, derivative=1)`.
 - `bi(z, derivative=0)` and `bi(z, derivative=1)`.
+- `airyai` and `airybi` remain public aliases for `ai` and `bi`.
 
 Certified Airy wrappers use Arb ball arithmetic and report component-level
 absolute and relative error bounds.
@@ -440,8 +441,9 @@ The repository also includes:
 - `docs/erfinv.md` for inverse-error-function certified-domain policy.
 - `docs/erfcinv.md` for inverse-complementary-error-function certified-domain
   policy.
-- `docs/certified_scope_0_2_0.md` for the current 0.2.0 alpha certified
+- `docs/certified_scope_0_2_0.md` for the current 0.2.0 certified
   support matrix.
+- `docs/release-0.2.0.md` for v0.2.0 final release planning notes.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.
 - `docs/release-0.2.0-alpha.10.md` for v0.2.0-alpha.10 feature-alpha planning

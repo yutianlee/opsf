@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.0 - 2026-05-09
+
+- Planned the first non-prerelease release of the 0.2 line.
+- Keeps the same public API as `0.2.0-alpha.10`.
+- Includes the gamma-family additions `gamma_ratio`, `loggamma_ratio`,
+  `beta`, and `pochhammer`.
+- Includes the error-function additions `erf`, `erfc`, `erfcx`, `erfi`, and
+  `dawson`.
+- Includes real-only `erfinv` on `-1 < x < 1`.
+- Includes real-only `erfcinv` on `0 < x < 2`.
+- No new public wrappers are added since `0.2.0-alpha.10`.
+- No mathematical implementation changes are included since
+  `0.2.0-alpha.10`.
+- No certification-claim broadening is included.
+- Parabolic-cylinder wrappers remain `experimental_formula`.
+- No custom Taylor/asymptotic certification methods are claimed.
+
 ## 0.2.0-alpha.10 - 2026-05-09
 
 - Added the public `erfcinv(x)` wrapper for the real principal inverse of

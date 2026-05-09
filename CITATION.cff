@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use certsf in research, please cite it using this metadata."
 title: "certsf: Alpha special-function wrappers with explicit certification diagnostics"
-version: "0.2.0-alpha.10"
+version: "0.2.0"
 date-released: "2026-05-09"
 authors:
   - family-names: Lee
