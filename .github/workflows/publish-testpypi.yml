@@ -1,5 +1,7 @@
 name: publish-testpypi
 
+# Manual staging only. Do not add release triggers; real PyPI prereleases are
+# published by publish-pypi from GitHub prerelease events.
 on:
   workflow_dispatch:
     inputs:
@@ -7,6 +9,9 @@ on:
         description: "Git ref or tag to publish"
         required: true
         default: "v0.2.0-alpha.7"
+      confirm:
+        description: "Type publish-testpypi to confirm"
+        required: true
 
 permissions:
   contents: read
@@ -17,6 +22,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Confirm manual TestPyPI staging
+        run: |
+          if [ "${{ inputs.confirm }}" != "publish-testpypi" ]; then
+            echo "Refusing to publish to TestPyPI without confirm=publish-testpypi."
+            exit 1
+          fi
+
       - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}

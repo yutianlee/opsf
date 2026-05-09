@@ -5,6 +5,9 @@ releases, keep the wording conservative: the package has certified Arb
 enclosures for documented scopes, but the parabolic-cylinder formula layer
 remains experimental until the formula audit is complete.
 
+Release publishing policy is recorded in
+[`release_policy.md`](release_policy.md).
+
 ## Required Checks
 
 - [ ] CI green on Python 3.10, 3.11, and 3.12.
@@ -31,6 +34,8 @@ remains experimental until the formula audit is complete.
 - [ ] Package metadata passes `python -m twine check dist/*`.
 - [ ] Wheel installs in a clean virtual environment.
 - [ ] GitHub release is marked prerelease for alpha tags.
+- [ ] Decide whether TestPyPI staging is needed under
+  [`release_policy.md`](release_policy.md).
 
 ## Command Hints
 
@@ -63,6 +68,8 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 
 - TestPyPI publishing is manual-only through `publish-testpypi`; it keeps the
   current planned release tag as the default dispatch ref.
+- Routine feature alpha releases may skip TestPyPI if build, `twine check`,
+  tag/version parity, protected PyPI publish, and real PyPI smoke all pass.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
