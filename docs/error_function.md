@@ -23,8 +23,8 @@ erfc(z, *, dps=50, mode="auto", certify=False)
 
 - `mode="fast"` uses `scipy.special.erf(z)` or `scipy.special.erfc(z)`.
 - `mode="high_precision"` uses `mpmath.erf(z)` or `mpmath.erfc(z)`.
-- `mode="certified"` uses Arb error-function primitives through
-  `python-flint`.
+- `mode="certified"` uses direct Arb `erf` and `erfc` primitives through
+  `python-flint` where available.
 
 Certified `erfc` uses the direct Arb `erfc` primitive when available. If a
 supported `python-flint` build exposes direct `erf` but not direct `erfc`, the
@@ -43,5 +43,4 @@ wrappers. Certified successes use narrow scopes:
 - `erf`: `certificate_scope="direct_arb_erf"`
 - `erfc`: `certificate_scope="direct_arb_erfc"`
 
-The wrapper does not add other public error-function variants such as `erfi`,
-`erfinv`, `erfcinv`, or scaled complementary error functions.
+The wrapper does not add other public error-function variants such as `erfi`, `erfinv`, `erfcinv`, or `erfcx`.

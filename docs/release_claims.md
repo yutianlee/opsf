@@ -53,6 +53,10 @@ Release-facing support matrices must keep these status phrases:
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.
+- Do not claim `erfi`, `erfinv`, `erfcinv`, or `erfcx` support until those
+  wrappers, backends, tests, and audit docs exist.
+- Do not claim Taylor, asymptotic, or custom certification methods for the
+  error-function family.
 - Do not imply that complex `loggamma_ratio` is the principal logarithm of
   `gamma_ratio` or that it certifies pole-limiting values.
 - Say that Bessel certified mode is restricted to real-valued order.
