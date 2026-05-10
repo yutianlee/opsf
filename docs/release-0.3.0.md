@@ -4,9 +4,11 @@
 It keeps the 0.2 public special-function wrapper surface and adds an explicit
 positive-real `loggamma` Stirling methods behind method registry v2.
 
-This implementation does not change package version metadata, does not change
-default method selection, and does not alter existing certified results for
-calls that omit `method=...` or pass `method="auto"`.
+The implementation PRs did not change package version metadata, did not change
+default method selection, and did not alter existing certified results for
+calls that omit `method=...` or pass `method="auto"`. The first release
+metadata bump for this line is planned in
+[`release-0.3.0-alpha.1.md`](release-0.3.0-alpha.1.md).
 
 ## Active Scope
 
@@ -76,6 +78,7 @@ Validation should confirm that:
   existing direct Arb path;
 - unsupported domains and unsupported modes fail cleanly rather than falling
   back to mpmath in certified mode;
-- package version metadata is unchanged;
+- release metadata changes are limited to the dedicated alpha release-planning
+  PR;
 - no parabolic-cylinder, Faddeeva, `wofz`, or plasma-dispersion support claim is
   added.
