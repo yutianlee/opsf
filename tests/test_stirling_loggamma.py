@@ -147,6 +147,14 @@ def test_certified_auto_loggamma_selects_unshifted_stirling_when_tail_certifies(
     _assert_auto_selector_diagnostics(result, "stirling")
     assert result.diagnostics["auto_candidates"][0]["method"] == "stirling"
     assert result.diagnostics["auto_candidates"][0]["selected"] is True
+    assert len(result.diagnostics["auto_candidates"]) == 1
+    _assert_preselection_candidate(
+        result.diagnostics["auto_candidates"][0],
+        can_certify=True,
+        selected=True,
+    )
+    assert result.diagnostics["auto_candidates"][0]["estimated_terms_used"] == result.terms_used
+    assert "tail_bound" in result.diagnostics["auto_candidates"][0]
 
     reference = certsf.loggamma("20", mode="certified", method="arb", dps=80)
     if _backend_is_unavailable(reference):
@@ -165,8 +173,26 @@ def test_certified_auto_loggamma_selects_shifted_stirling_when_unshifted_fails()
     assert result.diagnostics["shifted_argument"] == "38"
     assert result.diagnostics["auto_candidates"][0]["method"] == "stirling"
     assert result.diagnostics["auto_candidates"][0]["certified"] is False
+    _assert_preselection_candidate(
+        result.diagnostics["auto_candidates"][0],
+        can_certify=False,
+        selected=False,
+    )
+    assert result.diagnostics["auto_candidates"][0]["estimated_terms_used"] is None
+    assert result.diagnostics["auto_candidates"][0]["terms_attempted"]
+    assert result.diagnostics["auto_candidates"][0]["final_tail_bound"]
     assert result.diagnostics["auto_candidates"][1]["method"] == "stirling_shifted"
     assert result.diagnostics["auto_candidates"][1]["selected"] is True
+    _assert_preselection_candidate(
+        result.diagnostics["auto_candidates"][1],
+        can_certify=True,
+        selected=True,
+    )
+    assert result.diagnostics["auto_candidates"][1]["estimated_terms_used"] == result.terms_used
+    assert result.diagnostics["auto_candidates"][1]["tail_bound"]
+    assert result.diagnostics["auto_candidates"][1]["shift"] == 18
+    assert result.diagnostics["auto_candidates"][1]["shifted_argument"] == "38"
+    assert result.diagnostics["auto_candidates"][1]["shift_policy"] == "window_37_38"
     assert _selected_auto_candidates(result) == ["stirling_shifted"]
 
     reference = certsf.loggamma("20", mode="certified", method="arb", dps=130)
@@ -212,12 +238,49 @@ def test_certified_auto_loggamma_uses_direct_arb_outside_positive_real_stirling_
     _assert_auto_selector_diagnostics(result, "arb")
     assert result.diagnostics["auto_candidates"][0]["method"] == "arb"
     assert result.diagnostics["auto_candidates"][0]["selected"] is True
+    assert result.diagnostics["auto_candidates"][0]["preselected"] is False
+    assert result.diagnostics["auto_candidates"][0]["can_certify"] is expected_certified
     if expected_certified:
         assert result.value
         assert result.diagnostics["certificate_scope"] == "direct_arb_primitive"
     else:
         assert result.value == ""
         assert result.diagnostics["error"]
+
+
+def test_certified_auto_preselection_skips_full_unshifted_when_tail_cannot_certify(monkeypatch):
+    pytest.importorskip("flint")
+    import certsf.methods.loggamma_auto as loggamma_auto
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("full unshifted Stirling should not be evaluated")
+
+    monkeypatch.setattr(loggamma_auto, "stirling_loggamma", fail_if_called)
+
+    result = certsf.loggamma("20", mode="certified", method="certified_auto", dps=100)
+
+    _assert_successful_shifted_stirling_result(result, 100)
+    _assert_auto_selector_diagnostics(result, "stirling_shifted")
+    assert result.diagnostics["auto_candidates"][0]["method"] == "stirling"
+    assert result.diagnostics["auto_candidates"][0]["can_certify"] is False
+    assert result.diagnostics["auto_candidates"][1]["method"] == "stirling_shifted"
+    assert result.diagnostics["auto_candidates"][1]["selected"] is True
+
+
+def test_certified_auto_preselection_skips_shifted_when_unshifted_certifies(monkeypatch):
+    pytest.importorskip("flint")
+    import certsf.methods.loggamma_auto as loggamma_auto
+
+    def fail_if_called(*args, **kwargs):
+        raise AssertionError("shifted Stirling should not be evaluated")
+
+    monkeypatch.setattr(loggamma_auto, "stirling_loggamma_shifted", fail_if_called)
+
+    result = certsf.loggamma("20", mode="certified", method="certified_auto", dps=50)
+
+    _assert_successful_stirling_result(result, 50)
+    _assert_auto_selector_diagnostics(result, "stirling")
+    assert [candidate["method"] for candidate in result.diagnostics["auto_candidates"]] == ["stirling"]
 
 
 @pytest.mark.parametrize("x", ["20", "3.2", "50+1j", "0"])
@@ -434,6 +497,14 @@ def _assert_auto_selector_diagnostics(result, selected_method):
     assert result.diagnostics["auto_reason"]
     assert isinstance(result.diagnostics["auto_candidates"], list)
     assert result.diagnostics["auto_candidates"]
+
+
+def _assert_preselection_candidate(candidate, *, can_certify, selected):
+    assert candidate["preselected"] is True
+    assert candidate["can_certify"] is can_certify
+    assert candidate["selected"] is selected
+    assert "estimated_terms_used" in candidate
+    assert "requested_tolerance" in candidate
 
 
 def _selected_auto_candidates(result):

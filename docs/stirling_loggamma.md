@@ -75,10 +75,12 @@ The shifted method does not change `method="stirling"` and is not used for
 outside the positive-real Stirling scope, including complex values,
 non-finite values, and real `x < 20`, it selects the direct Arb `loggamma`
 primitive rather than a custom Stirling method. For finite real `x >= 20`, it
-may select `method="stirling"` or `method="stirling_shifted"` only when the
-selected method certifies its documented tail bound; otherwise it selects
-direct Arb. The selector never falls back to mpmath in certified mode and does
-not add complex Stirling, gamma-ratio asymptotics, or beta asymptotics.
+uses cheap tail-bound preselection before evaluating a custom finite Stirling
+sum. It may select `method="stirling"` or `method="stirling_shifted"` only when
+the preselection and selected method certify the documented tail bound;
+otherwise it selects direct Arb. The selector never falls back to mpmath in
+certified mode and does not add complex Stirling, gamma-ratio asymptotics, or
+beta asymptotics.
 
 Successful selected results preserve the selected backend's result method:
 `arb_ball`, `stirling_loggamma`, or `stirling_shifted_loggamma`.
@@ -147,8 +149,10 @@ These diagnostics distinguish the custom asymptotic certificate from direct
 Arb primitive certificates and from non-certified SciPy or mpmath values.
 When `method="certified_auto"` is used, the selected result also records
 `auto_selector="certified_auto"`, `auto_selected_method`, `auto_reason`, and
-`auto_candidates`; the selected backend's certificate scope and method field
-remain unchanged.
+`auto_candidates`; candidate records include preselection fields such as
+`preselected`, `can_certify`, `estimated_terms_used`, and tail-bound diagnostics
+when relevant. The selected backend's certificate scope and method field remain
+unchanged.
 
 ## Explicit Exclusions
 

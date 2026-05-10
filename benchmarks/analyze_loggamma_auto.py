@@ -53,10 +53,16 @@ def run_case(*, x: str, dps: int, method_requested: str) -> dict[str, Any]:
             "shift_policy": None,
             "coefficient_source": None,
             "largest_bernoulli_used": None,
+            "preselected": None,
+            "can_certify": None,
+            "estimated_terms_used": None,
+            "auto_candidates": None,
             "error": str(exc),
         }
 
     diagnostics = result.diagnostics
+    auto_candidates = diagnostics.get("auto_candidates")
+    selected_candidate = _selected_candidate(auto_candidates)
     return {
         "function": result.function,
         "x": x,
@@ -77,8 +83,27 @@ def run_case(*, x: str, dps: int, method_requested: str) -> dict[str, Any]:
         "shift_policy": diagnostics.get("shift_policy"),
         "coefficient_source": diagnostics.get("coefficient_source"),
         "largest_bernoulli_used": diagnostics.get("largest_bernoulli_used"),
+        "preselected": _candidate_field(selected_candidate, "preselected"),
+        "can_certify": _candidate_field(selected_candidate, "can_certify"),
+        "estimated_terms_used": _candidate_field(selected_candidate, "estimated_terms_used"),
+        "auto_candidates": auto_candidates,
         "error": None if result.certified else diagnostics.get("error"),
     }
+
+
+def _selected_candidate(candidates: Any) -> dict[str, Any] | None:
+    if not isinstance(candidates, list):
+        return None
+    for candidate in candidates:
+        if isinstance(candidate, dict) and candidate.get("selected") is True:
+            return candidate
+    return None
+
+
+def _candidate_field(candidate: dict[str, Any] | None, key: str) -> Any:
+    if candidate is None:
+        return None
+    return candidate.get(key)
 
 
 if __name__ == "__main__":

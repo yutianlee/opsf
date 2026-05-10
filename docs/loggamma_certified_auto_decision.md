@@ -20,9 +20,11 @@ loggamma(x, mode="certified", method="certified_auto", dps=...)
 The selector may choose direct Arb, explicit unshifted Stirling, or explicit
 shifted Stirling. Outside the positive-real custom Stirling scope, it selects
 direct Arb rather than attempting a custom asymptotic method. For real
-`x >= 20`, it chooses a Stirling path only when the documented positive-real
-tail-bound certificate succeeds. If custom selection is uncertain or cannot
-certify the requested precision, direct Arb remains the conservative path.
+`x >= 20`, it first uses tail-bound preselection to decide whether a custom
+method can certify before evaluating the finite Stirling sum. It chooses a
+Stirling path only when the documented positive-real tail-bound certificate
+succeeds. If custom selection is uncertain or cannot certify the requested
+precision, direct Arb remains the conservative path.
 
 ## Evidence Tooling
 
@@ -65,8 +67,11 @@ Within the sample, `certified_auto` selects direct Arb outside the positive-real
 Stirling scope, selects unshifted Stirling for several positive-real cases where
 the tail-bound certificate succeeds, and selects shifted Stirling for the
 `x = 20`, `dps = 100` case where unshifted Stirling does not certify but shifted
-Stirling does. The sample also records timing comparisons against direct Arb,
-including cases where the selector is slower than direct Arb.
+Stirling does. Candidate diagnostics now record preselection decisions such as
+`preselected`, `can_certify`, `estimated_terms_used`, and tail-bound fields.
+The implementation avoids redundant full custom-method evaluations by
+construction, but the sample remains evidence gathering rather than a
+performance claim.
 
 This evidence is not sufficient to change the default. Changing the default
 certified `loggamma` selector would be a visible behavior change requiring a
