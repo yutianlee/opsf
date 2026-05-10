@@ -3,11 +3,19 @@
 ## Unreleased / 0.3.0 planning
 
 - Added planning notes for the v0.3.0 line.
-- Targets method registry v2 and the first custom certified asymptotic method.
+- Landed method registry v2 infrastructure with explicit `method=...`
+  selection for Python wrappers.
+- Keeps default method selection unchanged when `method` is omitted or
+  `method="auto"`.
+- Adds `method="arb"` selection for existing certified Arb backends, while
+  rejecting unsupported function/mode combinations instead of reinterpreting
+  them.
+- Keeps `method="stirling"` planned but inactive; it cannot certify results in
+  this PR.
+- Targets the first custom certified asymptotic method in a later PR.
 - Defines the planned alpha scope for a positive-real `loggamma` Stirling
   asymptotic method, initially for real `x >= 20`.
-- Keeps this planning PR documentation-only: no `src/certsf` runtime behavior
-  changes, no public API changes, and no version bump.
+- Keeps the package version unchanged.
 - Does not promote parabolic-cylinder certification claims.
 - Does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
 - Does not broaden release certification wording beyond the planned narrow
