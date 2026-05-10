@@ -19,7 +19,7 @@ broaden package-wide, loggamma-wide, or parabolic-cylinder certification claims.
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | `certsf.mcp_server` tools for the current wrappers | experimental tool interface |
 | Method registry v2 | existing Python wrappers with optional `method=...` selection | infrastructure active; default selection unchanged |
-| Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Current Function List
 
@@ -64,11 +64,16 @@ The active custom-certified row is limited to the existing `loggamma` wrapper:
 - method family: Stirling/asymptotic expansion for positive real `x`;
 - selector: explicit `mode="certified", method="stirling"` or
   `mode="certified", method="stirling_shifted"`;
+- explicit selector: `mode="certified", method="certified_auto"` may select
+  direct Arb or one of the positive-real Stirling methods, and is not used for
+  `method=None` or `method="auto"`;
 - domain: real `x >= 20`;
 - certificate scope: `stirling_loggamma_positive_real`;
 - certificate level: `custom_asymptotic_bound`;
 - audit status: `theorem_documented`;
-- runtime method field: `stirling_loggamma` or `stirling_shifted_loggamma`;
+- runtime method field: `stirling_loggamma` or `stirling_shifted_loggamma`
+  when a custom method is selected; `arb_ball` when the explicit selector
+  chooses direct Arb;
 - default status: not automatic default selection.
 
 This row does not add a public wrapper, does not replace direct Arb primitive
@@ -79,6 +84,8 @@ behavior, `x < 20`, `x <= 0`, or gamma-ratio asymptotics.
 
 - Default certified `loggamma` remains direct Arb.
 - `method="auto"` remains equivalent to the previous automatic selection path.
+- Explicit `method="certified_auto"` is a selector only and does not change
+  default dispatch.
 - Parabolic-cylinder wrappers remain `experimental_formula`.
 - No Faddeeva, `wofz`, or plasma-dispersion wrappers are included.
 - No broad package-wide, family-wide, or all-input `loggamma` certification

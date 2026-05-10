@@ -133,9 +133,11 @@ domain note, and certificate scope. Callers may pass `method=...` for registered
 methods. For `loggamma`, explicit `mode="certified", method="stirling"` or
 `method="stirling_shifted"` selects an alpha-certified custom asymptotic bound
 for positive-real inputs with real `x >= 20`; neither method is automatic
-default selection. Adding a public wrapper requires registering its SciPy,
-mpmath, and Arb methods together; tests verify the registry, public API, and
-MCP tool list stay in sync.
+default selection. Explicit `mode="certified", method="certified_auto"` is a
+selector only: it may choose direct Arb or a positive-real Stirling method, but
+it does not change omitted-method or `method="auto"` dispatch. Adding a public
+wrapper requires registering its SciPy, mpmath, and Arb methods together; tests
+verify the registry, public API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
@@ -152,7 +154,7 @@ in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
 
 ```python
 from certsf import (
@@ -244,6 +246,13 @@ argument. These custom methods are limited to real `x >= 20`, record
 not certify complex `loggamma` branches, real `x < 20`, `x <= 0`, or
 gamma-ratio asymptotics, and they are not selected by default. See
 [`docs/stirling_loggamma.md`](docs/stirling_loggamma.md).
+
+Explicit `method="certified_auto"` in certified mode is a conservative selector
+for existing `loggamma` methods. Outside the positive-real Stirling scope it
+uses direct Arb; for real `x >= 20` it may select unshifted or shifted
+Stirling only when that method certifies its documented tail bound. It is not
+used for `method=None` or `method="auto"`, and it does not add complex
+Stirling, gamma-ratio asymptotics, or beta asymptotics.
 
 ```python
 from certsf import beta
@@ -505,5 +514,6 @@ The repository also includes:
   `benchmarks/bench_airy.py`, `benchmarks/bench_bessel.py`, and
   `benchmarks/bench_pcf.py` for lightweight JSON-lines timing smoke
   benchmarks. The loggamma benchmark compares direct Arb, explicit Stirling,
-  explicit shifted Stirling, high-precision mpmath, and fast SciPy paths
-  without making a default-method performance claim.
+  explicit shifted Stirling, explicit certified-auto selection, high-precision
+  mpmath, and fast SciPy paths without making a default-method performance
+  claim.

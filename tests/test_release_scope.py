@@ -7,8 +7,8 @@ from certsf.dispatcher import available_functions
 ROOT = Path(__file__).resolve().parents[1]
 CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
     '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
-    'explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; '
-    "not automatic default selection |"
+    'explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select '
+    'those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |'
 )
 
 FROZEN_0_1_0_FUNCTIONS = (

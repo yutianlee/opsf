@@ -33,7 +33,7 @@ Release-facing support matrices must keep these status phrases:
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Wording Rules
 
@@ -56,6 +56,9 @@ Release-facing support matrices must keep these status phrases:
   explicit `method="stirling_shifted"` are alpha-certified custom asymptotic
   bounds only for real `x >= 20`, and that neither is automatic default
   selection.
+- Say that explicit `method="certified_auto"` is a certified-mode selector
+  only: it may select direct Arb or one of the positive-real Stirling methods,
+  but it does not change omitted-method or `method="auto"` dispatch.
 - Do not claim complex `loggamma` branch certification, real `x < 20`,
   `x <= 0`, or gamma-ratio asymptotics for the Stirling methods.
 - Say that `erf` and `erfc` are certified only where Arb returns finite

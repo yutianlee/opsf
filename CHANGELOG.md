@@ -2,7 +2,14 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Added explicit certified `loggamma(..., method="certified_auto")` selection
+  for certified mode. The selector may choose direct Arb, explicit Stirling, or
+  explicit shifted Stirling, while preserving the selected backend's method,
+  certificate scope, and diagnostics.
+- Keeps `method=None`, `method="auto"`, and default certified `loggamma`
+  selection on direct Arb.
+- Does not add complex Stirling, gamma-ratio asymptotics, beta asymptotics,
+  parabolic-cylinder promotion, or new public wrappers.
 
 ## 0.3.0-alpha.1 - 2026-05-10
 
