@@ -170,8 +170,8 @@ def test_gamma_family_documentation_uses_current_v0_2_scope_wording(path, expect
 def test_pypi_smoke_covers_current_gamma_family_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.2.0"' in text
-    assert "inputs.version || '0.2.0'" in text
+    assert 'default: "0.3.0a1"' in text
+    assert "inputs.version || '0.3.0a1'" in text
     for call in (
         'gamma("3.2"',
         'loggamma("3.2"',
@@ -238,6 +238,32 @@ def test_pypi_smoke_certified_path_covers_current_gamma_family_surface():
         'dawson("1.0", mode="certified"',
     ):
         assert call in text
+
+
+def test_pypi_smoke_covers_v0_3_stirling_loggamma_methods():
+    text = _read(".github/workflows/pypi-smoke.yml")
+
+    for fragment in (
+        'loggamma("50", mode="certified", method="stirling", dps=50)',
+        'loggamma("20", mode="certified", method="stirling_shifted", dps=50)',
+        'loggamma("20", mode="certified", method="stirling_shifted", dps=100)',
+        'special_loggamma("50", mode="certified", method="stirling", dps=50)',
+        'special_loggamma("20", mode="certified", method="stirling_shifted", dps=50)',
+        'method="stirling_loggamma"',
+        'method="stirling_shifted_loggamma"',
+        '"certificate_scope"] == "stirling_loggamma_positive_real"',
+        '"selected_method"] == "stirling"',
+        '"selected_method"] == "stirling_shifted"',
+        '"shift"',
+        '"shifted_argument"',
+        '"shift_policy"',
+        '"guard_digits"',
+        '"effective_dps"',
+        '"coefficient_source"',
+        '"largest_bernoulli_used"',
+        '"tail_bound"',
+    ):
+        assert fragment in text
 
 
 def test_publish_workflows_use_node24_artifact_actions():
