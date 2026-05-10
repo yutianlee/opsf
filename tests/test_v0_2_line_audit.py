@@ -170,8 +170,8 @@ def test_gamma_family_documentation_uses_current_v0_2_scope_wording(path, expect
 def test_pypi_smoke_covers_current_gamma_family_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.3.0a2"' in text
-    assert "inputs.version || '0.3.0a2'" in text
+    assert 'default: "0.3.0a3"' in text
+    assert "inputs.version || '0.3.0a3'" in text
     for call in (
         'gamma("3.2"',
         'loggamma("3.2"',
@@ -256,6 +256,9 @@ def test_pypi_smoke_covers_v0_3_stirling_loggamma_methods():
         '"auto_selector"] == "certified_auto"',
         '"auto_selected_method"] in {"arb", "stirling", "stirling_shifted"}',
         '"auto_candidates"',
+        '"preselected"',
+        '"can_certify"',
+        '"estimated_terms_used"',
         'backend != "mpmath"',
         'method="stirling_loggamma"',
         'method="stirling_shifted_loggamma"',

@@ -1,5 +1,62 @@
 # Post-release verification
 
+## v0.3.0-alpha.3 / certsf 0.3.0a3
+
+This records the verification evidence for the third 0.3 line prerelease
+artifact.
+
+### Published artifact
+
+- Git tag: `v0.3.0-alpha.3`
+- GitHub prerelease: <https://github.com/yutianlee/certsf/releases/tag/v0.3.0-alpha.3>
+- GitHub release type: prerelease, not draft.
+- Source commit: `b8dcd98b8f7a31d69c98f0a057d5706c811733b8`
+- PyPI URL: <https://pypi.org/project/certsf/0.3.0a3/>
+- PyPI version: `certsf 0.3.0a3`
+- TestPyPI decision: skipped under `release_policy.md` for a routine feature
+  alpha; TestPyPI was not used for this prerelease.
+- Publish workflow run: `25632153992`
+- Publish workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25632153992>
+- Publish trigger: GitHub `release` event for `v0.3.0-alpha.3`
+- PyPI publish result: passed; PyPI JSON shows the wheel and sdist uploaded at
+  `2026-05-10T15:11:10.642109Z` and `2026-05-10T15:11:12.429305Z`.
+- Wheel SHA256:
+  `f2ed62a20373f6c4ad23e3997ba14c95b221ff232e97e0c1c05037e5670c00e2`
+- sdist SHA256:
+  `b285cd6ed368329b2c7ca26e220909f0d6479f1b26d8032e02732c0211fefa48`
+- `pypi-smoke` workflow run: `25632204261`
+- `pypi-smoke` workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25632204261>
+- `pypi-smoke` result: passed against `certsf 0.3.0a3` across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12
+  after rerunning failed jobs in the same workflow run.
+- PyPI edge-cache propagation failures: initial `pypi-smoke` run
+  `25632181882` failed during install in selected matrix jobs because the
+  runner-visible PyPI index listed versions only through `0.3.0a2`. The first
+  attempt of run `25632204261` also had Python 3.12 install failures for the
+  certified and MCP-certified jobs with the same runner-visible index lag;
+  rerunning failed jobs in `25632204261` passed after propagation completed.
+
+### Verification status
+
+The Git tag resolves to clean `main` commit
+`b8dcd98b8f7a31d69c98f0a057d5706c811733b8`. The GitHub prerelease is marked
+prerelease and is not a draft. The PyPI JSON endpoint returns
+`certsf 0.3.0a3` with matching wheel and sdist SHA256 hashes.
+
+The real PyPI publish workflow build job passed checkout, Python 3.12 setup,
+tag/version parity check, build-tool installation, sdist/wheel build,
+`twine check`, and distribution artifact upload. The PyPI publish job completed
+through trusted publishing from the GitHub release event.
+
+After the successful smoke run, this follow-up PR updates the scheduled/manual
+`pypi-smoke` workflow default and fallback version from `0.3.0a2` to
+`0.3.0a3`. It also strengthens Python API and MCP smoke calls for explicit
+`loggamma(method="certified_auto")` preselection diagnostics while preserving
+default direct-Arb dispatch and the narrow positive-real custom Stirling
+scopes.
+
 ## v0.3.0-alpha.2 / certsf 0.3.0a2
 
 This records the verification evidence for the second 0.3 line prerelease
