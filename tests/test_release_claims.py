@@ -77,6 +77,7 @@ RELEASE_SURFACES = (
     "CHANGELOG.md",
     "docs/release-0.1.0.md",
     "docs/release-0.3.0.md",
+    "docs/release-0.3.0-alpha.4.md",
     "docs/release-0.3.0-alpha.3.md",
     "docs/release-0.3.0-alpha.2.md",
     "docs/release-0.3.0-alpha.1.md",
@@ -98,12 +99,13 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bfully certified loggamma\b",
     r"\bglobally certified\b",
     r"\bglobal loggamma certification\b",
-    r"\bcomplex Stirling certification\b",
+    r"\bcomplex stirling certification\b",
     r"\bcomplete certified asymptotic support\b",
-    r"\bautomatic Stirling default\b",
+    r"\bautomatic stirling default\b",
     r"\bcertified_auto is default\b",
     r"\bcertified_auto is now default\b",
     r"\bcertified gamma-ratio asymptotics\b",
+    r"\bcertified beta asymptotics\b",
     r"\bglobal gamma certification\b",
     r"\bcomplex gamma stirling certification\b",
     r"\bcustom[- ]certified gamma is active\b",
@@ -267,10 +269,15 @@ def test_release_surfaces_do_not_use_overbroad_certification_claims():
             assert re.search(pattern, text) is None, f"{path} uses forbidden claim pattern: {pattern}"
 
 
-def test_forbidden_gamma_stirling_claim_pattern_matches_lowercase_phrase():
-    phrase = "complex gamma stirling certification"
+def test_forbidden_stirling_claim_patterns_match_lowercase_phrases():
+    phrases = (
+        "automatic stirling default",
+        "complex stirling certification",
+        "complex gamma stirling certification",
+    )
 
-    assert any(re.search(pattern, phrase) for pattern in FORBIDDEN_CLAIM_PATTERNS)
+    for phrase in phrases:
+        assert any(re.search(pattern, phrase) for pattern in FORBIDDEN_CLAIM_PATTERNS)
 
 
 def _read(path: str) -> str:
