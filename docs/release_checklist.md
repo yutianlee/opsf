@@ -47,7 +47,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.2.0
+python scripts/check_release_version.py v0.3.0-alpha.1
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -74,6 +74,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.3.0-alpha.1` maps to `0.3.0a1`,
   `v0.2.0` maps to `0.2.0`,
   `v0.2.0-alpha.10` maps to `0.2.0a10`,
   `v0.2.0-alpha.9` maps to `0.2.0a9`,
@@ -86,6 +87,47 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.3.0-alpha.1 Checklist
+
+- [ ] `pyproject.toml` version is `0.3.0a1`.
+- [ ] `CITATION.cff` version is `0.3.0-alpha.1`.
+- [ ] `CITATION.cff` date-released is `2026-05-10`.
+- [ ] `CHANGELOG.md` records the first 0.3 line alpha.
+- [ ] `docs/release-0.3.0-alpha.1.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.3.0-alpha.1`.
+- [ ] PyPI smoke workflow still targets `0.2.0` until `0.3.0a1` is
+  published and smoke verification passes.
+- [ ] GitHub release for `v0.3.0-alpha.1` is marked prerelease.
+- [ ] Stage to TestPyPI under `release_policy.md` because this is the first
+  release of a new minor line.
+- [ ] Manually run `publish-testpypi` with `ref=v0.3.0-alpha.1` and
+  `confirm=publish-testpypi` before the real PyPI prerelease.
+- [ ] Publish the real PyPI prerelease through the protected `publish-pypi`
+  workflow from the GitHub prerelease.
+- [ ] Run `pypi-smoke` against `0.3.0a1` after real PyPI publication.
+- [ ] No `src/` changes are included in the release-planning PR.
+- [ ] No public-wrapper changes are included.
+- [ ] The public wrapper surface remains the same as `0.2.0`.
+- [ ] Release copy says the new functionality is explicit certified custom
+  methods for existing `loggamma`.
+- [ ] Default certified `loggamma` remains the direct Arb path.
+- [ ] `method="auto"` remains unchanged.
+- [ ] `method="stirling"` and `method="stirling_shifted"` are explicit only.
+- [ ] Supported custom Stirling domain is real `x >= 20`.
+- [ ] Complex `loggamma` branches, `x < 20`, `x <= 0`, gamma-ratio
+  asymptotics, and beta asymptotics are excluded.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] `benchmarks/bench_loggamma_methods.py` is documented.
+- [ ] Release copy does not broaden certification claims.
+- [ ] `python scripts/check_release_version.py v0.3.0-alpha.1` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pyright src` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
+- [ ] `python benchmarks/bench_loggamma_methods.py` runs.
 
 ## v0.2.0 Checklist
 

@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased / 0.3.0 planning
+## Unreleased
+
+- No unreleased changes yet.
+
+## 0.3.0-alpha.1 - 2026-05-10
 
 - Added planning notes for the v0.3.0 line.
 - Landed method registry v2 infrastructure with explicit `method=...`
@@ -16,6 +20,9 @@
 - The shifted method uses `GUARD_DIGITS=2`, exact rational Stirling
   coefficients through `B_300`, and diagnostic fields for shift policy,
   shifted argument, coefficient source, and largest Bernoulli number used.
+- Added `benchmarks/bench_loggamma_methods.py` to compare direct Arb,
+  explicit Stirling, explicit shifted Stirling, high-precision mpmath, and
+  fast SciPy paths without making a performance or default-selection claim.
 - Keeps default method selection unchanged when `method` is omitted or
   `method="auto"`.
 - Adds `method="arb"` selection for existing certified Arb backends, while
@@ -25,7 +32,8 @@
   shifted Stirling are not automatic default selection.
 - Rejects unsupported Stirling domains and modes cleanly instead of falling
   back to Arb or mpmath in certified mode.
-- Keeps the package version unchanged.
+- Does not add complex Stirling.
+- Does not add gamma-ratio or beta asymptotics.
 - Does not promote parabolic-cylinder certification claims.
 - Does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
 - Does not broaden release certification wording beyond the narrow explicit
