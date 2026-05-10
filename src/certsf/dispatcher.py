@@ -9,7 +9,7 @@ from typing import Any
 from certsf.result import SFResult
 
 from .backends import arb_backend, mpmath_backend, scipy_backend
-from .methods import stirling_loggamma
+from .methods import stirling_loggamma, stirling_loggamma_shifted
 
 Mode = str
 
@@ -716,6 +716,21 @@ METHOD_REGISTRY["loggamma"]["certified"] = (
         priority=200,
         applicability_note=(
             "Explicit method='stirling' only; real x >= 20; not automatic default selection; "
+            "complex loggamma branches and gamma-ratio asymptotics excluded"
+        ),
+    ),
+    _spec(
+        "loggamma",
+        "certified",
+        "certsf+python-flint",
+        stirling_loggamma_shifted,
+        certified=True,
+        domain="Real x >= 20; explicit shifted positive-real Stirling/asymptotic loggamma method",
+        certificate_scope="stirling_loggamma_positive_real",
+        method_id="stirling_shifted",
+        priority=210,
+        applicability_note=(
+            "Explicit method='stirling_shifted' only; real x >= 20; not automatic default selection; "
             "complex loggamma branches and gamma-ratio asymptotics excluded"
         ),
     ),

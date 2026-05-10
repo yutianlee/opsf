@@ -21,7 +21,10 @@ The certified `pochhammer` path uses the audited finite product
 `prod_{k=0}^{n-1}(a+k)` for integer `n >= 0`. Explicit
 `loggamma(x, method="stirling")` uses the positive-real Stirling expansion,
 with Arb ball arithmetic for the finite Bernoulli sum and an explicit
-first-omitted-term asymptotic tail bound.
+first-omitted-term asymptotic tail bound. Explicit
+`loggamma(x, method="stirling_shifted")` applies the same positive-real
+Stirling theorem at `y = x + r` and subtracts the Arb finite recurrence
+`sum(log(x+j))`.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding primitive, when
@@ -35,7 +38,8 @@ are finite.
 `Gamma(a)` and `Gamma(b)` are finite.
 `pochhammer` accepts real or complex `a` with integer `n >= 0`, subject to the
 finite-product ceiling, and certifies exact zero factors to zero.
-Explicit `loggamma(method="stirling")` accepts finite real `x >= 20` only.
+Explicit `loggamma(method="stirling")` and
+`loggamma(method="stirling_shifted")` accept finite real `x >= 20` only.
 
 Excluded domain:
 `gamma` and `loggamma` at poles; `gamma_ratio` when `a` is a gamma pole,
@@ -46,7 +50,8 @@ interactions; any domain where Arb does not return a finite enclosure.
 `pochhammer` excludes non-integer `n`, negative `n`, product lengths above the
 documented ceiling, analytic continuation in `n`, and simultaneous-pole
 limiting values not covered by the zero-factor finite-product case.
-Explicit `loggamma(method="stirling")` excludes complex inputs, non-finite
+Explicit `loggamma(method="stirling")` and
+`loggamma(method="stirling_shifted")` exclude complex inputs, non-finite
 inputs, `x < 20`, `x <= 0`, principal-branch complex `loggamma`, and
 gamma-ratio asymptotics.
 
@@ -99,8 +104,8 @@ divisions, but it does not claim limiting values at simultaneous singularities.
 `pochhammer` uses finite products to avoid gamma quotient pole ambiguity in the
 supported integer-`n` path. Large product lengths can accumulate wide balls, so
 the certified path has a documented term ceiling rather than a gamma fallback.
-The explicit Stirling method is restricted to positive real inputs with
-`x >= 20`; it is not selected automatically and does not certify branch-cut or
+The explicit Stirling methods are restricted to positive real inputs with
+`x >= 20`; they are not selected automatically and do not certify branch-cut or
 complex-principal-loggamma behavior.
 
 Certification status:
@@ -116,7 +121,8 @@ principal `lgamma(a) - lgamma(b)` difference. Certified `beta` results use
 Certified `pochhammer` results use
 `certificate_scope="direct_arb_pochhammer_product"` and enclose the audited Arb
 finite product for nonnegative integer `n`.
-Explicit `loggamma(method="stirling")` results use
+Explicit `loggamma(method="stirling")` and
+`loggamma(method="stirling_shifted")` results use
 `certificate_scope="stirling_loggamma_positive_real"`,
 `certificate_level="custom_asymptotic_bound"`, and
 `audit_status="theorem_documented"`.

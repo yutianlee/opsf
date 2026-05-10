@@ -10,7 +10,8 @@ REQUIRED_CITATION_TITLE = "certsf: Alpha special-function wrappers with explicit
 RELEASE_CLAIM_DOC = "docs/release_claims.md"
 CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
     '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
-    'explicit `method="stirling"`; real `x >= 20`; not automatic default selection |'
+    'explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; '
+    "not automatic default selection |"
 )
 HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",

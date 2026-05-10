@@ -23,8 +23,8 @@ certified surface remains archived in
 
 ## 0.3.0 Development Certified Scope
 
-The 0.3.0 development line keeps the 0.2 public wrapper surface and adds one
-explicit custom asymptotic method for positive-real `loggamma`. Default
+The 0.3.0 development line keeps the 0.2 public wrapper surface and adds
+explicit custom asymptotic methods for positive-real `loggamma`. Default
 certified `loggamma` remains the direct Arb primitive path. The current status
 matrix is:
 
@@ -36,7 +36,7 @@ matrix is:
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
 
 ## Result Contract
 
@@ -44,8 +44,8 @@ Certified results set:
 
 - `certified=True`
 - `backend="python-flint"`
-- `method="arb_ball"`, `method="stirling_loggamma"`, or a documented Arb
-  formula method
+- `method="arb_ball"`, `method="stirling_loggamma"`,
+  `method="stirling_shifted_loggamma"`, or a documented Arb formula method
 - `abs_error_bound` to a rigorous absolute radius
 - `diagnostics["certificate_scope"]` to one of the scopes below
 - `diagnostics["certificate_level"]` to `direct_arb_primitive` for direct Arb
@@ -85,15 +85,19 @@ integer poles in `a+b` certify to zero through reciprocal gamma.
 For `pochhammer(a, n)`, certified mode supports integer `n >= 0` through the
 finite product `product_{k=0}^{n-1} (a+k)`. The `n = 0` case certifies to `1`,
 and exact zero factors certify to zero.
-For explicit `loggamma(x, method="stirling")`, certified mode additionally
-supports real `x >= 20` through the positive-real Stirling expansion. This is
-an explicit method only and does not replace the default direct Arb path.
+For explicit `loggamma(x, method="stirling")` or
+`loggamma(x, method="stirling_shifted")`, certified mode additionally supports
+real `x >= 20` through the positive-real Stirling expansion. These are explicit
+methods only and do not replace the default direct Arb path.
 
 Backend primitive:
 `arb/acb.gamma`, `arb/acb.lgamma`, and `arb/acb.rgamma`. The explicit
 `loggamma(method="stirling")` path evaluates a finite positive-real Stirling
 sum with Arb ball arithmetic and adds a documented first-omitted-term tail
-bound. The certified
+bound. The explicit `loggamma(method="stirling_shifted")` path applies the Arb
+recurrence `loggamma(x)=loggamma(x+r)-sum(log(x+j))`, evaluates the shifted
+finite Stirling sum with Arb ball arithmetic, and adds the same documented
+tail bound at the shifted argument. The certified
 `gamma_ratio` backend evaluates `Gamma(a) * rgamma(b)` using Arb gamma
 primitives rather than dividing by `Gamma(b)`. The certified
 `loggamma_ratio` backend evaluates Arb `lgamma(a) - lgamma(b)`. The certified
@@ -109,9 +113,9 @@ zero at non-positive integer gamma poles when Arb reports that enclosure.
 `Gamma(a)` and `Gamma(b)` are finite and Arb reports the zero product.
 `pochhammer` returns Arb midpoint and radius for the finite product, including
 an exact certified zero when a product factor is exactly zero.
-`loggamma(method="stirling")` returns a midpoint string plus a conservative
-absolute bound including the Arb finite-sum radius and the explicit
-asymptotic tail bound.
+`loggamma(method="stirling")` and `loggamma(method="stirling_shifted")` return
+midpoint strings plus conservative absolute bounds including the Arb
+finite-expression radius and the explicit asymptotic tail bound.
 
 Branch convention:
 `loggamma` follows the principal branch used by Arb. `loggamma_ratio` is the
@@ -127,7 +131,10 @@ handling. The one-argument gamma-family wrappers use no formula transformation.
 `pochhammer(a, n)` is evaluated as a finite product only for certified
 integer `n >= 0`.
 `loggamma(x, method="stirling")` is evaluated as the documented positive-real
-Stirling expansion only for real `x >= 20`; method omission and
+Stirling expansion only for real `x >= 20`.
+`loggamma(x, method="stirling_shifted")` is evaluated by shifting to
+`y=x+r`, applying the same positive-real Stirling expansion at `y`, and
+subtracting Arb logs of the recurrence factors. Method omission and
 `method="auto"` continue to use the direct Arb primitive in certified mode.
 
 Known exclusions:
@@ -141,9 +148,10 @@ including simultaneous numerator and denominator pole interactions.
 `pochhammer` returns clean non-certified failures for non-integer `n`, negative
 `n`, product lengths above the documented ceiling, and simultaneous-pole
 limiting values not covered by the finite-product zero-factor proof.
-`loggamma(method="stirling")` returns clean non-certified failures for complex
-inputs, non-finite input, `x < 20`, `x <= 0`, principal-branch complex
-`loggamma` requests, and gamma-ratio asymptotics.
+`loggamma(method="stirling")` and `loggamma(method="stirling_shifted")` return
+clean non-certified failures for complex inputs, non-finite input, `x < 20`,
+`x <= 0`, principal-branch complex `loggamma` requests, and gamma-ratio
+asymptotics.
 
 Validation tests:
 pole behavior, principal-branch checks on the negative real axis, gamma-ratio
@@ -153,7 +161,8 @@ away from singularities. Pochhammer tests cover finite-product special values,
 complex `a` with integer `n`, zero factors, certified recurrence, dispatch
 behavior, and rejected certified domains. Stirling-loggamma tests cover
 positive-real samples, Arb-reference containment, rejected inputs, MCP parity,
-and preservation of direct Arb default selection.
+coefficient-table exactness, shifted recurrence policy, and preservation of
+direct Arb default selection.
 
 Certificate scope:
 `direct_arb_primitive` for `gamma`, `loggamma`, and `rgamma`; the narrow
@@ -161,9 +170,9 @@ Certificate scope:
 `direct_arb_loggamma_ratio` scope for `loggamma_ratio`; and the narrow
 `direct_arb_beta` scope for `beta`; and `direct_arb_pochhammer_product` for
 `pochhammer`, recorded through `method="arb_ball"`. The explicit custom
-positive-real Stirling method for `loggamma` uses
+positive-real Stirling methods for `loggamma` use
 `stirling_loggamma_positive_real`, recorded through
-`method="stirling_loggamma"`.
+`method="stirling_loggamma"` or `method="stirling_shifted_loggamma"`.
 
 ## Error-Function Family
 

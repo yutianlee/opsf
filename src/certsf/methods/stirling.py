@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from decimal import Decimal, InvalidOperation, localcontext
+from decimal import Decimal, InvalidOperation, ROUND_FLOOR, localcontext
 import math
 from typing import Any
 
 from certsf.backends._common import ensure_dps, make_result
+from certsf.methods.stirling_coefficients import STIRLING_COEFFICIENTS
 from certsf.result import SFResult
 
 _CERTIFICATE_SCOPE = "stirling_loggamma_positive_real"
@@ -16,8 +17,12 @@ _CERTIFICATION_CLAIM = "certified positive-real Stirling loggamma enclosure with
 _DOMAIN = "positive_real_x_ge_20"
 _FORMULA = "stirling_loggamma"
 _METHOD = "stirling_loggamma"
+_SHIFTED_FORMULA = "stirling_shifted_loggamma"
+_SHIFTED_METHOD = "stirling_shifted_loggamma"
 _BACKEND = "certsf+python-flint"
+GUARD_DIGITS = 2
 _MAX_TERMS = 256
+_MAX_SHIFT = 10000
 
 
 def stirling_loggamma(x: Any, *, dps: int = 50) -> SFResult:
@@ -99,6 +104,115 @@ def stirling_loggamma(x: Any, *, dps: int = 50) -> SFResult:
         flint.ctx.prec = old_prec
 
 
+def stirling_loggamma_shifted(x: Any, *, dps: int = 50) -> SFResult:
+    """Certified shifted positive-real Stirling enclosure for ``loggamma(x)``."""
+
+    requested_dps = ensure_dps(dps)
+    effective_dps = requested_dps + GUARD_DIGITS
+    x_text, domain_error = _positive_real_text(x)
+    if domain_error is not None:
+        return _unavailable_shifted(requested_dps, effective_dps, domain_error)
+
+    try:
+        import flint
+    except ImportError:  # pragma: no cover - optional dependency
+        return _unavailable_shifted(requested_dps, effective_dps, "python-flint is not installed")
+
+    x_decimal = Decimal(x_text)
+    bits = _working_bits(effective_dps)
+    old_prec = flint.ctx.prec
+    flint.ctx.prec = bits
+    try:
+        argument = flint.arb(x_text)
+        target_tolerance = flint.arb(10) ** (-effective_dps)
+        shift, shift_policy, terms_used, tail_bound = _select_shifted_policy(
+            flint,
+            argument,
+            x_decimal,
+            effective_dps,
+            target_tolerance,
+        )
+        if terms_used is None or tail_bound is None:
+            final_shift = 0 if shift is None else shift
+            final_argument = argument + flint.arb(final_shift)
+            final_tail = _tail_bound_from_coefficient(flint, final_argument, _MAX_TERMS)
+            return _unavailable_shifted(
+                requested_dps,
+                effective_dps,
+                "Shifted Stirling loggamma tail bound did not reach the requested tolerance within the shift/term cap.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={
+                    "working_precision_bits": bits,
+                    "shift": final_shift,
+                    "shifted_argument": _decimal_string(x_decimal + Decimal(final_shift)),
+                    "shift_policy": shift_policy,
+                    "terms_attempted": _MAX_TERMS,
+                    "final_tail_bound": _safe_positive_string(final_tail, requested_dps, flint),
+                    "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+                    "coefficient_source": _coefficient_source(_MAX_TERMS + 1),
+                    "largest_bernoulli_used": 2 * _MAX_TERMS + 2,
+                },
+            )
+        assert shift is not None
+        assert terms_used is not None
+        assert tail_bound is not None
+
+        shifted_argument = argument + flint.arb(shift)
+        value = _stirling_sum_with_coefficients(flint, shifted_argument, terms_used)
+        for offset in range(shift):
+            value -= (argument + flint.arb(offset)).log()
+        if not bool(value.is_finite()):
+            return _unavailable_shifted(
+                requested_dps,
+                effective_dps,
+                "Shifted Stirling loggamma finite sum produced a non-finite enclosure.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={"working_precision_bits": bits, "shift": shift, "stirling_terms": terms_used},
+            )
+
+        finite_radius = value.rad()
+        total_bound = finite_radius + tail_bound
+        abs_error_bound = _safe_positive_string(total_bound, requested_dps, flint)
+        tail_bound_text = _safe_positive_string(tail_bound, requested_dps, flint)
+        diagnostics = _shifted_diagnostics(bits, effective_dps)
+        diagnostics.update(
+            {
+                "shift": shift,
+                "shifted_argument": _decimal_string(x_decimal + Decimal(shift)),
+                "shift_policy": shift_policy,
+                "terms_used": terms_used,
+                "stirling_terms": terms_used,
+                "largest_bernoulli_used": 2 * terms_used + 2,
+                "coefficient_source": _coefficient_source(terms_used + 1),
+                "tail_bound": tail_bound_text,
+                "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+            }
+        )
+        return make_result(
+            function="loggamma",
+            value=_arb_mid_string(value),
+            abs_error_bound=abs_error_bound,
+            rel_error_bound=_relative_error_bound(abs_error_bound, value),
+            certified=True,
+            method=_SHIFTED_METHOD,
+            backend=_BACKEND,
+            requested_dps=requested_dps,
+            working_dps=_bits_to_dps(bits),
+            terms_used=terms_used,
+            diagnostics=diagnostics,
+        )
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _unavailable_shifted(
+            requested_dps,
+            effective_dps,
+            f"Shifted Stirling loggamma method failed cleanly: {exc}",
+            working_dps=_bits_to_dps(bits),
+            diagnostics={"working_precision_bits": bits},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
 def _positive_real_text(value: Any) -> tuple[str, str | None]:
     if isinstance(value, complex):
         return "", "Stirling loggamma is certified only for real x >= 20; complex inputs are excluded."
@@ -147,6 +261,71 @@ def _stirling_sum(flint, x, terms_used: int):
     return total
 
 
+def _select_shifted_policy(flint, x, x_decimal: Decimal, effective_dps: int, target_tolerance):
+    if effective_dps < 56:
+        shift = 0
+        shift_policy = "direct_no_shift"
+    elif effective_dps <= 102:
+        shift = _window_shift(x_decimal)
+        shift_policy = "window_37_38"
+    else:
+        shift_policy = "minimal_shift"
+        minimal_shift = _minimal_shift(flint, x, target_tolerance)
+        if minimal_shift is None:
+            return None, shift_policy, None, None
+        shift = minimal_shift
+
+    terms_used, tail_bound = _select_terms_from_coefficients(flint, x + flint.arb(shift), target_tolerance)
+    return shift, shift_policy, terms_used, tail_bound
+
+
+def _window_shift(x: Decimal) -> int:
+    if x <= Decimal(37):
+        return max(0, int((Decimal(38) - x).to_integral_value(rounding=ROUND_FLOOR)))
+    return 0
+
+
+def _minimal_shift(flint, x, target_tolerance) -> int | None:
+    for shift in range(_MAX_SHIFT + 1):
+        terms_used, _tail_bound_value = _select_terms_from_coefficients(flint, x + flint.arb(shift), target_tolerance)
+        if terms_used is not None:
+            return shift
+    return None
+
+
+def _select_terms_from_coefficients(flint, x, target_tolerance):
+    for terms_used in range(1, _MAX_TERMS + 1):
+        tail_bound = _tail_bound_from_coefficient(flint, x, terms_used)
+        if tail_bound < target_tolerance:
+            return terms_used, tail_bound
+    return None, None
+
+
+def _tail_bound_from_coefficient(flint, x, terms_used: int):
+    omitted_k = terms_used + 1
+    return abs(flint.arb(_coefficient(flint, omitted_k))) / (x ** (2 * omitted_k - 1))
+
+
+def _stirling_sum_with_coefficients(flint, x, terms_used: int):
+    half = flint.arb("0.5")
+    two = flint.arb(2)
+    total = (x - half) * x.log() - x + half * (two * flint.arb.pi()).log()
+    for k in range(1, terms_used + 1):
+        total += flint.arb(_coefficient(flint, k)) / (x ** (2 * k - 1))
+    return total
+
+
+def _coefficient(flint, k: int):
+    if k <= len(STIRLING_COEFFICIENTS):
+        return flint.fmpq(STIRLING_COEFFICIENTS[k - 1])
+    n = 2 * k
+    return flint.fmpq.bernoulli(n) / flint.fmpq(n * (n - 1))
+
+
+def _coefficient_source(max_k: int) -> str:
+    return "table" if max_k <= len(STIRLING_COEFFICIENTS) else "table+flint_fallback"
+
+
 def _unavailable(
     requested_dps: int,
     message: str,
@@ -172,6 +351,32 @@ def _unavailable(
     )
 
 
+def _unavailable_shifted(
+    requested_dps: int,
+    effective_dps: int,
+    message: str,
+    *,
+    working_dps: int | None = None,
+    diagnostics: dict[str, Any] | None = None,
+) -> SFResult:
+    result_diagnostics = _shifted_diagnostics(None, effective_dps)
+    result_diagnostics["error"] = message
+    if diagnostics is not None:
+        result_diagnostics.update(diagnostics)
+    return make_result(
+        function="loggamma",
+        value="",
+        abs_error_bound=None,
+        rel_error_bound=None,
+        certified=False,
+        method=_SHIFTED_METHOD,
+        backend=_BACKEND,
+        requested_dps=requested_dps,
+        working_dps=requested_dps if working_dps is None else working_dps,
+        diagnostics=result_diagnostics,
+    )
+
+
 def _diagnostics(bits: int | None) -> dict[str, Any]:
     diagnostics: dict[str, Any] = {
         "mode": "certified",
@@ -184,6 +389,26 @@ def _diagnostics(bits: int | None) -> dict[str, Any]:
         "domain": _DOMAIN,
         "fallback": [],
         "max_terms": _MAX_TERMS,
+    }
+    if bits is not None:
+        diagnostics["working_precision_bits"] = bits
+    return diagnostics
+
+
+def _shifted_diagnostics(bits: int | None, effective_dps: int) -> dict[str, Any]:
+    diagnostics: dict[str, Any] = {
+        "mode": "certified",
+        "selected_method": "stirling_shifted",
+        "certificate_scope": _CERTIFICATE_SCOPE,
+        "certificate_level": _CERTIFICATE_LEVEL,
+        "audit_status": _AUDIT_STATUS,
+        "certification_claim": _CERTIFICATION_CLAIM,
+        "formula": _SHIFTED_FORMULA,
+        "domain": _DOMAIN,
+        "fallback": [],
+        "max_terms": _MAX_TERMS,
+        "guard_digits": GUARD_DIGITS,
+        "effective_dps": effective_dps,
     }
     if bits is not None:
         diagnostics["working_precision_bits"] = bits
@@ -235,3 +460,10 @@ def _decimal_from_mantissa_exponent(mantissa: int, exponent: int) -> str:
     else:
         body = digits[:point] + "." + digits[point:]
     return sign + body.rstrip("0").rstrip(".")
+
+
+def _decimal_string(value: Decimal) -> str:
+    text = format(value, "f")
+    if "." in text:
+        return text.rstrip("0").rstrip(".")
+    return text

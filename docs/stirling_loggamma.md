@@ -5,10 +5,11 @@ The method is selected only by:
 
 ```python
 loggamma(x, mode="certified", method="stirling", dps=...)
+loggamma(x, mode="certified", method="stirling_shifted", dps=...)
 ```
 
 Default certified `loggamma` remains the direct Arb primitive path. The
-Stirling method is not automatic default selection.
+Stirling methods are not automatic default selection.
 Parabolic-cylinder wrappers remain an `experimental_formula` surface; this
 method does not promote that family.
 
@@ -35,6 +36,35 @@ On the documented positive-real domain, the runtime uses the tail certificate
 The finite Stirling sum is evaluated with Arb ball arithmetic through
 `python-flint`; the returned absolute error bound includes both the Arb radius
 of that finite sum and the explicit asymptotic tail bound.
+
+## Shifted Method
+
+`method="stirling_shifted"` uses the recurrence
+
+```text
+loggamma(x) = loggamma(x + r) - sum_{j=0}^{r-1} log(x + j)
+```
+
+with `y = x + r`. The shifted method evaluates all logarithms and the finite
+Stirling sum with Arb ball arithmetic. The explicit tail bound is computed at
+the shifted positive-real argument `y`, and the returned absolute error bound
+includes the Arb radius of the complete finite expression plus that explicit
+tail bound.
+
+The shifted method uses `GUARD_DIGITS = 2`, so
+`effective_dps = requested_dps + 2` and
+`target_tolerance = 10**(-effective_dps)`. For real `x >= 20`, the shift policy
+is:
+
+- `effective_dps < 56`: `r = 0`, `shift_policy="direct_no_shift"`;
+- `effective_dps <= 102`: if `x <= 37`, `r = floor(38 - x)`, otherwise
+  `r = 0`, with `shift_policy="window_37_38"`;
+- otherwise: choose the minimal integer `r >= 0` such that the Stirling tail at
+  `y = x + r` can reach the target tolerance within the method term cap, with
+  `shift_policy="minimal_shift"`.
+
+The shifted method does not change `method="stirling"` and is not used for
+`method=None` or `method="auto"`.
 
 ## Remainder Theorem Used
 
@@ -81,6 +111,21 @@ Certified Stirling results record:
 - `working_precision_bits`: the Arb precision used internally;
 - `fallback`: an empty fallback record.
 
+Certified shifted Stirling results additionally record:
+
+- `selected_method`: `stirling_shifted`;
+- `shift`: the integer recurrence shift `r`;
+- `shifted_argument`: the positive-real argument `y = x + r`;
+- `shift_policy`: one of `direct_no_shift`, `window_37_38`, or
+  `minimal_shift`;
+- `guard_digits`: `2`;
+- `effective_dps`: `requested_dps + 2`;
+- `stirling_terms`: the number of Bernoulli correction terms included;
+- `largest_bernoulli_used`: including the omitted Bernoulli number used for
+  the tail bound;
+- `coefficient_source`: `table` or `table+flint_fallback`;
+- `tail_bound`: the rigorous bound applied at the shifted argument.
+
 These diagnostics distinguish the custom asymptotic certificate from direct
 Arb primitive certificates and from non-certified SciPy or mpmath values.
 
@@ -97,5 +142,5 @@ This method excludes:
 
 The exclusions are part of the certification scope. Unsupported inputs fail
 cleanly as non-certified results or are rejected by dispatcher method
-selection; explicit `method="stirling"` never silently falls back to Arb or
-mpmath.
+selection; explicit `method="stirling"` and `method="stirling_shifted"` never
+silently fall back to Arb or mpmath.

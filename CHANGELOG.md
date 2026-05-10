@@ -7,18 +7,24 @@
   selection for Python wrappers.
 - Added explicit `loggamma(x, mode="certified", method="stirling")` for real
   `x >= 20` as the first alpha-certified custom asymptotic-bound method.
+- Added explicit `loggamma(x, mode="certified", method="stirling_shifted")`
+  for real `x >= 20`, using a positive-real Arb recurrence shift before the
+  same Stirling tail-bound certificate.
 - The Stirling method uses Arb ball arithmetic for the finite sum and an
   explicit positive-real asymptotic tail bound, with
   `certificate_scope="stirling_loggamma_positive_real"`.
+- The shifted method uses `GUARD_DIGITS=2`, exact rational Stirling
+  coefficients through `B_300`, and diagnostic fields for shift policy,
+  shifted argument, coefficient source, and largest Bernoulli number used.
 - Keeps default method selection unchanged when `method` is omitted or
   `method="auto"`.
 - Adds `method="arb"` selection for existing certified Arb backends, while
   rejecting unsupported function/mode combinations instead of reinterpreting
   them.
-- Keeps direct Arb as the default certified `loggamma` method; Stirling is not
-  automatic default selection.
+- Keeps direct Arb as the default certified `loggamma` method; Stirling and
+  shifted Stirling are not automatic default selection.
 - Rejects unsupported Stirling domains and modes cleanly instead of falling
-  back to mpmath in certified mode.
+  back to Arb or mpmath in certified mode.
 - Keeps the package version unchanged.
 - Does not promote parabolic-cylinder certification claims.
 - Does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
