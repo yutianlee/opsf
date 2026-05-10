@@ -468,6 +468,9 @@ The repository also includes:
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
 - `docs/stirling_loggamma.md` for the explicit positive-real Stirling
   `loggamma` method.
+- `docs/loggamma_certified_auto_decision.md` for decision-support and
+  evidence-gathering notes on whether explicit `method="certified_auto"` should
+  later become the default certified `loggamma` selector.
 - `docs/error_function.md` for error-function certified-domain policy.
 - `docs/dawson.md` for Dawson integral certified-domain policy.
 - `docs/erfinv.md` for inverse-error-function certified-domain policy.
@@ -512,9 +515,11 @@ The repository also includes:
   `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
   `examples/mcp_payload.py` for payload-first release examples.
 - `benchmarks/bench_gamma.py`, `benchmarks/bench_loggamma_methods.py`,
-  `benchmarks/bench_airy.py`, `benchmarks/bench_bessel.py`, and
-  `benchmarks/bench_pcf.py` for lightweight JSON-lines timing smoke
-  benchmarks. The loggamma benchmark compares direct Arb, explicit Stirling,
-  explicit shifted Stirling, explicit certified-auto selection, high-precision
-  mpmath, and fast SciPy paths without making a default-method performance
-  claim.
+  `benchmarks/analyze_loggamma_auto.py`, `benchmarks/bench_airy.py`,
+  `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
+  JSON-lines timing smoke benchmarks. The loggamma benchmarks compare direct
+  Arb, explicit Stirling, explicit shifted Stirling, explicit certified-auto
+  selection, high-precision mpmath, and fast SciPy paths without making a
+  default-method performance claim. The certified-auto analyzer is decision
+  support only; `method="certified_auto"` remains explicit and no
+  default-dispatch change is made.
