@@ -41,8 +41,8 @@ For MCP tooling plus certified mode:
 python -m pip install "certsf[mcp,certified]"
 ```
 
-Prerelease versions such as `0.3.0a1` require `--pre` unless installing an
-exact version, for example `certsf==0.3.0a1`.
+Prerelease versions such as `0.3.0a2` require `--pre` unless installing an
+exact version, for example `certsf==0.3.0a2`.
 
 For local development:
 
@@ -476,6 +476,7 @@ The repository also includes:
 - `docs/certified_scope_0_3_0.md` for the active 0.3.0 development scope.
 - `docs/certified_scope_0_2_0.md` for the published 0.2.0 certified support
   matrix.
+- `docs/release-0.3.0-alpha.2.md` for v0.3.0-alpha.2 release planning.
 - `docs/release-0.3.0-alpha.1.md` for v0.3.0-alpha.1 release planning.
 - `docs/release-0.3.0.md` for v0.3.0 planning and implementation notes.
 - `docs/release-0.2.0.md` for v0.2.0 final release planning notes.

@@ -7,8 +7,10 @@ positive-real `loggamma` Stirling methods behind method registry v2.
 The implementation PRs did not change package version metadata, did not change
 default method selection, and did not alter existing certified results for
 calls that omit `method=...` or pass `method="auto"`. The first release
-metadata bump for this line is planned in
-[`release-0.3.0-alpha.1.md`](release-0.3.0-alpha.1.md).
+metadata bump for this line was planned in
+[`release-0.3.0-alpha.1.md`](release-0.3.0-alpha.1.md). The second alpha,
+[`release-0.3.0-alpha.2.md`](release-0.3.0-alpha.2.md), packages the explicit
+`method="certified_auto"` selector.
 
 ## Active Scope
 
