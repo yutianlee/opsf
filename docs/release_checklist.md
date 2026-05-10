@@ -47,7 +47,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.3.0-alpha.2
+python scripts/check_release_version.py v0.3.0-alpha.3
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -74,6 +74,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.3.0-alpha.3` maps to `0.3.0a3`,
   `v0.3.0-alpha.2` maps to `0.3.0a2`,
   `v0.3.0-alpha.1` maps to `0.3.0a1`,
   `v0.2.0` maps to `0.2.0`,
@@ -88,6 +89,51 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.3.0-alpha.3 Checklist
+
+- [ ] `pyproject.toml` version is `0.3.0a3`.
+- [ ] `CITATION.cff` version is `0.3.0-alpha.3`.
+- [ ] `CITATION.cff` date-released is `2026-05-10`.
+- [ ] `CHANGELOG.md` records the `certified_auto` preselection optimization
+  alpha.
+- [ ] `docs/release-0.3.0-alpha.3.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.3.0-alpha.3`.
+- [ ] PyPI smoke workflow remains pinned to `0.3.0a2` until `0.3.0a3` is
+  published and smoke verification passes.
+- [ ] GitHub release for `v0.3.0-alpha.3` is marked prerelease.
+- [ ] TestPyPI staging is skipped unless release validation identifies
+  packaging or workflow risk under `release_policy.md`.
+- [ ] Publish the real PyPI prerelease through the protected `publish-pypi`
+  workflow from the GitHub prerelease.
+- [ ] Run `pypi-smoke` against `0.3.0a3` after real PyPI publication.
+- [ ] No `src/` runtime implementation changes are included in the
+  release-planning PR.
+- [ ] No public-wrapper changes are included.
+- [ ] Release copy says this alpha packages the explicit `certified_auto`
+  preselection optimization for existing `loggamma`.
+- [ ] Default certified `loggamma` remains the direct Arb path.
+- [ ] `method=None` and `method="auto"` remain unchanged.
+- [ ] `method="certified_auto"` is explicit only and may select direct Arb,
+  `method="stirling"`, or `method="stirling_shifted"`.
+- [ ] Release copy says preselection avoids unnecessary full custom candidate
+  evaluations without changing default dispatch.
+- [ ] Complex `loggamma` branches, complex Stirling, `x < 20` custom
+  Stirling, `x <= 0` custom Stirling, gamma-ratio asymptotics, and beta
+  asymptotics are excluded.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] Release copy does not broaden certification claims.
+- [ ] `python scripts/check_release_version.py v0.3.0-alpha.3` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pyright src` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
+- [ ] `python benchmarks/bench_loggamma_methods.py` runs.
+- [ ] `python benchmarks/analyze_loggamma_auto.py` runs.
+- [ ] `python benchmarks/summarize_loggamma_auto.py docs/benchmark_samples/loggamma_certified_auto_sample.jsonl`
+  runs.
 
 ## v0.3.0-alpha.2 Checklist
 

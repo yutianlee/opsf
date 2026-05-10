@@ -10,7 +10,9 @@ calls that omit `method=...` or pass `method="auto"`. The first release
 metadata bump for this line was planned in
 [`release-0.3.0-alpha.1.md`](release-0.3.0-alpha.1.md). The second alpha,
 [`release-0.3.0-alpha.2.md`](release-0.3.0-alpha.2.md), packages the explicit
-`method="certified_auto"` selector.
+`method="certified_auto"` selector. The third alpha,
+[`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), packages the
+preselection optimization for that explicit selector.
 
 ## Active Scope
 
@@ -29,7 +31,9 @@ The v0.3.0 line includes:
   `loggamma(x) = stirling_loggamma_sum(x+r) - sum(log(x+j))`;
 - explicit `loggamma(x, mode="certified", method="certified_auto")` as a
   selector that may choose direct Arb or a positive-real Stirling method
-  without changing omitted-method or `method="auto"` dispatch;
+  without changing omitted-method or `method="auto"` dispatch, using
+  preselection diagnostics to avoid unnecessary full custom candidate
+  evaluations;
 - `certificate_scope="stirling_loggamma_positive_real"`;
 - `certificate_level="custom_asymptotic_bound"`; and
 - `audit_status="theorem_documented"`.
@@ -63,10 +67,13 @@ The line includes:
   0.3.0 development support matrix and the narrow active custom-method row;
 - [`stirling_loggamma.md`](stirling_loggamma.md), which records the formula,
   domain, diagnostics, certificate metadata, tail-bound contract, and
-  exclusions for the first custom asymptotic method; and
+  exclusions for the first custom asymptotic method;
 - [`loggamma_certified_auto_decision.md`](loggamma_certified_auto_decision.md),
   which records decision support and evidence-gathering notes for any later
-  consideration of default certified `loggamma` method selection.
+  consideration of default certified `loggamma` method selection; and
+- [`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), which records the
+  prerelease plan for packaging the explicit `certified_auto` preselection
+  optimization with no default-dispatch change.
 
 ## Benchmarks
 

@@ -76,6 +76,7 @@ RELEASE_SURFACES = (
     "CHANGELOG.md",
     "docs/release-0.1.0.md",
     "docs/release-0.3.0.md",
+    "docs/release-0.3.0-alpha.3.md",
     "docs/release-0.3.0-alpha.2.md",
     "docs/release-0.3.0-alpha.1.md",
     "docs/release_checklist.md",

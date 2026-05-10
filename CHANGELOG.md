@@ -4,6 +4,17 @@
 
 - No unreleased changes yet.
 
+## 0.3.0-alpha.3 - 2026-05-10
+
+- Packages the explicit `certified_auto` preselection optimization for
+  certified `loggamma`, so the opt-in selector can estimate unshifted and
+  shifted Stirling certifiability before evaluating full custom candidates.
+- Keeps `method="certified_auto"` explicit only.
+- Keeps default certified `loggamma` on the direct Arb path.
+- Keeps `method=None` and `method="auto"` behavior unchanged.
+- Does not add complex Stirling, gamma-ratio asymptotics, beta asymptotics,
+  parabolic-cylinder promotion, or new public wrappers.
+
 ## 0.3.0-alpha.2 - 2026-05-10
 
 - Added explicit certified `loggamma(..., method="certified_auto")` selection
