@@ -9,7 +9,7 @@ from typing import Any
 from certsf.result import SFResult
 
 from .backends import arb_backend, mpmath_backend, scipy_backend
-from .methods import certified_auto_loggamma, stirling_loggamma, stirling_loggamma_shifted
+from .methods import certified_auto_loggamma, gamma_stirling_exp, stirling_loggamma, stirling_loggamma_shifted
 
 Mode = str
 
@@ -98,7 +98,7 @@ def _certificate_metadata_for_scope(certificate_scope: str) -> tuple[str, str]:
         return "certified_real_root", "monotone_real_inverse"
     if certificate_scope in {"phase7_hypergeometric_parabolic_cylinder", "phase8_parabolic_cylinder_connections"}:
         return "formula_audited_experimental", "experimental_formula"
-    if certificate_scope == "stirling_loggamma_positive_real":
+    if certificate_scope in {"stirling_loggamma_positive_real", "gamma_positive_real_stirling_exp"}:
         return "custom_asymptotic_bound", "theorem_documented"
     return "direct_arb_primitive", "audited_direct"
 
@@ -702,6 +702,24 @@ REGISTRY: dict[str, dict[Mode, MethodSpec]] = {
 METHOD_REGISTRY: dict[str, dict[Mode, tuple[MethodSpec, ...]]] = {
     function: {mode: (method,) for mode, method in methods.items()} for function, methods in REGISTRY.items()
 }
+METHOD_REGISTRY["gamma"]["certified"] = (
+    REGISTRY["gamma"]["certified"],
+    _spec(
+        "gamma",
+        "certified",
+        "certsf+python-flint",
+        gamma_stirling_exp,
+        certified=True,
+        domain="Real x >= 20; explicit positive-real gamma via certified loggamma exponentiation",
+        certificate_scope="gamma_positive_real_stirling_exp",
+        method_id="stirling_exp",
+        priority=200,
+        applicability_note=(
+            "Explicit method='stirling_exp' only; real x >= 20; not automatic default selection; "
+            "complex gamma, reflection formulas, gamma-ratio asymptotics, and beta asymptotics excluded"
+        ),
+    ),
+)
 METHOD_REGISTRY["loggamma"]["certified"] = (
     REGISTRY["loggamma"]["certified"],
     _spec(

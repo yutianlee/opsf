@@ -94,7 +94,8 @@ Every wrapper returns an `SFResult` with these fields:
 - `certified`: `True` only when a rigorous enclosure was produced.
 - `function`: canonical function name.
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
-  `arb_ball`, `stirling_loggamma`, or `stirling_shifted_loggamma`.
+  `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`, or
+  `stirling_exp_gamma`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -138,13 +139,17 @@ selector only: it may choose direct Arb or a positive-real Stirling method, but
 it does not change omitted-method or `method="auto"` dispatch. Adding a public
 wrapper requires registering its SciPy, mpmath, and Arb methods together; tests
 verify the registry, public API, and MCP tool list stay in sync.
+For `gamma`, explicit `mode="certified", method="stirling_exp"` selects an
+alpha-certified positive-real method for finite real `x >= 20` by
+exponentiating a certified positive-real `loggamma` enclosure. It is explicit
+only and does not change default certified `gamma`.
 
 ## Supported Functions
 
-The 0.3 development line keeps the 0.2 public wrapper surface and adds the
-first explicit custom certified asymptotic method for `loggamma`. Default
-certified `loggamma` still uses direct Arb. The package remains alpha-quality
-in scientific scope.
+The 0.3 development line keeps the 0.2 public wrapper surface and adds
+explicit custom certified asymptotic methods for `loggamma` and positive-real
+`gamma`. Default certified `loggamma` and default certified `gamma` still use
+direct Arb. The package remains alpha-quality in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -154,7 +159,7 @@ in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
 
 ```python
 from certsf import (
@@ -253,6 +258,15 @@ uses direct Arb; for real `x >= 20` it may select unshifted or shifted
 Stirling only when that method certifies its documented tail bound. It is not
 used for `method=None` or `method="auto"`, and it does not add complex
 Stirling, gamma-ratio asymptotics, or beta asymptotics.
+
+Explicit `gamma(x, mode="certified", method="stirling_exp")` evaluates
+positive-real `gamma` for finite real `x >= 20` by exponentiating a certified
+positive-real `loggamma` Arb enclosure. It records
+`certificate_scope="gamma_positive_real_stirling_exp"` and returns
+`method="stirling_exp_gamma"`. It does not certify complex `gamma`,
+reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, or beta
+asymptotics, and it is not selected by default. See
+[`docs/gamma_stirling_exp.md`](docs/gamma_stirling_exp.md).
 
 ```python
 from certsf import beta
@@ -468,6 +482,8 @@ The repository also includes:
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
 - `docs/stirling_loggamma.md` for the explicit positive-real Stirling
   `loggamma` method.
+- `docs/gamma_stirling_exp.md` for the explicit positive-real `gamma`
+  method via certified `loggamma` exponentiation.
 - `docs/loggamma_certified_auto_decision.md` for decision-support and
   evidence-gathering notes on whether explicit `method="certified_auto"` should
   later become the default certified `loggamma` selector.

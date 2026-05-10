@@ -8,6 +8,8 @@ help users distinguish four different things:
 - direct Arb primitive enclosures with alpha certification evidence; and
 - the narrow custom positive-real `loggamma` Stirling methods with a documented
   asymptotic tail bound; and
+- the narrow explicit positive-real `gamma` method via certified `loggamma`
+  exponentiation; and
 - experimental formula-backed Arb enclosures with open formula audit work.
 
 ## Required Short Summary
@@ -33,7 +35,7 @@ Release-facing support matrices must keep these status phrases:
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Wording Rules
 
@@ -61,14 +63,13 @@ Release-facing support matrices must keep these status phrases:
   but it does not change omitted-method or `method="auto"` dispatch.
 - Do not claim complex `loggamma` branch certification, real `x < 20`,
   `x <= 0`, or gamma-ratio asymptotics for the Stirling methods.
-- Say that planned `gamma(x, mode="certified", method="stirling_exp")` via
-  certified `loggamma` exponentiation is documentation only until a later
-  implementation PR lands. The planned domain is finite real `x >= 20`, the
-  planned method is explicit only, and direct Arb remains the default certified
-  `gamma` path.
-- Do not claim active custom-certified `gamma`, complex-gamma Stirling support,
+- Say that `gamma(x, mode="certified", method="stirling_exp")` via certified
+  `loggamma` exponentiation is an active explicit method only. The domain is
+  finite real `x >= 20`, and direct Arb remains the default certified `gamma`
+  path.
+- Do not claim global `gamma` certification, complex-gamma Stirling support,
   reflection-formula support, gamma-ratio asymptotics, beta asymptotics, or
-  automatic default `gamma` selection for the planned `stirling_exp` method.
+  automatic default `gamma` selection for the `stirling_exp` method.
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.

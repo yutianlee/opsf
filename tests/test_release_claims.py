@@ -11,7 +11,8 @@ RELEASE_CLAIM_DOC = "docs/release_claims.md"
 CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
     '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
     'explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select '
-    'those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |'
+    'those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified '
+    'loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |'
 )
 HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",

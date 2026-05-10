@@ -21,6 +21,21 @@ def test_special_gamma_returns_json_object_payload():
     assert isinstance(payload["diagnostics"], dict)
 
 
+def test_special_gamma_stirling_exp_method_returns_certified_mcp_payload():
+    pytest.importorskip("flint")
+
+    payload = mcp_server.special_gamma("20", dps=50, mode="certified", method="stirling_exp")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload["function"] == "gamma"
+    assert payload["certified"] is True
+    assert payload["method"] == "stirling_exp_gamma"
+    assert payload["backend"] == "certsf+python-flint"
+    assert payload["diagnostics"]["selected_method"] == "stirling_exp"
+    assert payload["diagnostics"]["certificate_scope"] == "gamma_positive_real_stirling_exp"
+
+
 def test_special_gamma_ratio_returns_json_object_payload():
     payload = mcp_server.special_gamma_ratio("3.2", "1.2", dps=50, mode="high_precision")
 
