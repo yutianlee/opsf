@@ -63,7 +63,10 @@ The line includes:
   0.3.0 development support matrix and the narrow active custom-method row;
 - [`stirling_loggamma.md`](stirling_loggamma.md), which records the formula,
   domain, diagnostics, certificate metadata, tail-bound contract, and
-  exclusions for the first custom asymptotic method.
+  exclusions for the first custom asymptotic method; and
+- [`loggamma_certified_auto_decision.md`](loggamma_certified_auto_decision.md),
+  which records decision support and evidence-gathering notes for any later
+  consideration of default certified `loggamma` method selection.
 
 ## Benchmarks
 
@@ -74,6 +77,14 @@ Stirling, explicit shifted Stirling, explicit certified-auto selection,
 high-precision mpmath, and fast SciPy over representative positive real inputs.
 It is evidence-gathering infrastructure only; custom methods and the selector
 remain explicit and are not claimed as the faster or default method.
+
+The decision-support analyzer
+[`benchmarks/analyze_loggamma_auto.py`](../benchmarks/analyze_loggamma_auto.py)
+compares direct Arb, explicit unshifted Stirling, explicit shifted Stirling,
+and explicit `method="certified_auto"` over a broader certified-mode grid. It
+records unsupported explicit Stirling cases as structured failures. This is
+evidence gathering only: `certified_auto` remains explicit, and this document
+does not make any default-dispatch change.
 
 ## Validation Expectations
 

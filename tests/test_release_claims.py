@@ -85,6 +85,7 @@ RELEASE_SURFACES = (
     "docs/certified_scope_0_2_0.md",
     "docs/certified_scope_0_3_0.md",
     "docs/formula_audit.md",
+    "docs/loggamma_certified_auto_decision.md",
     "docs/stirling_loggamma.md",
     RELEASE_CLAIM_DOC,
 )
