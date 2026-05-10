@@ -104,7 +104,7 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcertified_auto is now default\b",
     r"\bcertified gamma-ratio asymptotics\b",
     r"\bglobal gamma certification\b",
-    r"\bcomplex gamma Stirling certification\b",
+    r"\bcomplex gamma stirling certification\b",
     r"\bcustom[- ]certified gamma is active\b",
     r"\bcertified custom gamma is already active\b",
     r"\breflection formula is certified\b",
@@ -264,6 +264,12 @@ def test_release_surfaces_do_not_use_overbroad_certification_claims():
         text = _read(path).lower()
         for pattern in FORBIDDEN_CLAIM_PATTERNS:
             assert re.search(pattern, text) is None, f"{path} uses forbidden claim pattern: {pattern}"
+
+
+def test_forbidden_gamma_stirling_claim_pattern_matches_lowercase_phrase():
+    phrase = "complex gamma stirling certification"
+
+    assert any(re.search(pattern, phrase) for pattern in FORBIDDEN_CLAIM_PATTERNS)
 
 
 def _read(path: str) -> str:
