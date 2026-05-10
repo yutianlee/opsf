@@ -6,10 +6,13 @@ The method is selected only by:
 ```python
 loggamma(x, mode="certified", method="stirling", dps=...)
 loggamma(x, mode="certified", method="stirling_shifted", dps=...)
+loggamma(x, mode="certified", method="certified_auto", dps=...)
 ```
 
 Default certified `loggamma` remains the direct Arb primitive path. The
-Stirling methods are not automatic default selection.
+Stirling methods are not automatic default selection. The explicit
+`method="certified_auto"` selector may choose direct Arb or a positive-real
+Stirling method, but it is not used for `method=None` or `method="auto"`.
 Parabolic-cylinder wrappers remain an `experimental_formula` surface; this
 method does not promote that family.
 
@@ -65,6 +68,20 @@ is:
 
 The shifted method does not change `method="stirling"` and is not used for
 `method=None` or `method="auto"`.
+
+## Explicit Certified Selector
+
+`method="certified_auto"` is an explicit certified-mode selector. For inputs
+outside the positive-real Stirling scope, including complex values,
+non-finite values, and real `x < 20`, it selects the direct Arb `loggamma`
+primitive rather than a custom Stirling method. For finite real `x >= 20`, it
+may select `method="stirling"` or `method="stirling_shifted"` only when the
+selected method certifies its documented tail bound; otherwise it selects
+direct Arb. The selector never falls back to mpmath in certified mode and does
+not add complex Stirling, gamma-ratio asymptotics, or beta asymptotics.
+
+Successful selected results preserve the selected backend's result method:
+`arb_ball`, `stirling_loggamma`, or `stirling_shifted_loggamma`.
 
 ## Remainder Theorem Used
 
@@ -128,6 +145,10 @@ Certified shifted Stirling results additionally record:
 
 These diagnostics distinguish the custom asymptotic certificate from direct
 Arb primitive certificates and from non-certified SciPy or mpmath values.
+When `method="certified_auto"` is used, the selected result also records
+`auto_selector="certified_auto"`, `auto_selected_method`, `auto_reason`, and
+`auto_candidates`; the selected backend's certificate scope and method field
+remain unchanged.
 
 ## Explicit Exclusions
 

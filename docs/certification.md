@@ -36,7 +36,7 @@ matrix is:
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Result Contract
 
@@ -88,7 +88,10 @@ and exact zero factors certify to zero.
 For explicit `loggamma(x, method="stirling")` or
 `loggamma(x, method="stirling_shifted")`, certified mode additionally supports
 real `x >= 20` through the positive-real Stirling expansion. These are explicit
-methods only and do not replace the default direct Arb path.
+methods only and do not replace the default direct Arb path. Explicit
+`loggamma(x, method="certified_auto")` is also certified-mode only; it may
+select direct Arb or one of those positive-real Stirling methods, but it is not
+used for omitted-method calls or `method="auto"`.
 
 Backend primitive:
 `arb/acb.gamma`, `arb/acb.lgamma`, and `arb/acb.rgamma`. The explicit
@@ -136,6 +139,9 @@ Stirling expansion only for real `x >= 20`.
 `y=x+r`, applying the same positive-real Stirling expansion at `y`, and
 subtracting Arb logs of the recurrence factors. Method omission and
 `method="auto"` continue to use the direct Arb primitive in certified mode.
+`loggamma(x, method="certified_auto")` evaluates no new formula itself; it
+selects direct Arb for unsupported Stirling domains and otherwise selects a
+custom method only when its documented tail bound certifies the request.
 
 Known exclusions:
 `gamma` and `loggamma` at poles return non-certified failures because the
@@ -173,6 +179,9 @@ Certificate scope:
 positive-real Stirling methods for `loggamma` use
 `stirling_loggamma_positive_real`, recorded through
 `method="stirling_loggamma"` or `method="stirling_shifted_loggamma"`.
+The explicit `method="certified_auto"` selector preserves the selected
+backend's result method and certificate scope, and adds selector diagnostics
+without creating a new mathematical certificate scope.
 
 ## Error-Function Family
 

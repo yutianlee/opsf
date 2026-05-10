@@ -75,6 +75,23 @@ def test_special_loggamma_shifted_stirling_method_returns_certified_mcp_payload(
     assert payload["diagnostics"]["certificate_scope"] == "stirling_loggamma_positive_real"
 
 
+def test_special_loggamma_certified_auto_method_returns_certified_mcp_payload():
+    pytest.importorskip("flint")
+
+    payload = mcp_server.special_loggamma("20", dps=100, mode="certified", method="certified_auto")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload["certified"] is True
+    assert payload["function"] == "loggamma"
+    assert payload["method"] == "stirling_shifted_loggamma"
+    assert payload["backend"] == "certsf+python-flint"
+    assert payload["diagnostics"]["selected_method"] == "stirling_shifted"
+    assert payload["diagnostics"]["auto_selector"] == "certified_auto"
+    assert payload["diagnostics"]["auto_selected_method"] == "stirling_shifted"
+    assert payload["diagnostics"]["certificate_scope"] == "stirling_loggamma_positive_real"
+
+
 def test_special_loggamma_arb_method_and_omission_preserve_mcp_payload_behavior():
     explicit = mcp_server.special_loggamma("50", dps=50, mode="certified", method="arb")
     omitted = mcp_server.special_loggamma("50", dps=50, mode="certified")

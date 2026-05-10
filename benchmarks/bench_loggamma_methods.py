@@ -13,6 +13,7 @@ METHOD_CASES = (
     ("certified", "arb", {"mode": "certified", "method": "arb"}),
     ("certified", "stirling", {"mode": "certified", "method": "stirling"}),
     ("certified", "stirling_shifted", {"mode": "certified", "method": "stirling_shifted"}),
+    ("certified", "certified_auto", {"mode": "certified", "method": "certified_auto"}),
     ("high_precision", None, {"mode": "high_precision"}),
     ("fast", None, {"mode": "fast"}),
 )

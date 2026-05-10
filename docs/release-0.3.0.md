@@ -25,14 +25,17 @@ The v0.3.0 line includes:
 - explicit `loggamma(x, mode="certified", method="stirling_shifted")` for
   real `x >= 20`, using Arb logs and the recurrence
   `loggamma(x) = stirling_loggamma_sum(x+r) - sum(log(x+j))`;
+- explicit `loggamma(x, mode="certified", method="certified_auto")` as a
+  selector that may choose direct Arb or a positive-real Stirling method
+  without changing omitted-method or `method="auto"` dispatch;
 - `certificate_scope="stirling_loggamma_positive_real"`;
 - `certificate_level="custom_asymptotic_bound"`; and
 - `audit_status="theorem_documented"`.
 
-The Stirling and shifted Stirling methods are additional certified methods for
-the existing public `loggamma` wrapper. They are not new public
-special-function wrappers and are not automatic default selection. Default
-certified `loggamma` remains the existing direct Arb path.
+The Stirling, shifted Stirling, and certified-auto selector are additional
+registered methods for the existing public `loggamma` wrapper. They are not
+new public special-function wrappers and are not automatic default selection.
+Default certified `loggamma` remains the existing direct Arb path.
 
 ## Non-Goals
 
@@ -63,10 +66,10 @@ The line includes:
 The manual benchmark
 [`benchmarks/bench_loggamma_methods.py`](../benchmarks/bench_loggamma_methods.py)
 emits JSON-lines timing records for direct Arb certified `loggamma`, explicit
-Stirling, explicit shifted Stirling, high-precision mpmath, and fast SciPy over
-representative positive real inputs. It is evidence-gathering infrastructure
-only; Stirling methods remain explicit and are not claimed as the faster or
-automatic default method.
+Stirling, explicit shifted Stirling, explicit certified-auto selection,
+high-precision mpmath, and fast SciPy over representative positive real inputs.
+It is evidence-gathering infrastructure only; custom methods and the selector
+remain explicit and are not claimed as the faster or default method.
 
 ## Validation Expectations
 
@@ -74,6 +77,8 @@ Validation should confirm that:
 
 - explicit `method="stirling"` and `method="stirling_shifted"` certify
   positive-real `loggamma` only for real `x >= 20`;
+- explicit `method="certified_auto"` may select direct Arb or a positive-real
+  Stirling method, while preserving the selected backend's certificate scope;
 - default certified `loggamma` and explicit `method="arb"` continue to use the
   existing direct Arb path;
 - unsupported domains and unsupported modes fail cleanly rather than falling

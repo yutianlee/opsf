@@ -24,7 +24,9 @@ with Arb ball arithmetic for the finite Bernoulli sum and an explicit
 first-omitted-term asymptotic tail bound. Explicit
 `loggamma(x, method="stirling_shifted")` applies the same positive-real
 Stirling theorem at `y = x + r` and subtracts the Arb finite recurrence
-`sum(log(x+j))`.
+`sum(log(x+j))`. Explicit `loggamma(x, method="certified_auto")` is a selector
+that may choose direct Arb or one of those positive-real Stirling methods; it
+does not evaluate a new formula.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding primitive, when
@@ -40,6 +42,8 @@ are finite.
 finite-product ceiling, and certifies exact zero factors to zero.
 Explicit `loggamma(method="stirling")` and
 `loggamma(method="stirling_shifted")` accept finite real `x >= 20` only.
+Explicit `loggamma(method="certified_auto")` uses direct Arb outside that
+positive-real Stirling scope.
 
 Excluded domain:
 `gamma` and `loggamma` at poles; `gamma_ratio` when `a` is a gamma pole,
@@ -53,7 +57,9 @@ limiting values not covered by the zero-factor finite-product case.
 Explicit `loggamma(method="stirling")` and
 `loggamma(method="stirling_shifted")` exclude complex inputs, non-finite
 inputs, `x < 20`, `x <= 0`, principal-branch complex `loggamma`, and
-gamma-ratio asymptotics.
+gamma-ratio asymptotics. The explicit `certified_auto` selector may choose
+direct Arb for unsupported Stirling domains, but it does not add complex
+Stirling or gamma-ratio asymptotics.
 
 Branch convention:
 `loggamma` follows Arb's principal branch. `loggamma_ratio` is the difference
@@ -106,7 +112,9 @@ supported integer-`n` path. Large product lengths can accumulate wide balls, so
 the certified path has a documented term ceiling rather than a gamma fallback.
 The explicit Stirling methods are restricted to positive real inputs with
 `x >= 20`; they are not selected automatically and do not certify branch-cut or
-complex-principal-loggamma behavior.
+complex-principal-loggamma behavior. Explicit `method="certified_auto"` keeps
+that scope narrow and leaves omitted-method and `method="auto"` dispatch on the
+direct Arb path.
 
 Certification status:
 `certificate_level="direct_arb_primitive"`. Certified `gamma`, `loggamma`, and
@@ -125,4 +133,6 @@ Explicit `loggamma(method="stirling")` and
 `loggamma(method="stirling_shifted")` results use
 `certificate_scope="stirling_loggamma_positive_real"`,
 `certificate_level="custom_asymptotic_bound"`, and
-`audit_status="theorem_documented"`.
+`audit_status="theorem_documented"`. Explicit `method="certified_auto"`
+preserves the selected backend's method and certificate scope and adds selector
+diagnostics.

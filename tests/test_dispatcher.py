@@ -87,6 +87,18 @@ def test_loggamma_shifted_stirling_method_spec_records_custom_asymptotic_metadat
     assert "not automatic default selection" in method.applicability_note
 
 
+def test_loggamma_certified_auto_method_spec_records_multi_scope_metadata():
+    method = METHOD_REGISTRY["loggamma"]["certified"][3]
+
+    assert method.method_id == "certified_auto"
+    assert method.certificate_scope == "direct_arb_primitive|stirling_loggamma_positive_real"
+    assert method.certificate_level == "direct_arb_primitive|custom_asymptotic_bound"
+    assert method.audit_status == "audited_direct|theorem_documented"
+    assert method.backend == "certsf+python-flint"
+    assert "Explicit method='certified_auto' only" in method.applicability_note
+    assert "does not change method=None" in method.applicability_note
+
+
 def test_stirling_methods_are_active_only_for_explicit_certified_loggamma():
     active_loggamma_methods = [
         method
@@ -103,17 +115,28 @@ def test_stirling_methods_are_active_only_for_explicit_certified_loggamma():
         for method in available_methods()
         if method.method_id == "stirling_shifted"
     ]
+    certified_auto_methods = [
+        method
+        for method in available_methods()
+        if method.method_id == "certified_auto"
+    ]
 
-    assert [method.method_id for method in active_loggamma_methods] == ["arb", "stirling", "stirling_shifted"]
+    assert [method.method_id for method in active_loggamma_methods] == [
+        "arb",
+        "stirling",
+        "stirling_shifted",
+        "certified_auto",
+    ]
     assert stirling_methods == [METHOD_REGISTRY["loggamma"]["certified"][1]]
     assert shifted_methods == [METHOD_REGISTRY["loggamma"]["certified"][2]]
+    assert certified_auto_methods == [METHOD_REGISTRY["loggamma"]["certified"][3]]
     assert METHOD_REGISTRY["loggamma"]["certified"][0] == REGISTRY["loggamma"]["certified"]
 
 
 def test_available_methods_exposes_auditable_method_specs_in_dispatch_order():
     methods = available_methods()
 
-    assert len(methods) == len(available_functions()) * 3 + 2
+    assert len(methods) == len(available_functions()) * 3 + 3
     assert methods[0] == REGISTRY["gamma"]["fast"]
     assert methods[1] == REGISTRY["gamma"]["high_precision"]
     assert methods[2] == REGISTRY["gamma"]["certified"]
@@ -198,6 +221,12 @@ def test_loggamma_shifted_stirling_method_is_not_reinterpreted_for_high_precisio
         match="method 'stirling_shifted' is not available for 'loggamma' in mode 'high_precision'",
     ):
         certsf.loggamma("50", dps=50, mode="high_precision", method="stirling_shifted")
+
+
+@pytest.mark.parametrize("mode", ["high_precision", "fast"])
+def test_loggamma_certified_auto_method_is_certified_mode_only(mode):
+    with pytest.raises(ValueError, match=f"method 'certified_auto' is not available for 'loggamma' in mode '{mode}'"):
+        certsf.loggamma("50", dps=50, mode=mode, method="certified_auto")
 
 
 def test_explicit_certified_arb_method_never_falls_back_to_mpmath():
