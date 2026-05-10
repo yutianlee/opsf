@@ -1,8 +1,9 @@
 # Planned Stirling `loggamma` Method
 
 This document records the target for the first custom certified asymptotic
-method planned for v0.3.0. It is a planning document only; the method is not
-implemented or claimed by the current runtime.
+method planned for v0.3.0. Method registry v2 infrastructure is present, but
+the Stirling method itself is not implemented or claimed by the current
+runtime.
 
 ## Target Formula
 
@@ -37,6 +38,9 @@ tail_bound <= |B_{2m+2}| / ((2m + 2)(2m + 1) x^(2m + 1)).
 The method should be selected only when the input is real and inside the
 documented positive-real domain. Other certified paths may continue to use Arb
 direct primitives as documented by the method registry.
+
+Until the implementation PR lands, `method="stirling"` is a planned method id
+that must fail clearly before returning any certified result.
 
 ## Required Diagnostics
 

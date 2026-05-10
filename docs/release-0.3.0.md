@@ -1,16 +1,26 @@
 # certsf 0.3.0 Planning
 
 `v0.3.0` targets the first custom certified asymptotic-method line for
-`certsf`. This planning PR is documentation-only: it does not change
-`src/certsf`, public API behavior, package version metadata, backend formulas,
-or any existing certification result.
+`certsf`. Method registry v2 infrastructure has landed so callers can request
+an explicit implementation method where one is registered. This infrastructure
+PR does not change package version metadata, backend formulas, default
+selection behavior, or any existing certification result for calls that do not
+pass `method=...`.
 
 ## Target Scope
 
-The planned v0.3.0 implementation work targets:
+The v0.3.0 line now includes:
 
-- method registry v2, with explicit method selection diagnostics for custom
-  certified methods;
+- method registry v2 metadata for method id, priority, certificate level, audit
+  status, and applicability notes;
+- `method=None` and `method="auto"` behavior equivalent to the previous
+  automatic selection path;
+- `method="arb"` selection for existing certified Arb backends when the
+  resolved mode is `certified`; and
+- clear rejection of unsupported method/function/mode combinations.
+
+The remaining planned v0.3.0 implementation work targets:
+
 - the first custom certified `loggamma` Stirling/asymptotic method;
 - a positive-real domain first, initially real `x >= 20`;
 - `certificate_scope="stirling_loggamma_positive_real"`;
@@ -20,6 +30,11 @@ The planned v0.3.0 implementation work targets:
 The planned `loggamma` method is an additional certified method for the
 existing public `loggamma` wrapper. It is not a new public special-function
 wrapper.
+
+`method="stirling"` is intentionally guarded as planned but not implemented.
+It must fail before any backend result can be marked certified until the
+separate implementation PR lands its proof references, runtime diagnostics, and
+tests.
 
 ## Non-Goals
 
@@ -52,4 +67,5 @@ diagnostics, method-registry tests, numerical enclosure tests, and release-scope
 tests before claiming the new method as active.
 
 For this planning PR, validation should confirm that no runtime behavior,
-public API, package version, or existing certification scope changed.
+package version, or existing certification scope changed for default method
+selection.

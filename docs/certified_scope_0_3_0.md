@@ -1,13 +1,14 @@
 # Certified Scope for 0.3.0 Planning
 
-This document records the planned v0.3.0 certified-scope direction. It copies
-the current 0.2.0 support matrix and adds one planned custom-certified-method
-row. The planned row is not active until implementation, proof references,
-runtime diagnostics, and tests land in a later PR.
+This document records the v0.3.0 certified-scope direction. It copies the
+current 0.2.0 support matrix and adds one planned custom-certified-method row.
+Method registry v2 infrastructure is active, but the planned Stirling row is
+not active until implementation, proof references, runtime diagnostics, and
+tests land in a later PR.
 
 The current 0.2.0 surface remains recorded in
-[`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). This planning document
-does not change public API behavior or broaden current certification claims.
+[`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). This document does not
+broaden current certification claims.
 
 ## Release Status Matrix
 
@@ -19,6 +20,7 @@ does not change public API behavior or broaden current certification claims.
 | Bessel family | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | `certsf.mcp_server` tools for the current wrappers | experimental tool interface |
+| Method registry v2 | existing Python wrappers with optional `method=...` selection | infrastructure active; default selection unchanged |
 | Custom Taylor/asymptotic methods | none | not yet |
 | Custom certified methods | `loggamma` positive-real Stirling asymptotic | planned alpha scope only; not active until implementation lands |
 
@@ -76,11 +78,16 @@ This row does not add a public wrapper, does not replace direct Arb primitive
 certification, and does not claim support for complex `loggamma`, branch-cut
 behavior, `x < 20`, `x <= 0`, or gamma-ratio asymptotics.
 
+`method="stirling"` is a guarded planned method id only. It must not return a
+certified result until the implementation lands.
+
 ## Scope Boundaries
 
 - Parabolic-cylinder wrappers remain `experimental_formula`.
 - No Faddeeva, `wofz`, or plasma-dispersion wrappers are planned for v0.3.0.
 - No broad package-wide, family-wide, or global certification claim is made.
+- Method registry v2 does not change default dispatch behavior for callers that
+  omit `method` or pass `method="auto"`.
 - MCP remains a thin experimental interface and does not expand the
   mathematical support surface.
 - Unsupported certified domains must continue to fail cleanly as non-certified

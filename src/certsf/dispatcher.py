@@ -19,11 +19,16 @@ class MethodSpec:
 
     function: str
     mode: Mode
+    method_id: str
+    priority: int
     backend: str
     callable: Callable[..., SFResult]
     certified: bool
     domain: str
     certificate_scope: str | None = None
+    certificate_level: str | None = None
+    audit_status: str | None = None
+    applicability_note: str | None = None
 
 
 _MODE_ORDER: tuple[Mode, ...] = ("auto", "fast", "high_precision", "certified")
@@ -61,6 +66,40 @@ _FAST_DOMAIN = "SciPy-supported double-precision inputs"
 _HIGH_PRECISION_DOMAIN = "mpmath-supported high-precision inputs"
 
 
+def _default_method_id(mode: Mode) -> str:
+    if mode == "fast":
+        return "scipy"
+    if mode == "high_precision":
+        return "mpmath"
+    if mode == "certified":
+        return "arb"
+    raise ValueError(f"no default method id for mode {mode!r}")
+
+
+def _certificate_metadata(certificate_scope: str) -> tuple[str, str]:
+    levels: list[str] = []
+    audit_statuses: list[str] = []
+    for scope in certificate_scope.split("|"):
+        level, audit_status = _certificate_metadata_for_scope(scope)
+        if level not in levels:
+            levels.append(level)
+        if audit_status not in audit_statuses:
+            audit_statuses.append(audit_status)
+    return "|".join(levels), "|".join(audit_statuses)
+
+
+def _certificate_metadata_for_scope(certificate_scope: str) -> tuple[str, str]:
+    if certificate_scope == "direct_arb_pochhammer_product":
+        return "direct_arb_finite_product", "audited_direct"
+    if certificate_scope in {"arb_erfcx_formula", "arb_erfi_formula", "arb_dawson_formula"}:
+        return "formula_audited_alpha", "formula_identity"
+    if certificate_scope in {"arb_erfinv_real_root", "arb_erfcinv_via_erfinv"}:
+        return "certified_real_root", "monotone_real_inverse"
+    if certificate_scope in {"phase7_hypergeometric_parabolic_cylinder", "phase8_parabolic_cylinder_connections"}:
+        return "formula_audited_experimental", "experimental_formula"
+    return "direct_arb_primitive", "audited_direct"
+
+
 def _spec(
     function: str,
     mode: Mode,
@@ -70,15 +109,29 @@ def _spec(
     certified: bool,
     domain: str,
     certificate_scope: str | None = None,
+    method_id: str | None = None,
+    priority: int = 100,
+    certificate_level: str | None = None,
+    audit_status: str | None = None,
+    applicability_note: str | None = None,
 ) -> MethodSpec:
+    if certificate_scope is not None:
+        inferred_certificate_level, inferred_audit_status = _certificate_metadata(certificate_scope)
+        certificate_level = inferred_certificate_level if certificate_level is None else certificate_level
+        audit_status = inferred_audit_status if audit_status is None else audit_status
     return MethodSpec(
         function=function,
         mode=mode,
+        method_id=_default_method_id(mode) if method_id is None else method_id,
+        priority=priority,
         backend=backend,
         callable=method,
         certified=certified,
         domain=domain,
         certificate_scope=certificate_scope,
+        certificate_level=certificate_level,
+        audit_status=audit_status,
+        applicability_note=domain if applicability_note is None else applicability_note,
     )
 
 
@@ -643,8 +696,19 @@ REGISTRY: dict[str, dict[Mode, MethodSpec]] = {
     },
 }
 
+METHOD_REGISTRY: dict[str, dict[Mode, tuple[MethodSpec, ...]]] = {
+    function: {mode: (method,) for mode, method in methods.items()} for function, methods in REGISTRY.items()
+}
+
 _VALID_MODES = frozenset(_MODE_ORDER)
 _VALID_FUNCTIONS = frozenset(_FUNCTION_ORDER)
+_PLANNED_METHODS: dict[tuple[str, Mode, str], str] = {
+    (
+        "loggamma",
+        "certified",
+        "stirling",
+    ): "method 'stirling' for 'loggamma' in certified mode is planned for v0.3.0 but not implemented"
+}
 
 
 def dispatch(
@@ -653,14 +717,15 @@ def dispatch(
     dps: int = 50,
     mode: Mode = "auto",
     certify: bool = False,
+    method: str | None = None,
 ) -> SFResult:
     """Dispatch a public wrapper call through the explicit method registry."""
 
     if function not in _VALID_FUNCTIONS:
         raise ValueError(f"unknown special function: {function!r}")
     selected_mode = _select_mode(mode, certify, dps)
-    method = _method_spec(function, selected_mode)
-    return method.callable(*args, dps=dps)
+    method_spec = _method_spec(function, selected_mode, method)
+    return method_spec.callable(*args, dps=dps)
 
 
 def available_functions() -> tuple[str, ...]:
@@ -678,7 +743,12 @@ def available_modes() -> tuple[Mode, ...]:
 def available_methods() -> tuple[MethodSpec, ...]:
     """Return all registered concrete methods in dispatch order."""
 
-    return tuple(REGISTRY[function][mode] for function in _FUNCTION_ORDER for mode in _CONCRETE_MODES)
+    return tuple(
+        method
+        for function in _FUNCTION_ORDER
+        for mode in _CONCRETE_MODES
+        for method in sorted(METHOD_REGISTRY[function][mode], key=lambda item: item.priority)
+    )
 
 
 def _select_mode(mode: Mode, certify: bool, dps: int) -> Mode:
@@ -692,11 +762,29 @@ def _select_mode(mode: Mode, certify: bool, dps: int) -> Mode:
     return mode
 
 
-def _method_spec(function: str, mode: Mode) -> MethodSpec:
+def _method_spec(function: str, mode: Mode, requested_method: str | None = None) -> MethodSpec:
     try:
-        return REGISTRY[function][mode]
+        methods = METHOD_REGISTRY[function][mode]
     except KeyError as exc:  # pragma: no cover - guarded by public validation
         raise RuntimeError(f"no backend registered for {function!r} in mode {mode!r}") from exc
+    if requested_method is None or requested_method == "auto":
+        return sorted(methods, key=lambda item: item.priority)[0]
+    if not isinstance(requested_method, str):
+        raise ValueError("method must be a string or None")
+
+    for method in methods:
+        if method.method_id == requested_method:
+            return method
+
+    planned_message = _PLANNED_METHODS.get((function, mode, requested_method))
+    if planned_message is not None:
+        raise ValueError(planned_message)
+
+    available = ", ".join(("auto", *(method.method_id for method in sorted(methods, key=lambda item: item.priority))))
+    raise ValueError(
+        f"method {requested_method!r} is not available for {function!r} in mode {mode!r}; "
+        f"available methods: {available}"
+    )
 
 
 def _validate_method_registry() -> None:
@@ -729,6 +817,48 @@ def _validate_method_registry() -> None:
                 raise RuntimeError(f"dispatcher registry method is not callable: {function!r}/{mode!r}")
             if method.certified and method.certificate_scope is None:
                 raise RuntimeError(f"certified method missing certificate scope: {function!r}/{mode!r}")
+
+    registered_v2_functions = set(METHOD_REGISTRY)
+    if registered_v2_functions != expected_functions:
+        raise RuntimeError(
+            "dispatcher method registry v2 function mismatch: "
+            f"missing={sorted(expected_functions - registered_v2_functions)!r}, "
+            f"extra={sorted(registered_v2_functions - expected_functions)!r}"
+        )
+    for function, modes in METHOD_REGISTRY.items():
+        registered_modes = set(modes)
+        if registered_modes != expected_modes:
+            raise RuntimeError(
+                f"dispatcher method registry v2 mode mismatch for {function!r}: "
+                f"missing={sorted(expected_modes - registered_modes)!r}, "
+                f"extra={sorted(registered_modes - expected_modes)!r}"
+            )
+        for mode, v2_methods in modes.items():
+            if not v2_methods:
+                raise RuntimeError(f"dispatcher method registry v2 has no methods for {function!r}/{mode!r}")
+            default_method = min(v2_methods, key=lambda item: item.priority)
+            if default_method != REGISTRY[function][mode]:
+                raise RuntimeError(f"dispatcher default method mismatch for {function!r}/{mode!r}")
+            method_ids: set[str] = set()
+            for v2_method in v2_methods:
+                if v2_method.function != function or v2_method.mode != mode:
+                    raise RuntimeError(
+                        "dispatcher method registry v2 MethodSpec mismatch: "
+                        f"key=({function!r}, {mode!r}), "
+                        f"spec=({v2_method.function!r}, {v2_method.mode!r})"
+                    )
+                if v2_method.method_id in method_ids:
+                    raise RuntimeError(f"duplicate method id for {function!r}/{mode!r}: {v2_method.method_id!r}")
+                method_ids.add(v2_method.method_id)
+                if v2_method.priority < 0:
+                    raise RuntimeError(f"method priority must be nonnegative: {function!r}/{mode!r}")
+                if not v2_method.applicability_note:
+                    raise RuntimeError(f"method missing applicability note: {function!r}/{mode!r}")
+                if v2_method.certified:
+                    if v2_method.certificate_scope is None:
+                        raise RuntimeError(f"certified method missing certificate scope: {function!r}/{mode!r}")
+                    if v2_method.certificate_level is None or v2_method.audit_status is None:
+                        raise RuntimeError(f"certified method missing audit metadata: {function!r}/{mode!r}")
 
 
 _validate_method_registry()
