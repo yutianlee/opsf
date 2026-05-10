@@ -164,4 +164,7 @@ This method excludes:
 The exclusions are part of the certification scope. Unsupported inputs fail
 cleanly as non-certified results or are rejected by dispatcher method
 selection; explicit `method="stirling"` and `method="stirling_shifted"` never
-silently fall back to Arb or mpmath.
+silently fall back to Arb or mpmath. Explicit `method="certified_auto"` may
+select direct Arb for excluded Stirling domains, including poles or complex
+principal-branch requests, but that preserves the direct Arb certificate scope
+or clean Arb failure and never becomes a custom Stirling certificate.
