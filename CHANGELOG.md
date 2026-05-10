@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased / 0.3.0 planning
+
+- Added planning notes for the v0.3.0 line.
+- Targets method registry v2 and the first custom certified asymptotic method.
+- Defines the planned alpha scope for a positive-real `loggamma` Stirling
+  asymptotic method, initially for real `x >= 20`.
+- Keeps this planning PR documentation-only: no `src/certsf` runtime behavior
+  changes, no public API changes, and no version bump.
+- Does not promote parabolic-cylinder certification claims.
+- Does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
+- Does not broaden release certification wording beyond the planned narrow
+  `loggamma` positive-real asymptotic scope.
+
 ## 0.2.0 - 2026-05-09
 
 - Planned the first non-prerelease release of the 0.2 line.
