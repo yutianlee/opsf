@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- No unreleased changes yet.
+
+## 0.3.0-alpha.2 - 2026-05-10
+
 - Added explicit certified `loggamma(..., method="certified_auto")` selection
   for certified mode. The selector may choose direct Arb, explicit Stirling, or
   explicit shifted Stirling, while preserving the selected backend's method,

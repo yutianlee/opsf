@@ -43,6 +43,7 @@ def test_release_checklist_links_policy_and_keeps_testpypi_manual_only():
 
 def test_publish_testpypi_workflow_requires_manual_confirmation():
     text = _read(".github/workflows/publish-testpypi.yml")
+    publish_text = _read(".github/workflows/publish-pypi.yml")
 
     assert "Manual staging only." in text
     assert "workflow_dispatch:" in text
@@ -52,7 +53,8 @@ def test_publish_testpypi_workflow_requires_manual_confirmation():
     assert "Refusing to publish to TestPyPI without confirm=publish-testpypi." in text
     assert "actions/upload-artifact@v6" in text
     assert "actions/download-artifact@v6" in text
-    assert 'default: "v0.3.0-alpha.1"' in text
+    assert 'default: "v0.3.0-alpha.2"' in text
+    assert 'default: "v0.3.0-alpha.2"' in publish_text
 
 
 def _read(path: str) -> str:
