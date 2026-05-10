@@ -59,6 +59,25 @@ package, for all `loggamma` inputs, or for every special-function family. The
 only custom-certified alpha scope is the positive-real Stirling `loggamma`
 methods documented in [`stirling_loggamma.md`](stirling_loggamma.md).
 
+## Future Work: Positive-Real `gamma`
+
+The next custom-method candidate is positive-real `gamma(x)` via certified
+`loggamma` exponentiation. The planned explicit method name is
+`gamma(x, mode="certified", method="stirling_exp", dps=...)` for finite real
+`x >= 20`. The planned certificate scope is
+`gamma_positive_real_stirling_exp`, with certificate level
+`custom_asymptotic_bound` and audit status `theorem_documented`.
+
+This is not implemented yet, no release claim is active yet, and no default
+dispatch behavior changes in this planning note. The future method must use a
+rigorous positive-real `loggamma` enclosure and Arb exponentiation, and the
+returned `gamma` enclosure must account for both finite-expression Arb radius
+and the propagated explicit loggamma tail bound.
+
+The planned method excludes complex `gamma`, real `x < 20`, real `x <= 0`,
+reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, and beta
+asymptotics. See [`gamma_stirling_exp.md`](gamma_stirling_exp.md).
+
 ## Documentation
 
 The line includes:
@@ -70,7 +89,9 @@ The line includes:
   exclusions for the first custom asymptotic method;
 - [`loggamma_certified_auto_decision.md`](loggamma_certified_auto_decision.md),
   which records decision support and evidence-gathering notes for any later
-  consideration of default certified `loggamma` method selection; and
+  consideration of default certified `loggamma` method selection;
+- [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records a planned
+  inactive positive-real `gamma` method candidate and its exclusions; and
 - [`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), which records the
   prerelease plan for packaging the explicit `certified_auto` preselection
   optimization with no default-dispatch change.
