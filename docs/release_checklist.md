@@ -131,16 +131,15 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 
 Post-release verification note:
 
-- TODO: Git tag `v0.3.0-alpha.1` and the GitHub prerelease were not found
-  during the 2026-05-10 verification pass.
-- TODO: TestPyPI staging for `certsf 0.3.0a1` is not recorded yet; no
-  `publish-testpypi` run for `v0.3.0-alpha.1` was found.
-- TODO: Real PyPI publication for `certsf 0.3.0a1` is not recorded yet; the
-  PyPI JSON endpoint returned 404.
-- TODO: `pypi-smoke` has not passed against `0.3.0a1` yet.
-- The `pypi-smoke` workflow intentionally remains pinned to `0.2.0` until
-  real PyPI publication and smoke verification for `0.3.0a1` pass.
-- Post-release verification TODOs are recorded in
+- Git tag `v0.3.0-alpha.1` points at
+  `3f92ca5f9de2b83337647bbcfbe2452ea2b1a608`.
+- GitHub release `v0.3.0-alpha.1` is marked prerelease and is not a draft.
+- TestPyPI staging run `25625895759` passed for `certsf 0.3.0a1`.
+- Real PyPI publish run `25625499969` passed and PyPI confirms
+  `certsf 0.3.0a1`.
+- Final `pypi-smoke` run `25626012923` passed against `0.3.0a1` across base,
+  certified, and MCP-certified install paths.
+- Post-release verification evidence is recorded in
   [`post_release_verification.md`](post_release_verification.md).
 
 ## v0.2.0 Checklist
