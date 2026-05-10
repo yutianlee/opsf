@@ -11,7 +11,9 @@ error bounds, and diagnostics explaining how the result was produced.
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
 the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
-the current 0.2.0 support matrix lives in
+the active 0.3.0 development scope lives in
+[`docs/certified_scope_0_3_0.md`](docs/certified_scope_0_3_0.md), and the
+published 0.2.0 support matrix lives in
 [`docs/certified_scope_0_2_0.md`](docs/certified_scope_0_2_0.md). The frozen
 0.1.0 matrix remains archived in
 [`docs/certified_scope_0_1_0.md`](docs/certified_scope_0_1_0.md), and the
@@ -91,8 +93,8 @@ Every wrapper returns an `SFResult` with these fields:
 - `rel_error_bound`: rigorous relative error bound when available.
 - `certified`: `True` only when a rigorous enclosure was produced.
 - `function`: canonical function name.
-- `method`: implementation method, such as `scipy.special`, `mpmath`, or
-  `arb_ball`.
+- `method`: implementation method, such as `scipy.special`, `mpmath`,
+  `arb_ball`, or `stirling_loggamma`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -105,7 +107,8 @@ silently fall back to mpmath and call the value certified.
 Certified successes also expose `diagnostics["certificate_level"]`,
 `diagnostics["audit_status"]`, and `diagnostics["certification_claim"]`, so
 callers can distinguish direct Arb primitive wrappers from narrow identity
-formulas and experimental formula-backed claims.
+formulas, custom asymptotic-bound methods, and experimental formula-backed
+claims.
 
 ## Choosing a Mode
 
@@ -126,15 +129,19 @@ you need more digits but not a rigorous certificate.
 
 The dispatcher uses an explicit `MethodSpec` registry for every concrete mode.
 Each registered method records its backend, callable, certification intent,
-domain note, and certificate scope. Adding a public wrapper requires registering
-its SciPy, mpmath, and Arb methods together; tests verify the registry, public
-API, and MCP tool list stay in sync.
+domain note, and certificate scope. Callers may pass `method=...` for registered
+methods. For `loggamma`, explicit `mode="certified", method="stirling"` selects
+the alpha-certified custom asymptotic bound for positive-real inputs with real
+`x >= 20`; it is not automatic default selection. Adding a public wrapper
+requires registering its SciPy, mpmath, and Arb methods together; tests verify
+the registry, public API, and MCP tool list stay in sync.
 
 ## Supported Functions
 
-The 0.2 line includes gamma-family wrappers and error functions while keeping
-the release wording conservative and the parabolic-cylinder claims unchanged.
-The package remains alpha-quality in scientific scope.
+The 0.3 development line keeps the 0.2 public wrapper surface and adds the
+first explicit custom certified asymptotic method for `loggamma`. Default
+certified `loggamma` still uses direct Arb. The package remains alpha-quality
+in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -144,7 +151,7 @@ The package remains alpha-quality in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | not yet |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"`; real `x >= 20`; not automatic default selection |
 
 ```python
 from certsf import (
@@ -223,6 +230,15 @@ argument returns a clean non-certified failure. For complex values, the result
 is the difference of principal `loggamma` values, not necessarily the principal
 logarithm of `gamma_ratio(a, b)`. See
 [`docs/loggamma_ratio.md`](docs/loggamma_ratio.md).
+
+Explicit `loggamma(x, mode="certified", method="stirling")` evaluates the
+positive-real Stirling expansion with Arb ball arithmetic for the finite sum
+and an explicit first-omitted-term tail bound. This custom method is limited to
+real `x >= 20`, records
+`certificate_scope="stirling_loggamma_positive_real"`, and returns
+`method="stirling_loggamma"`. It does not certify complex `loggamma` branches,
+real `x < 20`, `x <= 0`, or gamma-ratio asymptotics, and it is not selected by
+default. See [`docs/stirling_loggamma.md`](docs/stirling_loggamma.md).
 
 ```python
 from certsf import beta
@@ -436,13 +452,17 @@ The repository also includes:
 - `docs/beta.md` for beta-function pole policy and certified-backend
   rationale.
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
+- `docs/stirling_loggamma.md` for the explicit positive-real Stirling
+  `loggamma` method.
 - `docs/error_function.md` for error-function certified-domain policy.
 - `docs/dawson.md` for Dawson integral certified-domain policy.
 - `docs/erfinv.md` for inverse-error-function certified-domain policy.
 - `docs/erfcinv.md` for inverse-complementary-error-function certified-domain
   policy.
-- `docs/certified_scope_0_2_0.md` for the current 0.2.0 certified
-  support matrix.
+- `docs/certified_scope_0_3_0.md` for the active 0.3.0 development scope.
+- `docs/certified_scope_0_2_0.md` for the published 0.2.0 certified support
+  matrix.
+- `docs/release-0.3.0.md` for v0.3.0 planning and implementation notes.
 - `docs/release-0.2.0.md` for v0.2.0 final release planning notes.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.

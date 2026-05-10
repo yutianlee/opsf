@@ -9,6 +9,7 @@ from typing import Any
 from certsf.result import SFResult
 
 from .backends import arb_backend, mpmath_backend, scipy_backend
+from .methods import stirling_loggamma
 
 Mode = str
 
@@ -97,6 +98,8 @@ def _certificate_metadata_for_scope(certificate_scope: str) -> tuple[str, str]:
         return "certified_real_root", "monotone_real_inverse"
     if certificate_scope in {"phase7_hypergeometric_parabolic_cylinder", "phase8_parabolic_cylinder_connections"}:
         return "formula_audited_experimental", "experimental_formula"
+    if certificate_scope == "stirling_loggamma_positive_real":
+        return "custom_asymptotic_bound", "theorem_documented"
     return "direct_arb_primitive", "audited_direct"
 
 
@@ -699,16 +702,28 @@ REGISTRY: dict[str, dict[Mode, MethodSpec]] = {
 METHOD_REGISTRY: dict[str, dict[Mode, tuple[MethodSpec, ...]]] = {
     function: {mode: (method,) for mode, method in methods.items()} for function, methods in REGISTRY.items()
 }
+METHOD_REGISTRY["loggamma"]["certified"] = (
+    REGISTRY["loggamma"]["certified"],
+    _spec(
+        "loggamma",
+        "certified",
+        "certsf+python-flint",
+        stirling_loggamma,
+        certified=True,
+        domain="Real x >= 20; explicit positive-real Stirling/asymptotic loggamma method",
+        certificate_scope="stirling_loggamma_positive_real",
+        method_id="stirling",
+        priority=200,
+        applicability_note=(
+            "Explicit method='stirling' only; real x >= 20; not automatic default selection; "
+            "complex loggamma branches and gamma-ratio asymptotics excluded"
+        ),
+    ),
+)
 
 _VALID_MODES = frozenset(_MODE_ORDER)
 _VALID_FUNCTIONS = frozenset(_FUNCTION_ORDER)
-_PLANNED_METHODS: dict[tuple[str, Mode, str], str] = {
-    (
-        "loggamma",
-        "certified",
-        "stirling",
-    ): "method 'stirling' for 'loggamma' in certified mode is planned for v0.3.0 but not implemented"
-}
+_PLANNED_METHODS: dict[tuple[str, Mode, str], str] = {}
 
 
 def dispatch(

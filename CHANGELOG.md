@@ -5,20 +5,24 @@
 - Added planning notes for the v0.3.0 line.
 - Landed method registry v2 infrastructure with explicit `method=...`
   selection for Python wrappers.
+- Added explicit `loggamma(x, mode="certified", method="stirling")` for real
+  `x >= 20` as the first alpha-certified custom asymptotic-bound method.
+- The Stirling method uses Arb ball arithmetic for the finite sum and an
+  explicit positive-real asymptotic tail bound, with
+  `certificate_scope="stirling_loggamma_positive_real"`.
 - Keeps default method selection unchanged when `method` is omitted or
   `method="auto"`.
 - Adds `method="arb"` selection for existing certified Arb backends, while
   rejecting unsupported function/mode combinations instead of reinterpreting
   them.
-- Keeps `method="stirling"` planned but inactive; it cannot certify results in
-  this PR.
-- Targets the first custom certified asymptotic method in a later PR.
-- Defines the planned alpha scope for a positive-real `loggamma` Stirling
-  asymptotic method, initially for real `x >= 20`.
+- Keeps direct Arb as the default certified `loggamma` method; Stirling is not
+  automatic default selection.
+- Rejects unsupported Stirling domains and modes cleanly instead of falling
+  back to mpmath in certified mode.
 - Keeps the package version unchanged.
 - Does not promote parabolic-cylinder certification claims.
 - Does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
-- Does not broaden release certification wording beyond the planned narrow
+- Does not broaden release certification wording beyond the narrow explicit
   `loggamma` positive-real asymptotic scope.
 
 ## 0.2.0 - 2026-05-09
