@@ -167,6 +167,7 @@ def test_certified_auto_loggamma_selects_shifted_stirling_when_unshifted_fails()
     assert result.diagnostics["auto_candidates"][0]["certified"] is False
     assert result.diagnostics["auto_candidates"][1]["method"] == "stirling_shifted"
     assert result.diagnostics["auto_candidates"][1]["selected"] is True
+    assert _selected_auto_candidates(result) == ["stirling_shifted"]
 
     reference = certsf.loggamma("20", mode="certified", method="arb", dps=130)
     if _backend_is_unavailable(reference):
@@ -192,25 +193,39 @@ def test_certified_auto_loggamma_selects_custom_method_for_positive_real_boundar
     _assert_reference_lies_in_stirling_bound(result, reference)
 
 
-@pytest.mark.parametrize("x", ["3.2", "50+1j"])
-def test_certified_auto_loggamma_uses_direct_arb_outside_positive_real_stirling_scope(x):
+@pytest.mark.parametrize(
+    ("x", "expected_certified"),
+    [
+        ("3.2", True),
+        ("50+1j", True),
+        ("0", False),
+    ],
+)
+def test_certified_auto_loggamma_uses_direct_arb_outside_positive_real_stirling_scope(x, expected_certified):
     result = certsf.loggamma(x, mode="certified", method="certified_auto", dps=50)
     if _backend_is_unavailable(result):
         pytest.skip(result.diagnostics["error"])
 
-    assert result.certified is True
+    assert result.certified is expected_certified
     assert result.method == "arb_ball"
     assert result.backend == "python-flint"
-    assert result.diagnostics["certificate_scope"] == "direct_arb_primitive"
     _assert_auto_selector_diagnostics(result, "arb")
     assert result.diagnostics["auto_candidates"][0]["method"] == "arb"
+    assert result.diagnostics["auto_candidates"][0]["selected"] is True
+    if expected_certified:
+        assert result.value
+        assert result.diagnostics["certificate_scope"] == "direct_arb_primitive"
+    else:
+        assert result.value == ""
+        assert result.diagnostics["error"]
 
 
-@pytest.mark.parametrize("x", ["20", "3.2", "50+1j"])
+@pytest.mark.parametrize("x", ["20", "3.2", "50+1j", "0"])
 def test_certified_auto_loggamma_never_falls_back_to_mpmath(x):
     result = certsf.loggamma(x, mode="certified", method="certified_auto", dps=50)
 
     assert result.backend != "mpmath"
+    _assert_auto_selector_diagnostics(result, result.diagnostics["auto_selected_method"])
 
 
 @pytest.mark.parametrize("mode", ["high_precision", "fast"])
@@ -415,9 +430,18 @@ def _assert_reference_lies_in_stirling_bound(result, reference):
 def _assert_auto_selector_diagnostics(result, selected_method):
     assert result.diagnostics["auto_selector"] == "certified_auto"
     assert result.diagnostics["auto_selected_method"] == selected_method
+    assert result.diagnostics["auto_selected_method"] in {"arb", "stirling", "stirling_shifted"}
     assert result.diagnostics["auto_reason"]
     assert isinstance(result.diagnostics["auto_candidates"], list)
     assert result.diagnostics["auto_candidates"]
+
+
+def _selected_auto_candidates(result):
+    return [
+        candidate["method"]
+        for candidate in result.diagnostics["auto_candidates"]
+        if candidate.get("selected") is True
+    ]
 
 
 def _backend_is_unavailable(result):

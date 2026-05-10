@@ -46,6 +46,8 @@ def _run_case(x: str, dps: int, mode: str, method_requested: str | None, kwargs:
         "terms_used": result.terms_used,
         "abs_error_bound": result.abs_error_bound,
         "certificate_scope": result.diagnostics.get("certificate_scope"),
+        "auto_selected_method": result.diagnostics.get("auto_selected_method"),
+        "auto_reason": result.diagnostics.get("auto_reason"),
     }
 
 

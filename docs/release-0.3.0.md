@@ -45,6 +45,8 @@ separate proof, implementation, tests, and documentation change explicitly
 broadens that scope.
 
 The v0.3.0 line does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
+It also does not add complex Stirling, gamma-ratio asymptotics, or beta
+asymptotics.
 
 The v0.3.0 line does not make a broad complete-certification claim for the
 package, for all `loggamma` inputs, or for every special-function family. The
