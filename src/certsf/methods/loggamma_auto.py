@@ -7,7 +7,13 @@ from typing import Any
 
 from certsf.backends import arb_backend
 from certsf.backends._common import ensure_dps
-from certsf.methods.stirling import _positive_real_text, stirling_loggamma, stirling_loggamma_shifted
+from certsf.methods.stirling import (
+    _positive_real_text,
+    estimate_shifted_stirling_policy,
+    estimate_stirling_terms_for_tolerance,
+    stirling_loggamma,
+    stirling_loggamma_shifted,
+)
 from certsf.result import SFResult
 
 
@@ -26,6 +32,9 @@ def certified_auto_loggamma(x: Any, *, dps: int = 50) -> SFResult:
                 {
                     "method": "arb",
                     "selected": True,
+                    "preselected": False,
+                    "can_certify": result.certified,
+                    "estimated_terms_used": None,
                     "reason": domain_error,
                     "certified": result.certified,
                     "result_method": result.method,
@@ -35,9 +44,22 @@ def certified_auto_loggamma(x: Any, *, dps: int = 50) -> SFResult:
         )
 
     candidates: list[dict[str, Any]] = []
-    stirling = stirling_loggamma(x_text, dps=requested_dps)
-    candidates.append(_candidate_summary("stirling", stirling))
-    if stirling.certified:
+    stirling_estimate = estimate_stirling_terms_for_tolerance(x_text, dps=requested_dps)
+    candidates.append(_preselection_candidate("stirling", stirling_estimate))
+    if stirling_estimate["can_certify"]:
+        stirling = stirling_loggamma(x_text, dps=requested_dps)
+        candidates[-1] = _merge_candidate(candidates[-1], _candidate_summary("stirling", stirling))
+        if not stirling.certified:
+            candidates[-1]["reason"] = "unshifted Stirling preselection certified but full method did not certify"
+            arb = arb_backend.arb_loggamma(x, dps=requested_dps)
+            candidates.append(_selected_arb_candidate(arb, "selected direct Arb after unshifted Stirling did not certify"))
+            return _with_auto_diagnostics(
+                arb,
+                selected_method="arb",
+                reason="unshifted Stirling did not certify after preselection; selected direct Arb",
+                candidates=candidates,
+            )
+
         candidates[-1]["selected"] = True
         return _with_auto_diagnostics(
             stirling,
@@ -46,9 +68,22 @@ def certified_auto_loggamma(x: Any, *, dps: int = 50) -> SFResult:
             candidates=candidates,
         )
 
-    shifted = stirling_loggamma_shifted(x_text, dps=requested_dps)
-    candidates.append(_candidate_summary("stirling_shifted", shifted))
-    if shifted.certified:
+    shifted_estimate = estimate_shifted_stirling_policy(x_text, dps=requested_dps)
+    candidates.append(_preselection_candidate("stirling_shifted", shifted_estimate))
+    if shifted_estimate["can_certify"]:
+        shifted = stirling_loggamma_shifted(x_text, dps=requested_dps)
+        candidates[-1] = _merge_candidate(candidates[-1], _candidate_summary("stirling_shifted", shifted))
+        if not shifted.certified:
+            candidates[-1]["reason"] = "shifted Stirling preselection certified but full method did not certify"
+            arb = arb_backend.arb_loggamma(x, dps=requested_dps)
+            candidates.append(_selected_arb_candidate(arb, "selected direct Arb after shifted Stirling did not certify"))
+            return _with_auto_diagnostics(
+                arb,
+                selected_method="arb",
+                reason="shifted Stirling did not certify after preselection; selected direct Arb",
+                candidates=candidates,
+            )
+
         candidates[-1]["selected"] = True
         return _with_auto_diagnostics(
             shifted,
@@ -58,8 +93,7 @@ def certified_auto_loggamma(x: Any, *, dps: int = 50) -> SFResult:
         )
 
     arb = arb_backend.arb_loggamma(x, dps=requested_dps)
-    candidates.append(_candidate_summary("arb", arb))
-    candidates[-1]["selected"] = True
+    candidates.append(_selected_arb_candidate(arb, "custom Stirling preselection did not certify"))
     return _with_auto_diagnostics(
         arb,
         selected_method="arb",
@@ -93,6 +127,55 @@ def _candidate_summary(method_id: str, result: SFResult) -> dict[str, Any]:
         if key in diagnostics:
             summary[key] = diagnostics[key]
     return summary
+
+
+def _preselection_candidate(method_id: str, estimate: dict[str, Any]) -> dict[str, Any]:
+    summary = {
+        "method": method_id,
+        "selected": False,
+        "certified": False,
+        "abs_error_bound": None,
+        "terms_used": None,
+    }
+    summary.update(estimate)
+    summary["method"] = method_id
+    summary["selected"] = False
+    return summary
+
+
+def _merge_candidate(base: dict[str, Any], evaluated: dict[str, Any]) -> dict[str, Any]:
+    merged = dict(base)
+    merged.update(evaluated)
+    for key in ("preselected", "can_certify", "estimated_terms_used"):
+        if key in base:
+            merged[key] = base[key]
+    for key in (
+        "tail_bound",
+        "final_tail_bound",
+        "requested_tolerance",
+        "shift",
+        "shifted_argument",
+        "shift_policy",
+        "coefficient_source",
+        "largest_bernoulli_used",
+    ):
+        if key in base and key not in merged:
+            merged[key] = base[key]
+    return merged
+
+
+def _selected_arb_candidate(result: SFResult, reason: str) -> dict[str, Any]:
+    candidate = _candidate_summary("arb", result)
+    candidate.update(
+        {
+            "selected": True,
+            "preselected": False,
+            "can_certify": result.certified,
+            "estimated_terms_used": None,
+            "reason": reason,
+        }
+    )
+    return candidate
 
 
 def _with_auto_diagnostics(

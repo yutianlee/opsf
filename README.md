@@ -521,7 +521,9 @@ The repository also includes:
   JSON-lines timing smoke benchmarks. The loggamma benchmarks compare direct
   Arb, explicit Stirling, explicit shifted Stirling, explicit certified-auto
   selection, high-precision mpmath, and fast SciPy paths without making a
-  default-method performance claim. The certified-auto analyzer and summarizer
-  are decision support only; `method="certified_auto"` remains explicit and no
-  default-dispatch change is made. A compact sample summary is checked in at
+  default-method performance claim. The explicit certified-auto selector uses
+  preselection diagnostics to avoid unnecessary custom candidate evaluations,
+  but it remains decision support only; `method="certified_auto"` remains
+  explicit and no default-dispatch change is made. A compact sample summary is
+  checked in at
   `docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`.

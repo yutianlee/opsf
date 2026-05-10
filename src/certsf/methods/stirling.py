@@ -243,6 +243,157 @@ def _select_terms(flint, x, target_tolerance) -> tuple[int | None, Any | None]:
     return None, None
 
 
+def estimate_stirling_terms_for_tolerance(x: Any, *, dps: int = 50) -> dict[str, Any]:
+    """Estimate unshifted Stirling certifiability without the finite sum."""
+
+    requested_dps = ensure_dps(dps)
+    x_text, domain_error = _positive_real_text(x)
+    if domain_error is not None:
+        return _preselection_unavailable("stirling", requested_dps, domain_error)
+
+    try:
+        import flint
+    except ImportError:  # pragma: no cover - optional dependency
+        return _preselection_unavailable("stirling", requested_dps, "python-flint is not installed")
+
+    bits = _working_bits(requested_dps)
+    old_prec = flint.ctx.prec
+    flint.ctx.prec = bits
+    try:
+        argument = flint.arb(x_text)
+        target_tolerance = flint.arb(10) ** (-(requested_dps + GUARD_DIGITS))
+        terms_used, tail_bound = _select_terms(flint, argument, target_tolerance)
+        base = _preselection_base("stirling", requested_dps)
+        base.update(
+            {
+                "working_precision_bits": bits,
+                "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+            }
+        )
+        if terms_used is None or tail_bound is None:
+            final_tail = _tail_bound(flint, argument, _MAX_TERMS)
+            base.update(
+                {
+                    "can_certify": False,
+                    "estimated_terms_used": None,
+                    "terms_attempted": _MAX_TERMS,
+                    "final_tail_bound": _safe_positive_string(final_tail, requested_dps, flint),
+                    "error": "Stirling loggamma tail bound did not reach the requested tolerance within the term cap.",
+                    "reason": "unshifted Stirling tail bound does not reach the requested tolerance within the term cap",
+                }
+            )
+            return base
+
+        base.update(
+            {
+                "can_certify": True,
+                "estimated_terms_used": terms_used,
+                "tail_bound": _safe_positive_string(tail_bound, requested_dps, flint),
+                "reason": "unshifted Stirling tail bound satisfies the requested tolerance",
+            }
+        )
+        return base
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _preselection_unavailable(
+            "stirling",
+            requested_dps,
+            f"unshifted Stirling preselection failed cleanly: {exc}",
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def estimate_shifted_stirling_policy(x: Any, *, dps: int = 50) -> dict[str, Any]:
+    """Estimate shifted Stirling certifiability without logs or the finite sum."""
+
+    requested_dps = ensure_dps(dps)
+    effective_dps = requested_dps + GUARD_DIGITS
+    x_text, domain_error = _positive_real_text(x)
+    if domain_error is not None:
+        return _preselection_unavailable(
+            "stirling_shifted",
+            requested_dps,
+            domain_error,
+            effective_dps=effective_dps,
+        )
+
+    try:
+        import flint
+    except ImportError:  # pragma: no cover - optional dependency
+        return _preselection_unavailable(
+            "stirling_shifted",
+            requested_dps,
+            "python-flint is not installed",
+            effective_dps=effective_dps,
+        )
+
+    x_decimal = Decimal(x_text)
+    bits = _working_bits(effective_dps)
+    old_prec = flint.ctx.prec
+    flint.ctx.prec = bits
+    try:
+        argument = flint.arb(x_text)
+        target_tolerance = flint.arb(10) ** (-effective_dps)
+        shift, shift_policy, terms_used, tail_bound = _select_shifted_policy(
+            flint,
+            argument,
+            x_decimal,
+            effective_dps,
+            target_tolerance,
+        )
+        final_shift = 0 if shift is None else shift
+        shifted_argument_text = _decimal_string(x_decimal + Decimal(final_shift))
+        base = _preselection_base("stirling_shifted", requested_dps, effective_dps=effective_dps)
+        base.update(
+            {
+                "working_precision_bits": bits,
+                "shift": final_shift,
+                "shifted_argument": shifted_argument_text,
+                "shift_policy": shift_policy,
+                "guard_digits": GUARD_DIGITS,
+                "effective_dps": effective_dps,
+                "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+            }
+        )
+        if terms_used is None or tail_bound is None:
+            final_argument = argument + flint.arb(final_shift)
+            final_tail = _tail_bound_from_coefficient(flint, final_argument, _MAX_TERMS)
+            base.update(
+                {
+                    "can_certify": False,
+                    "estimated_terms_used": None,
+                    "terms_attempted": _MAX_TERMS,
+                    "final_tail_bound": _safe_positive_string(final_tail, requested_dps, flint),
+                    "coefficient_source": _coefficient_source(_MAX_TERMS + 1),
+                    "largest_bernoulli_used": 2 * _MAX_TERMS + 2,
+                    "error": "Shifted Stirling loggamma tail bound did not reach the requested tolerance within the shift/term cap.",
+                    "reason": "shifted Stirling tail bound does not reach the requested tolerance within the shift/term cap",
+                }
+            )
+            return base
+
+        base.update(
+            {
+                "can_certify": True,
+                "estimated_terms_used": terms_used,
+                "tail_bound": _safe_positive_string(tail_bound, requested_dps, flint),
+                "coefficient_source": _coefficient_source(terms_used + 1),
+                "largest_bernoulli_used": 2 * terms_used + 2,
+                "reason": "shifted Stirling tail bound satisfies the requested tolerance",
+            }
+        )
+        return base
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _preselection_unavailable(
+            "stirling_shifted",
+            requested_dps,
+            f"shifted Stirling preselection failed cleanly: {exc}",
+            effective_dps=effective_dps,
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
 def _tail_bound(flint, x, terms_used: int):
     omitted_index = 2 * terms_used + 2
     bernoulli = abs(flint.arb(flint.fmpq.bernoulli(omitted_index)))
@@ -324,6 +475,41 @@ def _coefficient(flint, k: int):
 
 def _coefficient_source(max_k: int) -> str:
     return "table" if max_k <= len(STIRLING_COEFFICIENTS) else "table+flint_fallback"
+
+
+def _preselection_base(
+    method_id: str,
+    requested_dps: int,
+    *,
+    effective_dps: int | None = None,
+) -> dict[str, Any]:
+    result_method = _SHIFTED_METHOD if method_id == "stirling_shifted" else _METHOD
+    base: dict[str, Any] = {
+        "method": method_id,
+        "preselected": True,
+        "can_certify": False,
+        "estimated_terms_used": None,
+        "result_method": result_method,
+        "backend": _BACKEND,
+        "certificate_scope": _CERTIFICATE_SCOPE,
+        "max_terms": _MAX_TERMS,
+        "requested_dps": requested_dps,
+    }
+    if effective_dps is not None:
+        base["effective_dps"] = effective_dps
+    return base
+
+
+def _preselection_unavailable(
+    method_id: str,
+    requested_dps: int,
+    reason: str,
+    *,
+    effective_dps: int | None = None,
+) -> dict[str, Any]:
+    base = _preselection_base(method_id, requested_dps, effective_dps=effective_dps)
+    base.update({"reason": reason, "error": reason})
+    return base
 
 
 def _unavailable(

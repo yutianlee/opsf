@@ -39,6 +39,10 @@ def test_loggamma_auto_analysis_benchmark_schema_is_present():
         '"shift_policy"',
         '"coefficient_source"',
         '"largest_bernoulli_used"',
+        '"preselected"',
+        '"can_certify"',
+        '"estimated_terms_used"',
+        '"auto_candidates"',
         '"error"',
     ):
         assert field in text
@@ -116,6 +120,9 @@ def test_loggamma_auto_sample_stays_compact_and_covers_representative_subset():
         '"method_requested": "certified_auto"',
         '"auto_selected_method"',
         '"auto_reason"',
+        '"preselected"',
+        '"can_certify"',
+        '"estimated_terms_used"',
     ):
         assert fragment in text
 
