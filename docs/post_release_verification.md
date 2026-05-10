@@ -1,5 +1,59 @@
 # Post-release verification
 
+## v0.3.0-alpha.1 / certsf 0.3.0a1
+
+This section is intentionally incomplete because the required release evidence
+was not available during post-release verification on 2026-05-10. Do not update
+the scheduled/manual `pypi-smoke` default from `0.2.0` to `0.3.0a1` until the
+real PyPI publication and a `pypi-smoke` run against `0.3.0a1` have both passed.
+
+### Published artifact
+
+- Git tag: TODO: `v0.3.0-alpha.1` was not found in GitHub tag refs.
+- GitHub prerelease URL: TODO: no GitHub release was found at
+  <https://github.com/yutianlee/certsf/releases/tag/v0.3.0-alpha.1>.
+- GitHub release type: TODO: verify the GitHub release is marked prerelease.
+- Source commit: `379cb0cd8d6da67b6b34c4f471e6bedc749411d0`
+- TestPyPI URL: TODO: verify
+  <https://test.pypi.org/project/certsf/0.3.0a1/> after staging; the JSON
+  endpoint returned 404 during this verification.
+- TestPyPI workflow run: TODO: no `publish-testpypi` run for
+  `v0.3.0-alpha.1` was found.
+- TestPyPI workflow URL: TODO.
+- TestPyPI result: TODO.
+- PyPI URL: TODO: verify <https://pypi.org/project/certsf/0.3.0a1/> after
+  publication; the JSON endpoint returned 404 during this verification.
+- Publish workflow run: TODO: no `publish-pypi` run for `v0.3.0-alpha.1` was
+  found.
+- Publish workflow URL: TODO.
+- PyPI publish result: TODO.
+- Wheel SHA256: TODO.
+- sdist SHA256: TODO.
+- `pypi-smoke` workflow run: TODO: no `pypi-smoke` run against `0.3.0a1` was
+  found.
+- `pypi-smoke` workflow URL: TODO.
+- `pypi-smoke` result: TODO.
+- PyPI edge-cache propagation failures: TODO: none were observed because the
+  `0.3.0a1` package was not available to smoke.
+
+### Verification status
+
+The latest available release records at verification time were still for
+`v0.2.0`: GitHub release `v0.2.0`, TestPyPI workflow run `25612987386`,
+publish workflow run `25613028613`, and final `pypi-smoke` run `25613084716`.
+No evidence was fabricated for `v0.3.0-alpha.1`.
+
+Required follow-up before this section can be completed:
+
+- Create and publish GitHub prerelease `v0.3.0-alpha.1`.
+- Run `publish-testpypi` with `ref=v0.3.0-alpha.1` and
+  `confirm=publish-testpypi`.
+- Publish `certsf 0.3.0a1` to real PyPI through `publish-pypi`.
+- Run `pypi-smoke` against `0.3.0a1`.
+- After the smoke run passes, update `.github/workflows/pypi-smoke.yml` from
+  `0.2.0` to `0.3.0a1` and add smoke coverage for explicit
+  `method="stirling"` and `method="stirling_shifted"` calls.
+
 ## v0.2.0 / certsf 0.2.0
 
 This records the verification evidence for the first non-prerelease 0.2 line

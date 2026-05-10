@@ -129,6 +129,20 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - [ ] `python -m twine check dist/*` passes.
 - [ ] `python benchmarks/bench_loggamma_methods.py` runs.
 
+Post-release verification note:
+
+- TODO: Git tag `v0.3.0-alpha.1` and the GitHub prerelease were not found
+  during the 2026-05-10 verification pass.
+- TODO: TestPyPI staging for `certsf 0.3.0a1` is not recorded yet; no
+  `publish-testpypi` run for `v0.3.0-alpha.1` was found.
+- TODO: Real PyPI publication for `certsf 0.3.0a1` is not recorded yet; the
+  PyPI JSON endpoint returned 404.
+- TODO: `pypi-smoke` has not passed against `0.3.0a1` yet.
+- The `pypi-smoke` workflow intentionally remains pinned to `0.2.0` until
+  real PyPI publication and smoke verification for `0.3.0a1` pass.
+- Post-release verification TODOs are recorded in
+  [`post_release_verification.md`](post_release_verification.md).
+
 ## v0.2.0 Checklist
 
 - [ ] `pyproject.toml` version is `0.2.0`.
