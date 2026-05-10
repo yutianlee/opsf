@@ -94,7 +94,7 @@ Every wrapper returns an `SFResult` with these fields:
 - `certified`: `True` only when a rigorous enclosure was produced.
 - `function`: canonical function name.
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
-  `arb_ball`, or `stirling_loggamma`.
+  `arb_ball`, `stirling_loggamma`, or `stirling_shifted_loggamma`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -130,11 +130,12 @@ you need more digits but not a rigorous certificate.
 The dispatcher uses an explicit `MethodSpec` registry for every concrete mode.
 Each registered method records its backend, callable, certification intent,
 domain note, and certificate scope. Callers may pass `method=...` for registered
-methods. For `loggamma`, explicit `mode="certified", method="stirling"` selects
-the alpha-certified custom asymptotic bound for positive-real inputs with real
-`x >= 20`; it is not automatic default selection. Adding a public wrapper
-requires registering its SciPy, mpmath, and Arb methods together; tests verify
-the registry, public API, and MCP tool list stay in sync.
+methods. For `loggamma`, explicit `mode="certified", method="stirling"` or
+`method="stirling_shifted"` selects an alpha-certified custom asymptotic bound
+for positive-real inputs with real `x >= 20`; neither method is automatic
+default selection. Adding a public wrapper requires registering its SciPy,
+mpmath, and Arb methods together; tests verify the registry, public API, and
+MCP tool list stay in sync.
 
 ## Supported Functions
 
@@ -151,7 +152,7 @@ in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
 
 ```python
 from certsf import (
@@ -233,12 +234,16 @@ logarithm of `gamma_ratio(a, b)`. See
 
 Explicit `loggamma(x, mode="certified", method="stirling")` evaluates the
 positive-real Stirling expansion with Arb ball arithmetic for the finite sum
-and an explicit first-omitted-term tail bound. This custom method is limited to
-real `x >= 20`, records
-`certificate_scope="stirling_loggamma_positive_real"`, and returns
-`method="stirling_loggamma"`. It does not certify complex `loggamma` branches,
-real `x < 20`, `x <= 0`, or gamma-ratio asymptotics, and it is not selected by
-default. See [`docs/stirling_loggamma.md`](docs/stirling_loggamma.md).
+and an explicit first-omitted-term tail bound. Explicit
+`method="stirling_shifted"` evaluates the same positive-real target after an
+Arb recurrence shift `loggamma(x)=loggamma(x+r)-sum(log(x+j))`, using a
+documented shift policy and the same tail-bound theorem at the shifted
+argument. These custom methods are limited to real `x >= 20`, record
+`certificate_scope="stirling_loggamma_positive_real"`, and return
+`method="stirling_loggamma"` or `method="stirling_shifted_loggamma"`. They do
+not certify complex `loggamma` branches, real `x < 20`, `x <= 0`, or
+gamma-ratio asymptotics, and they are not selected by default. See
+[`docs/stirling_loggamma.md`](docs/stirling_loggamma.md).
 
 ```python
 from certsf import beta
@@ -499,5 +504,5 @@ The repository also includes:
   `benchmarks/bench_airy.py`, `benchmarks/bench_bessel.py`, and
   `benchmarks/bench_pcf.py` for lightweight JSON-lines timing smoke
   benchmarks. The loggamma benchmark compares direct Arb, explicit Stirling,
-  high-precision mpmath, and fast SciPy paths without making a default-method
-  performance claim.
+  explicit shifted Stirling, high-precision mpmath, and fast SciPy paths
+  without making a default-method performance claim.

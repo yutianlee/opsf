@@ -1,7 +1,7 @@
 # Certified Scope for 0.3.0
 
 This document records the v0.3.0 certified-scope direction. It keeps the
-current 0.2.0 public wrapper list and adds one active custom-certified-method
+current 0.2.0 public wrapper list and adds an active custom-certified-method
 row for explicit positive-real `loggamma`.
 
 The published 0.2.0 surface remains recorded in
@@ -19,7 +19,7 @@ broaden package-wide, loggamma-wide, or parabolic-cylinder certification claims.
 | Parabolic-cylinder family | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | `certsf.mcp_server` tools for the current wrappers | experimental tool interface |
 | Method registry v2 | existing Python wrappers with optional `method=...` selection | infrastructure active; default selection unchanged |
-| Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"`; real `x >= 20`; not automatic default selection |
+| Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; real `x >= 20`; not automatic default selection |
 
 ## Current Function List
 
@@ -62,12 +62,13 @@ They are not additional certified functions.
 The active custom-certified row is limited to the existing `loggamma` wrapper:
 
 - method family: Stirling/asymptotic expansion for positive real `x`;
-- selector: explicit `mode="certified", method="stirling"`;
+- selector: explicit `mode="certified", method="stirling"` or
+  `mode="certified", method="stirling_shifted"`;
 - domain: real `x >= 20`;
 - certificate scope: `stirling_loggamma_positive_real`;
 - certificate level: `custom_asymptotic_bound`;
 - audit status: `theorem_documented`;
-- runtime method field: `stirling_loggamma`;
+- runtime method field: `stirling_loggamma` or `stirling_shifted_loggamma`;
 - default status: not automatic default selection.
 
 This row does not add a public wrapper, does not replace direct Arb primitive

@@ -12,6 +12,7 @@ DPS_VALUES = (30, 50, 80, 100)
 METHOD_CASES = (
     ("certified", "arb", {"mode": "certified", "method": "arb"}),
     ("certified", "stirling", {"mode": "certified", "method": "stirling"}),
+    ("certified", "stirling_shifted", {"mode": "certified", "method": "stirling_shifted"}),
     ("high_precision", None, {"mode": "high_precision"}),
     ("fast", None, {"mode": "fast"}),
 )
