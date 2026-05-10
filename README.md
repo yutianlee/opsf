@@ -495,6 +495,9 @@ The repository also includes:
 - `examples/gamma_certified.py`, `examples/airy_components.py`,
   `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
   `examples/mcp_payload.py` for payload-first release examples.
-- `benchmarks/bench_gamma.py`, `benchmarks/bench_airy.py`,
-  `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
-  JSON-lines timing smoke benchmarks.
+- `benchmarks/bench_gamma.py`, `benchmarks/bench_loggamma_methods.py`,
+  `benchmarks/bench_airy.py`, `benchmarks/bench_bessel.py`, and
+  `benchmarks/bench_pcf.py` for lightweight JSON-lines timing smoke
+  benchmarks. The loggamma benchmark compares direct Arb, explicit Stirling,
+  high-precision mpmath, and fast SciPy paths without making a default-method
+  performance claim.
