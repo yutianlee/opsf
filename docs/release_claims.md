@@ -93,6 +93,9 @@ Release-facing support matrices must keep these status phrases:
   or "certified for every continuation".
 - Do not say "fully certified loggamma", "global loggamma certification", or
   "complete certified special functions".
+- Do not say "complex Stirling certification", "complete certified asymptotic
+  support", "automatic Stirling default", or "certified gamma-ratio
+  asymptotics".
 - Do not describe the parabolic-cylinder family as certified without the
   experimental formula-layer qualifier.
 - Do not imply that MCP expands the mathematical support surface.

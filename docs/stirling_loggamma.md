@@ -36,6 +36,31 @@ The finite Stirling sum is evaluated with Arb ball arithmetic through
 `python-flint`; the returned absolute error bound includes both the Arb radius
 of that finite sum and the explicit asymptotic tail bound.
 
+## Remainder Theorem Used
+
+The theorem used here is only the positive-real Stirling remainder theorem for
+`log Gamma(x)`. When `x` is real and positive, and the Stirling series is
+truncated after `m` Bernoulli correction terms, the remainder is bounded in
+absolute value by the first omitted Bernoulli correction term and has the
+corresponding sign. The implemented absolute tail bound is:
+
+```text
+|R_m(x)| <= |B_{2m+2}| / ((2m + 2)(2m + 1) x^(2m + 1)).
+```
+
+This is the bound recorded in result diagnostics as `tail_bound`. The final
+returned `abs_error_bound` also includes the Arb rounding radius from the
+finite Stirling sum.
+
+The reference used for this scope is DLMF 5.11(i), which states the
+first-neglected-term remainder property for the gamma-function asymptotic
+expansions when the variable is real and positive:
+<https://dlmf.nist.gov/5.11.i>.
+
+This theorem does not apply to complex `z`, branch-cut or principal-branch
+complex `loggamma`, gamma-ratio asymptotics, or beta asymptotics. Those cases
+remain outside the `stirling_loggamma_positive_real` certificate scope.
+
 ## Certificate Metadata
 
 - domain: real `x >= 20`;

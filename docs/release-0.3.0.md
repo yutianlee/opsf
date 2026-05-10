@@ -53,6 +53,15 @@ The line includes:
   domain, diagnostics, certificate metadata, tail-bound contract, and
   exclusions for the first custom asymptotic method.
 
+## Benchmarks
+
+The manual benchmark
+[`benchmarks/bench_loggamma_methods.py`](../benchmarks/bench_loggamma_methods.py)
+emits JSON-lines timing records for direct Arb certified `loggamma`, explicit
+Stirling, high-precision mpmath, and fast SciPy over representative positive
+real inputs. It is evidence-gathering infrastructure only; Stirling remains
+explicit and is not claimed as the faster or automatic default method.
+
 ## Validation Expectations
 
 Validation should confirm that:
