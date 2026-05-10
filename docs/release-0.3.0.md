@@ -12,7 +12,10 @@ metadata bump for this line was planned in
 [`release-0.3.0-alpha.2.md`](release-0.3.0-alpha.2.md), packages the explicit
 `method="certified_auto"` selector. The third alpha,
 [`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), packages the
-preselection optimization for that explicit selector.
+preselection optimization for that explicit selector. The fourth alpha,
+[`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), packages the explicit
+positive-real `gamma` method `method="stirling_exp"` with no default-dispatch
+change.
 
 ## Active Scope
 
@@ -97,7 +100,10 @@ The line includes:
   which records decision support and evidence-gathering notes for any later
   consideration of default certified `loggamma` method selection;
 - [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records the active
-  explicit positive-real `gamma` method and its exclusions; and
+  explicit positive-real `gamma` method and its exclusions;
+- [`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), which records the
+  prerelease plan for packaging the explicit positive-real `gamma`
+  `method="stirling_exp"` with no default-dispatch change; and
 - [`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), which records the
   prerelease plan for packaging the explicit `certified_auto` preselection
   optimization with no default-dispatch change.

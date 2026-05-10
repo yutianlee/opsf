@@ -2,14 +2,18 @@
 
 ## Unreleased
 
-- Added explicit positive-real `gamma(x)` certificate via certified `loggamma`
-  exponentiation with `mode="certified", method="stirling_exp"` for finite real
-  `x >= 20`.
+- No unreleased changes yet.
+
+## 0.3.0-alpha.4 - 2026-05-10
+
+- Packages the explicit positive-real `gamma(x)` certificate via certified
+  `loggamma` exponentiation with
+  `mode="certified", method="stirling_exp"` for finite real `x >= 20`.
 - Keeps default certified `gamma`, `method=None`, and `method="auto"` on the
   direct Arb path.
 - Does not add complex gamma, reflection formula certification, near-pole
   certification, gamma-ratio asymptotics, beta asymptotics,
-  parabolic-cylinder promotion, public wrappers, or version metadata changes.
+  parabolic-cylinder promotion, or new public wrappers.
 
 ## 0.3.0-alpha.3 - 2026-05-10
 
