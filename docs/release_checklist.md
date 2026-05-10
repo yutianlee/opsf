@@ -128,6 +128,27 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - [ ] `python -m twine check dist/*` passes.
 - [ ] `python benchmarks/bench_loggamma_methods.py` runs.
 
+Post-release verification note:
+
+- Git tag `v0.3.0-alpha.2` points at
+  `1d51181e3b90c379e1ef543aca85e008cdf090d6`.
+- GitHub release `v0.3.0-alpha.2` is marked prerelease and is not a draft.
+- TestPyPI staging was skipped under `release_policy.md` because this was a
+  routine feature alpha without packaging, dependency, or workflow-risk changes.
+- Real PyPI publish run `25627010550` passed and PyPI confirms
+  `certsf 0.3.0a2`.
+- Initial `pypi-smoke` runs `25627041563` and `25627081269` captured PyPI
+  edge-cache propagation failures where selected runners saw only versions
+  through `0.3.0a1`.
+- Final `pypi-smoke` run `25627550209` passed against `0.3.0a2` across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- Wheel SHA256:
+  `f9a76868647d01bdc60c11e9a614c9cfbf043189a7defbd2a8ee39a8704150ac`
+- sdist SHA256:
+  `d2fef600543c18fff7caf430ba9c2d8e3aa95d3f66756b9341717a0b28f604fb`
+- Full evidence is recorded in
+  [`post_release_verification.md`](post_release_verification.md).
+
 ## v0.3.0-alpha.1 Checklist
 
 - [ ] `pyproject.toml` version is `0.3.0a1`.
