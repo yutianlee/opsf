@@ -61,6 +61,14 @@ Release-facing support matrices must keep these status phrases:
   but it does not change omitted-method or `method="auto"` dispatch.
 - Do not claim complex `loggamma` branch certification, real `x < 20`,
   `x <= 0`, or gamma-ratio asymptotics for the Stirling methods.
+- Say that planned `gamma(x, mode="certified", method="stirling_exp")` via
+  certified `loggamma` exponentiation is documentation only until a later
+  implementation PR lands. The planned domain is finite real `x >= 20`, the
+  planned method is explicit only, and direct Arb remains the default certified
+  `gamma` path.
+- Do not claim active custom-certified `gamma`, complex-gamma Stirling support,
+  reflection-formula support, gamma-ratio asymptotics, beta asymptotics, or
+  automatic default `gamma` selection for the planned `stirling_exp` method.
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.
@@ -100,6 +108,9 @@ Release-facing support matrices must keep these status phrases:
 - Do not say "complex Stirling certification", "complete certified asymptotic
   support", "automatic Stirling default", or "certified gamma-ratio
   asymptotics".
+- Do not say "global gamma certification", "complex gamma Stirling
+  certification", "custom certified gamma is active", or "automatic default
+  gamma selection".
 - Do not describe the parabolic-cylinder family as certified without the
   experimental formula-layer qualifier.
 - Do not imply that MCP expands the mathematical support surface.
