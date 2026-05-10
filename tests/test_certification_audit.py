@@ -63,6 +63,9 @@ ARB_ERFCINV_VIA_ERFINV_CLAIM = (
     "certified real inverse enclosure for erfcinv(x)=erfinv(1-x) using monotonicity of real erfc"
 )
 FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; formula audit in progress"
+STIRLING_LOGGAMMA_CLAIM = (
+    "certified positive-real Stirling loggamma enclosure with explicit asymptotic tail bound"
+)
 
 
 @pytest.mark.parametrize(
@@ -134,6 +137,18 @@ def test_pochhammer_certified_result_exposes_narrow_audited_claim():
     assert result.diagnostics["certificate_level"] == "direct_arb_finite_product"
     assert result.diagnostics["audit_status"] == "audited_direct"
     assert result.diagnostics["certification_claim"] == DIRECT_ARB_POCHHAMMER_CLAIM
+
+
+def test_stirling_loggamma_certified_result_exposes_custom_asymptotic_claim():
+    pytest.importorskip("flint")
+
+    result = certsf.loggamma("50", dps=50, mode="certified", method="stirling")
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "stirling_loggamma_positive_real"
+    assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
+    assert result.diagnostics["audit_status"] == "theorem_documented"
+    assert result.diagnostics["certification_claim"] == STIRLING_LOGGAMMA_CLAIM
 
 
 @pytest.mark.parametrize(

@@ -2,10 +2,12 @@
 
 The 0.x alpha line should make conservative certification claims. Release
 copy, package metadata, README text, examples, and GitHub release notes must
-help users distinguish three different things:
+help users distinguish four different things:
 
 - plain numerical values from SciPy or mpmath;
 - direct Arb primitive enclosures with alpha certification evidence; and
+- the narrow custom positive-real `loggamma` Stirling method with a documented
+  asymptotic tail bound; and
 - experimental formula-backed Arb enclosures with open formula audit work.
 
 ## Required Short Summary
@@ -31,7 +33,7 @@ Release-facing support matrices must keep these status phrases:
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | not yet |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"`; real `x >= 20`; not automatic default selection |
 
 ## Wording Rules
 
@@ -50,6 +52,11 @@ Release-facing support matrices must keep these status phrases:
 - Say that `pochhammer` is certified only through the finite product for
   integer `n >= 0`, with no analytic continuation in `n` and no simultaneous
   pole-limit claim.
+- Say that explicit `loggamma(x, mode="certified", method="stirling")` is an
+  alpha-certified custom asymptotic bound only for real `x >= 20`, and that it
+  is not automatic default selection.
+- Do not claim complex `loggamma` branch certification, real `x < 20`,
+  `x <= 0`, or gamma-ratio asymptotics for the Stirling method.
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.
@@ -84,6 +91,8 @@ Release-facing support matrices must keep these status phrases:
 - Say that unsupported certified domains fail cleanly as non-certified results.
 - Do not say "fully certified", "globally certified", "production-certified",
   or "certified for every continuation".
+- Do not say "fully certified loggamma", "global loggamma certification", or
+  "complete certified special functions".
 - Do not describe the parabolic-cylinder family as certified without the
   experimental formula-layer qualifier.
 - Do not imply that MCP expands the mathematical support surface.

@@ -5,6 +5,10 @@ from certsf.dispatcher import available_functions
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
+    '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
+    'explicit `method="stirling"`; real `x >= 20`; not automatic default selection |'
+)
 
 FROZEN_0_1_0_FUNCTIONS = (
     "gamma",
@@ -78,7 +82,7 @@ CURRENT_0_2_0_STATUS_ROWS = (
     ),
     "| `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |",
     "| MCP server | experimental tool interface |",
-    "| Custom Taylor/asymptotic methods | not yet |",
+    CURRENT_CUSTOM_ASYMPTOTIC_ROW,
 )
 
 FROZEN_0_1_0_SCOPE_ROWS = (
@@ -150,8 +154,10 @@ def test_readme_and_certification_docs_repeat_release_scope_statuses():
 
     assert "docs/certified_scope_0_1_0.md" in readme_text
     assert "docs/certified_scope_0_2_0.md" in readme_text
+    assert "docs/certified_scope_0_3_0.md" in readme_text
     assert "certified_scope_0_1_0.md" in certification_text
     assert "certified_scope_0_2_0.md" in certification_text
+    assert "certified_scope_0_3_0.md" in certification_text
     for row in CURRENT_0_2_0_STATUS_ROWS:
         assert row in readme_text
         assert row in certification_text

@@ -9,108 +9,206 @@ from .functions.gamma import beta, gamma, gamma_ratio, loggamma, loggamma_ratio,
 from .functions.parabolic_cylinder import pbdv, pcfd, pcfu, pcfv, pcfw
 
 
-def special_gamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return gamma(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_gamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return gamma(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_loggamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return loggamma(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_loggamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return loggamma(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_rgamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return rgamma(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_rgamma(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return rgamma(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_gamma_ratio(a: str, b: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return gamma_ratio(a, b, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_gamma_ratio(
+    a: str,
+    b: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return gamma_ratio(a, b, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_loggamma_ratio(a: str, b: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return loggamma_ratio(a, b, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_loggamma_ratio(
+    a: str,
+    b: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return loggamma_ratio(a, b, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_beta(a: str, b: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return beta(a, b, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_beta(a: str, b: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return beta(a, b, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pochhammer(a: str, n: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pochhammer(a, n, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pochhammer(
+    a: str,
+    n: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pochhammer(a, n, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erf(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erf(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erf(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erf(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erfc(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erfc(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erfc(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erfc(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erfcx(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erfcx(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erfcx(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erfcx(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erfi(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erfi(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erfi(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erfi(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_dawson(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return dawson(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_dawson(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return dawson(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erfinv(x: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erfinv(x, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erfinv(x: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erfinv(x, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_erfcinv(x: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return erfcinv(x, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_erfcinv(x: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return erfcinv(x, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return airy(z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_airy(z: str, dps: int = 50, mode: str = "auto", certify: bool = False, method: str | None = None):
+    return airy(z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_ai(z: str, derivative: int = 0, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return ai(z, derivative=derivative, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_ai(
+    z: str,
+    derivative: int = 0,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return ai(z, derivative=derivative, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_bi(z: str, derivative: int = 0, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return bi(z, derivative=derivative, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_bi(
+    z: str,
+    derivative: int = 0,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return bi(z, derivative=derivative, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_besselj(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return besselj(v, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_besselj(
+    v: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return besselj(v, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_bessely(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return bessely(v, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_bessely(
+    v: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return bessely(v, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_besseli(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return besseli(v, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_besseli(
+    v: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return besseli(v, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_besselk(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return besselk(v, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_besselk(
+    v: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return besselk(v, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pbdv(v: str, x: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pbdv(v, x, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pbdv(
+    v: str,
+    x: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pbdv(v, x, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pcfd(v: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pcfd(v, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pcfd(
+    v: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pcfd(v, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pcfu(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pcfu(a, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pcfu(
+    a: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pcfu(a, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pcfv(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pcfv(a, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pcfv(
+    a: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pcfv(a, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
-def special_pcfw(a: str, z: str, dps: int = 50, mode: str = "auto", certify: bool = False):
-    return pcfw(a, z, dps=dps, mode=mode, certify=certify).to_mcp_dict()
+def special_pcfw(
+    a: str,
+    z: str,
+    dps: int = 50,
+    mode: str = "auto",
+    certify: bool = False,
+    method: str | None = None,
+):
+    return pcfw(a, z, dps=dps, mode=mode, certify=certify, method=method).to_mcp_dict()
 
 
 _MCP_TOOLS = (

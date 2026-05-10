@@ -8,6 +8,10 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_SHORT_SUMMARY = "Alpha special-function wrappers with explicit certification diagnostics."
 REQUIRED_CITATION_TITLE = "certsf: Alpha special-function wrappers with explicit certification diagnostics"
 RELEASE_CLAIM_DOC = "docs/release_claims.md"
+CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
+    '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
+    'explicit `method="stirling"`; real `x >= 20`; not automatic default selection |'
+)
 HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
     "| `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",
     "| `airy`, `ai`, `bi` | alpha-certified, direct Arb primitive |",
@@ -32,7 +36,7 @@ CURRENT_RELEASE_STATUS_ROWS = (
     ),
     "| `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |",
     "| MCP server | experimental tool interface |",
-    "| Custom Taylor/asymptotic methods | not yet |",
+    CURRENT_CUSTOM_ASYMPTOTIC_ROW,
 )
 HISTORICAL_0_1_0_SCOPE_ROWS = (
     "| Gamma family | `gamma`, `loggamma`, `rgamma` | alpha-certified, direct Arb primitive |",
@@ -70,20 +74,26 @@ RELEASE_SURFACES = (
     "README.md",
     "CHANGELOG.md",
     "docs/release-0.1.0.md",
+    "docs/release-0.3.0.md",
     "docs/release_checklist.md",
     "docs/certification.md",
     "docs/certification_audit.md",
     "docs/certified_scope_0_1_0.md",
     "docs/certified_scope_0_2_0.md",
+    "docs/certified_scope_0_3_0.md",
     "docs/formula_audit.md",
+    "docs/stirling_loggamma.md",
     RELEASE_CLAIM_DOC,
 )
 RELEASE_COPY_SURFACES = tuple(path for path in RELEASE_SURFACES if path != RELEASE_CLAIM_DOC)
 FORBIDDEN_CLAIM_PATTERNS = (
     r"\bfully certified\b",
+    r"\bfully certified loggamma\b",
     r"\bglobally certified\b",
+    r"\bglobal loggamma certification\b",
     r"\bproduction[- ]certified\b",
     r"\bcertified for every continuation\b",
+    r"\bcomplete certified special functions\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) certified\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) broadly certified\b",
     r"\bfully certified parabolic-cylinder\b",

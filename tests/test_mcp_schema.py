@@ -43,6 +43,35 @@ def test_special_loggamma_ratio_returns_json_object_payload():
     assert isinstance(payload["diagnostics"], dict)
 
 
+def test_special_loggamma_stirling_method_returns_certified_mcp_payload():
+    pytest.importorskip("flint")
+
+    payload = mcp_server.special_loggamma("50", dps=50, mode="certified", method="stirling")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload["certified"] is True
+    assert payload["function"] == "loggamma"
+    assert payload["method"] == "stirling_loggamma"
+    assert payload["backend"] == "certsf+python-flint"
+    assert payload["diagnostics"]["selected_method"] == "stirling"
+    assert payload["diagnostics"]["certificate_scope"] == "stirling_loggamma_positive_real"
+
+
+def test_special_loggamma_arb_method_and_omission_preserve_mcp_payload_behavior():
+    explicit = mcp_server.special_loggamma("50", dps=50, mode="certified", method="arb")
+    omitted = mcp_server.special_loggamma("50", dps=50, mode="certified")
+    if _backend_is_unavailable_payload(explicit):
+        pytest.skip(explicit["diagnostics"]["error"])
+
+    assert explicit["certified"] is True
+    assert omitted["certified"] is True
+    assert explicit["method"] == omitted["method"] == "arb_ball"
+    assert explicit["backend"] == omitted["backend"] == "python-flint"
+    assert explicit["diagnostics"]["certificate_scope"] == "direct_arb_primitive"
+    assert omitted["diagnostics"]["certificate_scope"] == "direct_arb_primitive"
+
+
 def test_special_beta_returns_json_object_payload():
     payload = mcp_server.special_beta("3.2", "1.2", dps=50, mode="high_precision")
 
@@ -159,3 +188,7 @@ def test_mcp_server_stays_thin_adapter_without_backend_logic():
     assert "special.loggamma" not in source
     assert ".rgamma()" not in source
     assert ".to_mcp_dict()" in source
+
+
+def _backend_is_unavailable_payload(payload):
+    return not payload["certified"] and "python-flint is not installed" in payload["diagnostics"].get("error", "")

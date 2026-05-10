@@ -11,9 +11,11 @@ Certified successes must include:
 - `diagnostics["certificate_scope"]`: the scope listed below.
 - `diagnostics["certificate_level"]`: `direct_arb_primitive`,
   `direct_arb_finite_product`, `certified_real_root`,
-  `formula_audited_alpha`, or `formula_audited_experimental`.
+  `custom_asymptotic_bound`, `formula_audited_alpha`, or
+  `formula_audited_experimental`.
 - `diagnostics["audit_status"]`: either `audited_direct` or
-  `monotone_real_inverse` or `formula_identity` or `experimental_formula`.
+  `monotone_real_inverse` or `theorem_documented` or `formula_identity` or
+  `experimental_formula`.
 - `diagnostics["certification_claim"]`: concise wording for the level of claim.
 
 The certificate levels mean:
@@ -31,6 +33,10 @@ The certificate levels mean:
 - `certified_real_root`: Arb encloses a unique real root on a documented
   monotone real interval. The runtime diagnostics must identify the domain and
   root equation, and unsupported real or complex inputs must fail cleanly.
+- `custom_asymptotic_bound`: the wrapper evaluates a documented custom
+  asymptotic formula on a narrow domain, computes the finite part with Arb ball
+  arithmetic, and adds an explicit theorem-backed tail bound to the returned
+  absolute error bound.
 - `formula_audited_alpha`: Arb rigorously encloses a narrowly documented
   identity formula for an alpha wrapper. The runtime diagnostics must identify
   the formula and must not imply a broader algorithmic stability claim.
@@ -63,6 +69,7 @@ certificate level or promote
 | `direct_arb_loggamma_ratio` | `loggamma_ratio` | `direct_arb_primitive` | Arb `lgamma(a) - lgamma(b)` principal-branch difference; pole clean-failure tests; branch convention test; recurrence and composition identity checks | Gamma poles in either argument; simultaneous-pole limiting values; principal-log-of-ratio claims |
 | `direct_arb_beta` | `beta` | `direct_arb_primitive` | Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; symmetry and recurrence identity checks | Non-finite `Gamma(a)` or `Gamma(b)` targets; simultaneous pole interactions and limiting-value claims |
 | `direct_arb_pochhammer_product` | `pochhammer` | `direct_arb_finite_product` | Arb finite product `prod_{k=0}^{n-1}(a+k)`; special-value tests; zero-factor test; recurrence identity check; integer-domain rejection tests | Non-integer `n`; negative `n`; analytic continuation in `n`; simultaneous-pole limiting values; product paths above the documented term ceiling |
+| `stirling_loggamma_positive_real` | `loggamma` via explicit `method="stirling"` | `custom_asymptotic_bound` | Positive-real Stirling expansion with Bernoulli terms; Arb finite sum; explicit first-omitted-term tail bound; tests for `x=20,50,100,1000`; direct Arb containment; MCP parity; default-Arb preservation | Complex `z`; `x < 20`; `x <= 0`; non-finite input; principal-branch complex `loggamma`; gamma-ratio asymptotics; automatic default selection |
 | `direct_arb_erf` | `erf` | `direct_arb_primitive` | Direct Arb `erf` primitive; zero, oddness, complex sample, and external-reference containment tests | Non-finite Arb enclosures; custom asymptotic certification paths |
 | `direct_arb_erfc` | `erfc` | `direct_arb_primitive` | Direct Arb `erfc` primitive, or explicit Arb `1-erf` fallback with `formula="1-erf"`; zero, complement identity, complex sample, and external-reference containment tests | Non-finite Arb enclosures; unrecorded cancellation-prone fallback formulas; custom asymptotic certification paths |
 | `direct_arb_erfcx` | `erfcx` | `direct_arb_primitive` | Direct Arb `erfcx` primitive when exposed by python-flint; runtime scope and diagnostics tests preserve the direct path | Non-finite Arb enclosures; custom asymptotic certification paths |
@@ -113,6 +120,13 @@ The `direct_arb_pochhammer_product` scope uses finite-product wording:
 
 ```text
 certified Arb enclosure of finite product prod_{k=0}^{n-1}(a+k) for nonnegative integer n
+```
+
+The explicit positive-real Stirling `loggamma` scope uses custom-asymptotic
+wording:
+
+```text
+certified positive-real Stirling loggamma enclosure with explicit asymptotic tail bound
 ```
 
 The error-function scopes use narrow audited-direct wording:
