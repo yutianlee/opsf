@@ -515,11 +515,13 @@ The repository also includes:
   `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
   `examples/mcp_payload.py` for payload-first release examples.
 - `benchmarks/bench_gamma.py`, `benchmarks/bench_loggamma_methods.py`,
-  `benchmarks/analyze_loggamma_auto.py`, `benchmarks/bench_airy.py`,
+  `benchmarks/analyze_loggamma_auto.py`,
+  `benchmarks/summarize_loggamma_auto.py`, `benchmarks/bench_airy.py`,
   `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
   JSON-lines timing smoke benchmarks. The loggamma benchmarks compare direct
   Arb, explicit Stirling, explicit shifted Stirling, explicit certified-auto
   selection, high-precision mpmath, and fast SciPy paths without making a
-  default-method performance claim. The certified-auto analyzer is decision
-  support only; `method="certified_auto"` remains explicit and no
-  default-dispatch change is made.
+  default-method performance claim. The certified-auto analyzer and summarizer
+  are decision support only; `method="certified_auto"` remains explicit and no
+  default-dispatch change is made. A compact sample summary is checked in at
+  `docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`.

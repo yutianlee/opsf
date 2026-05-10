@@ -86,6 +86,16 @@ records unsupported explicit Stirling cases as structured failures. This is
 evidence gathering only: `certified_auto` remains explicit, and this document
 does not make any default-dispatch change.
 
+The summary helper
+[`benchmarks/summarize_loggamma_auto.py`](../benchmarks/summarize_loggamma_auto.py)
+reduces analyzer JSON-lines output into certified counts, selector choices,
+timing comparisons, and failure-pattern summaries. A compact generated sample
+is stored at
+[`docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`](benchmark_samples/loggamma_certified_auto_sample_summary.json).
+The current recommendation remains conservative: direct Arb stays the default
+certified `loggamma` method, `method="certified_auto"` stays explicit, and no
+default-dispatch change is made in this evidence PR.
+
 ## Validation Expectations
 
 Validation should confirm that:

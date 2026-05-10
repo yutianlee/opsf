@@ -98,6 +98,8 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcomplex Stirling certification\b",
     r"\bcomplete certified asymptotic support\b",
     r"\bautomatic Stirling default\b",
+    r"\bcertified_auto is default\b",
+    r"\bcertified_auto is now default\b",
     r"\bcertified gamma-ratio asymptotics\b",
     r"\bproduction[- ]certified\b",
     r"\bcertified for every continuation\b",

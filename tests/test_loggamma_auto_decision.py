@@ -1,3 +1,6 @@
+import json
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -41,6 +44,35 @@ def test_loggamma_auto_analysis_benchmark_schema_is_present():
         assert field in text
 
 
+def test_loggamma_auto_summary_script_summarizes_sample_schema():
+    script = ROOT / "benchmarks" / "summarize_loggamma_auto.py"
+    sample = ROOT / "docs" / "benchmark_samples" / "loggamma_certified_auto_sample.jsonl"
+
+    completed = subprocess.run(
+        [sys.executable, str(script), str(sample)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    summary = json.loads(completed.stdout)
+
+    assert script.is_file()
+    for field in (
+        "total_records",
+        "methods_seen",
+        "certified_counts_by_method",
+        "certified_auto_selected_method_counts",
+        "fastest_method_by_case",
+        "cases_stirling_failed_shifted_succeeded",
+    ):
+        assert field in summary
+    assert "certified_auto" in summary["methods_seen"]
+    assert any(
+        summary["certified_auto_selected_method_counts"].get(method, 0) > 0
+        for method in ("arb", "stirling", "stirling_shifted")
+    )
+
+
 def test_loggamma_auto_decision_docs_are_conservative_and_link_tooling():
     report = _read("docs/loggamma_certified_auto_decision.md")
     readme = _read("README.md")
@@ -48,10 +80,15 @@ def test_loggamma_auto_decision_docs_are_conservative_and_link_tooling():
 
     for text in (report, readme, release):
         assert "benchmarks/analyze_loggamma_auto.py" in text
+        assert "benchmarks/summarize_loggamma_auto.py" in text
         assert "loggamma_certified_auto_decision.md" in text
+        assert "loggamma_certified_auto_sample_summary.json" in text
     assert "`method=\"certified_auto\"` remains explicit only" in report
     assert "default certified `loggamma` remains the direct Arb path" in report
     assert "does not change runtime behavior" in report
+    assert "not sufficient to change the default" in report
+    assert "visible behavior change requiring a" in report
+    assert "For now, keep direct Arb as the default certified `loggamma` method" in report
     assert "does not recommend changing the default" in report
     assert "no certification for complex Stirling expansions" in report
     assert "no gamma-ratio asymptotics" in report
@@ -81,6 +118,18 @@ def test_loggamma_auto_sample_stays_compact_and_covers_representative_subset():
         '"auto_reason"',
     ):
         assert fragment in text
+
+
+def test_loggamma_auto_sample_summary_stays_compact_and_readable():
+    path = ROOT / "docs" / "benchmark_samples" / "loggamma_certified_auto_sample_summary.json"
+    summary = json.loads(path.read_text(encoding="utf-8"))
+
+    assert path.is_file()
+    assert summary["total_records"] == 32
+    assert "certified_auto" in summary["methods_seen"]
+    assert summary["cases_stirling_failed_shifted_succeeded"]
+    assert summary["certified_auto_selected_method_counts"]["arb"] > 0
+    assert summary["certified_auto_selected_method_counts"]["stirling"] > 0
 
 
 def _read(path: str) -> str:
