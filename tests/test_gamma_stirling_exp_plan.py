@@ -10,21 +10,19 @@ def _read(path: str) -> str:
     return (ROOT / path).read_text(encoding="utf-8")
 
 
-def test_gamma_stirling_exp_planning_doc_exists_and_is_inactive():
+def test_gamma_stirling_exp_doc_exists_and_records_active_explicit_scope():
     text = _read("docs/gamma_stirling_exp.md")
 
     assert 'method="stirling_exp"' in text
-    assert "planning note only" in text
-    assert "planned only" in text
-    assert "not active until an implementation" in text
-    assert "does not activate a runtime method" in text
+    assert "active explicit method" in text
     assert "does not change default dispatch" in text
+    assert "not automatic default selection" in text
 
 
-def test_gamma_stirling_exp_planning_doc_freezes_narrow_scope():
+def test_gamma_stirling_exp_doc_freezes_narrow_scope():
     text = _read("docs/gamma_stirling_exp.md")
 
-    assert "Planned domain: real `x >= 20`." in text
+    assert "Active domain: finite real `x >= 20`." in text
     assert 'certificate_scope="gamma_positive_real_stirling_exp"' in text
     assert 'certificate_level="custom_asymptotic_bound"' in text
     assert 'audit_status="theorem_documented"' in text
@@ -36,7 +34,7 @@ def test_gamma_stirling_exp_planning_doc_freezes_narrow_scope():
     assert "`experimental_formula`" in text
 
 
-def test_gamma_stirling_exp_planned_diagnostics_are_documented():
+def test_gamma_stirling_exp_diagnostics_are_documented():
     text = _read("docs/gamma_stirling_exp.md")
 
     for fragment in (
@@ -49,27 +47,32 @@ def test_gamma_stirling_exp_planned_diagnostics_are_documented():
         assert fragment in text
 
 
-def test_gamma_stirling_exp_is_not_registered_yet():
+def test_gamma_stirling_exp_is_registered_only_for_certified_gamma():
     method_ids = {
         method.method_id
         for method in available_methods()
         if method.function == "gamma" and method.mode == "certified"
     }
+    non_gamma_methods = {
+        (method.function, method.mode)
+        for method in available_methods()
+        if method.method_id == "stirling_exp" and method.function != "gamma"
+    }
 
-    assert "stirling_exp" not in method_ids
+    assert "stirling_exp" in method_ids
+    assert non_gamma_methods == set()
 
 
-def test_gamma_stirling_exp_planning_surfaces_are_linked():
+def test_gamma_stirling_exp_surfaces_are_linked():
     scope = _read("docs/certified_scope_0_3_0.md")
     release = _read("docs/release-0.3.0.md")
     changelog = _read("CHANGELOG.md")
 
-    assert "Planned custom gamma method" in scope
-    assert "planned only, not active until implementation lands" in scope
+    assert "Custom gamma method" in scope
+    assert "active explicit method" in scope
     assert "gamma_positive_real_stirling_exp" in scope
-    assert "Future Work: Positive-Real `gamma`" in release
-    assert "not implemented yet" in release
-    assert "no release claim is active yet" in release
+    assert "Positive-Real `gamma` via Loggamma Exponentiation" in release
+    assert "active explicit method" in release
     assert "gamma_stirling_exp.md" in release
-    assert "Planned positive-real `gamma(x)` custom certificate" in changelog
-    assert "Documentation only; no runtime behavior" in changelog
+    assert "explicit positive-real `gamma(x)` certificate" in changelog
+    assert "method=\"stirling_exp\"" in changelog

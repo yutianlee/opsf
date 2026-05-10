@@ -65,6 +65,19 @@ def test_loggamma_direct_arb_method_spec_records_audit_metadata():
     assert method.applicability_note == method.domain
 
 
+def test_gamma_stirling_exp_method_spec_records_custom_asymptotic_metadata():
+    method = METHOD_REGISTRY["gamma"]["certified"][1]
+
+    assert method.method_id == "stirling_exp"
+    assert method.certificate_scope == "gamma_positive_real_stirling_exp"
+    assert method.certificate_level == "custom_asymptotic_bound"
+    assert method.audit_status == "theorem_documented"
+    assert method.backend == "certsf+python-flint"
+    assert "x >= 20" in method.domain
+    assert "not automatic default selection" in method.applicability_note
+    assert "reflection formulas" in method.applicability_note
+
+
 def test_loggamma_stirling_method_spec_records_custom_asymptotic_metadata():
     method = METHOD_REGISTRY["loggamma"]["certified"][1]
 
@@ -133,10 +146,21 @@ def test_stirling_methods_are_active_only_for_explicit_certified_loggamma():
     assert METHOD_REGISTRY["loggamma"]["certified"][0] == REGISTRY["loggamma"]["certified"]
 
 
+def test_stirling_exp_method_is_active_only_for_explicit_certified_gamma():
+    active_gamma_methods = [
+        method for method in available_methods() if method.function == "gamma" and method.mode == "certified"
+    ]
+    stirling_exp_methods = [method for method in available_methods() if method.method_id == "stirling_exp"]
+
+    assert [method.method_id for method in active_gamma_methods] == ["arb", "stirling_exp"]
+    assert stirling_exp_methods == [METHOD_REGISTRY["gamma"]["certified"][1]]
+    assert METHOD_REGISTRY["gamma"]["certified"][0] == REGISTRY["gamma"]["certified"]
+
+
 def test_available_methods_exposes_auditable_method_specs_in_dispatch_order():
     methods = available_methods()
 
-    assert len(methods) == len(available_functions()) * 3 + 3
+    assert len(methods) == len(available_functions()) * 3 + 4
     assert methods[0] == REGISTRY["gamma"]["fast"]
     assert methods[1] == REGISTRY["gamma"]["high_precision"]
     assert methods[2] == REGISTRY["gamma"]["certified"]

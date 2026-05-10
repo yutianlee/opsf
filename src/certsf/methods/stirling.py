@@ -213,6 +213,240 @@ def stirling_loggamma_shifted(x: Any, *, dps: int = 50) -> SFResult:
         flint.ctx.prec = old_prec
 
 
+def _stirling_loggamma_ball(
+    x: Any,
+    *,
+    dps: int = 50,
+    shifted: bool | None = None,
+) -> dict[str, Any]:
+    """Return an internal Arb enclosure for positive-real ``loggamma(x)``.
+
+    The returned ball includes the finite-sum Arb radius and the explicit
+    positive-real Stirling tail bound. It is intentionally internal because the
+    public ``loggamma`` result contract exposes strings, while downstream
+    certified methods need the Arb ball before any nonlinear post-processing.
+    """
+
+    requested_dps = ensure_dps(dps)
+    x_text, domain_error = _positive_real_text(x)
+    if domain_error is not None:
+        return _loggamma_ball_unavailable(requested_dps, domain_error)
+
+    if shifted is None:
+        unshifted_estimate = estimate_stirling_terms_for_tolerance(x_text, dps=requested_dps)
+        shifted = not bool(unshifted_estimate.get("can_certify"))
+
+    if shifted:
+        return _stirling_loggamma_ball_shifted(x_text, requested_dps)
+    return _stirling_loggamma_ball_unshifted(x_text, requested_dps)
+
+
+def _stirling_loggamma_ball_unshifted(x_text: str, requested_dps: int) -> dict[str, Any]:
+    try:
+        import flint
+    except ImportError:  # pragma: no cover - optional dependency
+        return _loggamma_ball_unavailable(requested_dps, "python-flint is not installed")
+
+    bits = _working_bits(requested_dps)
+    old_prec = flint.ctx.prec
+    flint.ctx.prec = bits
+    try:
+        argument = flint.arb(x_text)
+        target_tolerance = flint.arb(10) ** (-(requested_dps + GUARD_DIGITS))
+        terms_used, tail_bound = _select_terms(flint, argument, target_tolerance)
+        if terms_used is None or tail_bound is None:
+            final_tail = _tail_bound(flint, argument, _MAX_TERMS)
+            return _loggamma_ball_unavailable(
+                requested_dps,
+                "Stirling loggamma tail bound did not reach the requested tolerance within the term cap.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={
+                    "working_precision_bits": bits,
+                    "terms_attempted": _MAX_TERMS,
+                    "final_tail_bound": _safe_positive_string(final_tail, requested_dps, flint),
+                    "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+                },
+            )
+
+        finite_ball = _stirling_sum(flint, argument, terms_used)
+        if not bool(finite_ball.is_finite()):
+            return _loggamma_ball_unavailable(
+                requested_dps,
+                "Stirling loggamma finite sum produced a non-finite enclosure.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={"working_precision_bits": bits, "terms_used": terms_used},
+            )
+
+        loggamma_ball = _widen_arb_ball(flint, finite_ball, tail_bound)
+        tail_bound_text = _safe_positive_string(tail_bound, requested_dps, flint)
+        diagnostics = _diagnostics(bits)
+        diagnostics.update(
+            {
+                "terms_used": terms_used,
+                "tail_bound": tail_bound_text,
+                "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+            }
+        )
+        return {
+            "certified": True,
+            "ball": loggamma_ball,
+            "finite_ball": finite_ball,
+            "terms_used": terms_used,
+            "tail_bound": tail_bound,
+            "tail_bound_text": tail_bound_text,
+            "abs_error_bound": _safe_positive_string(loggamma_ball.rad(), requested_dps, flint),
+            "loggamma_method_used": "stirling",
+            "working_dps": _bits_to_dps(bits),
+            "working_precision_bits": bits,
+            "diagnostics": diagnostics,
+        }
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _loggamma_ball_unavailable(
+            requested_dps,
+            f"Stirling loggamma method failed cleanly: {exc}",
+            working_dps=_bits_to_dps(bits),
+            diagnostics={"working_precision_bits": bits},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def _stirling_loggamma_ball_shifted(x_text: str, requested_dps: int) -> dict[str, Any]:
+    effective_dps = requested_dps + GUARD_DIGITS
+    try:
+        import flint
+    except ImportError:  # pragma: no cover - optional dependency
+        return _loggamma_ball_unavailable(
+            requested_dps,
+            "python-flint is not installed",
+            diagnostics={"guard_digits": GUARD_DIGITS, "effective_dps": effective_dps},
+        )
+
+    x_decimal = Decimal(x_text)
+    bits = _working_bits(effective_dps)
+    old_prec = flint.ctx.prec
+    flint.ctx.prec = bits
+    try:
+        argument = flint.arb(x_text)
+        target_tolerance = flint.arb(10) ** (-effective_dps)
+        shift, shift_policy, terms_used, tail_bound = _select_shifted_policy(
+            flint,
+            argument,
+            x_decimal,
+            effective_dps,
+            target_tolerance,
+        )
+        if terms_used is None or tail_bound is None:
+            final_shift = 0 if shift is None else shift
+            final_argument = argument + flint.arb(final_shift)
+            final_tail = _tail_bound_from_coefficient(flint, final_argument, _MAX_TERMS)
+            return _loggamma_ball_unavailable(
+                requested_dps,
+                "Shifted Stirling loggamma tail bound did not reach the requested tolerance within the shift/term cap.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={
+                    "working_precision_bits": bits,
+                    "guard_digits": GUARD_DIGITS,
+                    "effective_dps": effective_dps,
+                    "shift": final_shift,
+                    "shifted_argument": _decimal_string(x_decimal + Decimal(final_shift)),
+                    "shift_policy": shift_policy,
+                    "terms_attempted": _MAX_TERMS,
+                    "final_tail_bound": _safe_positive_string(final_tail, requested_dps, flint),
+                    "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+                    "coefficient_source": _coefficient_source(_MAX_TERMS + 1),
+                    "largest_bernoulli_used": 2 * _MAX_TERMS + 2,
+                },
+            )
+        assert shift is not None
+        assert terms_used is not None
+        assert tail_bound is not None
+
+        shifted_argument = argument + flint.arb(shift)
+        finite_ball = _stirling_sum_with_coefficients(flint, shifted_argument, terms_used)
+        for offset in range(shift):
+            finite_ball -= (argument + flint.arb(offset)).log()
+        if not bool(finite_ball.is_finite()):
+            return _loggamma_ball_unavailable(
+                requested_dps,
+                "Shifted Stirling loggamma finite sum produced a non-finite enclosure.",
+                working_dps=_bits_to_dps(bits),
+                diagnostics={
+                    "working_precision_bits": bits,
+                    "guard_digits": GUARD_DIGITS,
+                    "effective_dps": effective_dps,
+                    "shift": shift,
+                    "stirling_terms": terms_used,
+                },
+            )
+
+        loggamma_ball = _widen_arb_ball(flint, finite_ball, tail_bound)
+        tail_bound_text = _safe_positive_string(tail_bound, requested_dps, flint)
+        diagnostics = _shifted_diagnostics(bits, effective_dps)
+        diagnostics.update(
+            {
+                "shift": shift,
+                "shifted_argument": _decimal_string(x_decimal + Decimal(shift)),
+                "shift_policy": shift_policy,
+                "terms_used": terms_used,
+                "stirling_terms": terms_used,
+                "largest_bernoulli_used": 2 * terms_used + 2,
+                "coefficient_source": _coefficient_source(terms_used + 1),
+                "tail_bound": tail_bound_text,
+                "requested_tolerance": _safe_positive_string(target_tolerance, requested_dps, flint),
+            }
+        )
+        return {
+            "certified": True,
+            "ball": loggamma_ball,
+            "finite_ball": finite_ball,
+            "terms_used": terms_used,
+            "tail_bound": tail_bound,
+            "tail_bound_text": tail_bound_text,
+            "abs_error_bound": _safe_positive_string(loggamma_ball.rad(), requested_dps, flint),
+            "loggamma_method_used": "stirling_shifted",
+            "working_dps": _bits_to_dps(bits),
+            "working_precision_bits": bits,
+            "diagnostics": diagnostics,
+        }
+    except Exception as exc:  # pragma: no cover - depends on optional backend domains
+        return _loggamma_ball_unavailable(
+            requested_dps,
+            f"Shifted Stirling loggamma method failed cleanly: {exc}",
+            working_dps=_bits_to_dps(bits),
+            diagnostics={"working_precision_bits": bits, "guard_digits": GUARD_DIGITS, "effective_dps": effective_dps},
+        )
+    finally:
+        flint.ctx.prec = old_prec
+
+
+def _widen_arb_ball(flint, value, extra_radius):
+    total_radius = value.rad() + extra_radius
+    center = flint.arb(value.mid())
+    # python-flint 0.8 exposes interval union rather than direct radius
+    # mutation. The union of midpoint-total_radius and midpoint+total_radius
+    # is an Arb ball containing the finite expression plus the explicit tail.
+    return (center - total_radius).union(center + total_radius)
+
+
+def _loggamma_ball_unavailable(
+    requested_dps: int,
+    message: str,
+    *,
+    working_dps: int | None = None,
+    diagnostics: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    result_diagnostics = {"mode": "certified", "error": message, "fallback": []}
+    if diagnostics is not None:
+        result_diagnostics.update(diagnostics)
+    return {
+        "certified": False,
+        "error": message,
+        "working_dps": requested_dps if working_dps is None else working_dps,
+        "diagnostics": result_diagnostics,
+    }
+
+
 def _positive_real_text(value: Any) -> tuple[str, str | None]:
     if isinstance(value, complex):
         return "", "Stirling loggamma is certified only for real x >= 20; complex inputs are excluded."

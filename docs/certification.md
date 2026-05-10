@@ -24,9 +24,9 @@ certified surface remains archived in
 ## 0.3.0 Development Certified Scope
 
 The 0.3.0 development line keeps the 0.2 public wrapper surface and adds
-explicit custom asymptotic methods for positive-real `loggamma`. Default
-certified `loggamma` remains the direct Arb primitive path. The current status
-matrix is:
+explicit custom asymptotic methods for positive-real `loggamma` and
+positive-real `gamma`. Default certified `loggamma` and default certified
+`gamma` remain the direct Arb primitive paths. The current status matrix is:
 
 | Area | Release status |
 | --- | --- |
@@ -36,7 +36,7 @@ matrix is:
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Result Contract
 
@@ -45,7 +45,8 @@ Certified results set:
 - `certified=True`
 - `backend="python-flint"`
 - `method="arb_ball"`, `method="stirling_loggamma"`,
-  `method="stirling_shifted_loggamma"`, or a documented Arb formula method
+  `method="stirling_shifted_loggamma"`, `method="stirling_exp_gamma"`, or a
+  documented Arb formula method
 - `abs_error_bound` to a rigorous absolute radius
 - `diagnostics["certificate_scope"]` to one of the scopes below
 - `diagnostics["certificate_level"]` to `direct_arb_primitive` for direct Arb
@@ -92,6 +93,10 @@ methods only and do not replace the default direct Arb path. Explicit
 `loggamma(x, method="certified_auto")` is also certified-mode only; it may
 select direct Arb or one of those positive-real Stirling methods, but it is not
 used for omitted-method calls or `method="auto"`.
+For explicit `gamma(x, method="stirling_exp")`, certified mode additionally
+supports finite real `x >= 20` by exponentiating a certified positive-real
+`loggamma` Arb enclosure. This method is explicit only and does not replace the
+default direct Arb path.
 
 Backend primitive:
 `arb/acb.gamma`, `arb/acb.lgamma`, and `arb/acb.rgamma`. The explicit
@@ -101,6 +106,10 @@ bound. The explicit `loggamma(method="stirling_shifted")` path applies the Arb
 recurrence `loggamma(x)=loggamma(x+r)-sum(log(x+j))`, evaluates the shifted
 finite Stirling sum with Arb ball arithmetic, and adds the same documented
 tail bound at the shifted argument. The certified
+`gamma(method="stirling_exp")` path widens the internal positive-real
+`loggamma` Arb ball by the explicit tail bound and evaluates `exp` using Arb
+ball arithmetic.
+The certified
 `gamma_ratio` backend evaluates `Gamma(a) * rgamma(b)` using Arb gamma
 primitives rather than dividing by `Gamma(b)`. The certified
 `loggamma_ratio` backend evaluates Arb `lgamma(a) - lgamma(b)`. The certified
@@ -119,6 +128,9 @@ an exact certified zero when a product factor is exactly zero.
 `loggamma(method="stirling")` and `loggamma(method="stirling_shifted")` return
 midpoint strings plus conservative absolute bounds including the Arb
 finite-expression radius and the explicit asymptotic tail bound.
+`gamma(method="stirling_exp")` returns a midpoint string plus a conservative
+absolute bound for `exp(L)` after the certified `loggamma` enclosure `L` has
+been widened by the explicit positive-real Stirling tail.
 
 Branch convention:
 `loggamma` follows the principal branch used by Arb. `loggamma_ratio` is the
@@ -142,6 +154,9 @@ subtracting Arb logs of the recurrence factors. Method omission and
 `loggamma(x, method="certified_auto")` evaluates no new formula itself; it
 selects direct Arb for unsupported Stirling domains and otherwise selects a
 custom method only when its documented tail bound certifies the request.
+`gamma(x, method="stirling_exp")` is evaluated as
+`exp(loggamma_enclosure(x))` only for finite real `x >= 20`. Method omission
+and `method="auto"` continue to use the direct Arb primitive in certified mode.
 
 Known exclusions:
 `gamma` and `loggamma` at poles return non-certified failures because the
@@ -158,6 +173,9 @@ limiting values not covered by the finite-product zero-factor proof.
 clean non-certified failures for complex inputs, non-finite input, `x < 20`,
 `x <= 0`, principal-branch complex `loggamma` requests, and gamma-ratio
 asymptotics.
+`gamma(method="stirling_exp")` returns clean non-certified failures for complex
+inputs, non-finite input, `x < 20`, `x <= 0`, reflection-formula requests,
+near-pole behavior, gamma-ratio asymptotics, and beta asymptotics.
 
 Validation tests:
 pole behavior, principal-branch checks on the negative real axis, gamma-ratio
@@ -169,6 +187,9 @@ behavior, and rejected certified domains. Stirling-loggamma tests cover
 positive-real samples, Arb-reference containment, rejected inputs, MCP parity,
 coefficient-table exactness, shifted recurrence policy, and preservation of
 direct Arb default selection.
+Gamma Stirling-exp tests cover positive-real samples, Arb-reference
+containment, rejected inputs, MCP parity, and preservation of direct Arb
+default selection.
 
 Certificate scope:
 `direct_arb_primitive` for `gamma`, `loggamma`, and `rgamma`; the narrow
@@ -182,6 +203,9 @@ positive-real Stirling methods for `loggamma` use
 The explicit `method="certified_auto"` selector preserves the selected
 backend's result method and certificate scope, and adds selector diagnostics
 without creating a new mathematical certificate scope.
+The explicit custom positive-real gamma method uses
+`gamma_positive_real_stirling_exp`, recorded through
+`method="stirling_exp_gamma"`.
 
 ## Error-Function Family
 

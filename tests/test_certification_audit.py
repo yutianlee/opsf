@@ -66,6 +66,7 @@ FORMULA_CLAIM = "certified Arb enclosure of the implemented documented formula; 
 STIRLING_LOGGAMMA_CLAIM = (
     "certified positive-real Stirling loggamma enclosure with explicit asymptotic tail bound"
 )
+GAMMA_STIRLING_EXP_CLAIM = "certified positive-real gamma enclosure via certified loggamma exponentiation"
 
 
 @pytest.mark.parametrize(
@@ -149,6 +150,18 @@ def test_stirling_loggamma_certified_result_exposes_custom_asymptotic_claim():
     assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
     assert result.diagnostics["audit_status"] == "theorem_documented"
     assert result.diagnostics["certification_claim"] == STIRLING_LOGGAMMA_CLAIM
+
+
+def test_gamma_stirling_exp_certified_result_exposes_custom_asymptotic_claim():
+    pytest.importorskip("flint")
+
+    result = certsf.gamma("20", dps=50, mode="certified", method="stirling_exp")
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "gamma_positive_real_stirling_exp"
+    assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
+    assert result.diagnostics["audit_status"] == "theorem_documented"
+    assert result.diagnostics["certification_claim"] == GAMMA_STIRLING_EXP_CLAIM
 
 
 @pytest.mark.parametrize(

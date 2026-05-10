@@ -1,8 +1,8 @@
 # certsf 0.3.0 Planning
 
-`v0.3.0` is the first `certsf` line with a custom certified asymptotic method.
-It keeps the 0.2 public special-function wrapper surface and adds an explicit
-positive-real `loggamma` Stirling methods behind method registry v2.
+`v0.3.0` is the first `certsf` line with custom certified asymptotic methods.
+It keeps the 0.2 public special-function wrapper surface and adds explicit
+positive-real `loggamma` and `gamma` methods behind method registry v2.
 
 The implementation PRs did not change package version metadata, did not change
 default method selection, and did not alter existing certified results for
@@ -34,14 +34,19 @@ The v0.3.0 line includes:
   without changing omitted-method or `method="auto"` dispatch, using
   preselection diagnostics to avoid unnecessary full custom candidate
   evaluations;
+- explicit `gamma(x, mode="certified", method="stirling_exp")` for finite real
+  `x >= 20`, using a certified positive-real `loggamma` Arb enclosure and Arb
+  exponentiation;
 - `certificate_scope="stirling_loggamma_positive_real"`;
+- `certificate_scope="gamma_positive_real_stirling_exp"`;
 - `certificate_level="custom_asymptotic_bound"`; and
 - `audit_status="theorem_documented"`.
 
-The Stirling, shifted Stirling, and certified-auto selector are additional
-registered methods for the existing public `loggamma` wrapper. They are not
-new public special-function wrappers and are not automatic default selection.
-Default certified `loggamma` remains the existing direct Arb path.
+The Stirling, shifted Stirling, certified-auto selector, and Stirling-exp
+gamma method are additional registered methods for existing public wrappers.
+They are not new public special-function wrappers and are not automatic
+default selection. Default certified `loggamma` and default certified `gamma`
+remain the existing direct Arb paths.
 
 ## Non-Goals
 
@@ -56,25 +61,26 @@ asymptotics.
 
 The v0.3.0 line does not make a broad complete-certification claim for the
 package, for all `loggamma` inputs, or for every special-function family. The
-only custom-certified alpha scope is the positive-real Stirling `loggamma`
-methods documented in [`stirling_loggamma.md`](stirling_loggamma.md).
+only custom-certified alpha scopes are the positive-real Stirling `loggamma`
+methods documented in [`stirling_loggamma.md`](stirling_loggamma.md) and the
+positive-real `gamma` method documented in
+[`gamma_stirling_exp.md`](gamma_stirling_exp.md).
 
-## Future Work: Positive-Real `gamma`
+## Positive-Real `gamma` via Loggamma Exponentiation
 
-The next custom-method candidate is positive-real `gamma(x)` via certified
-`loggamma` exponentiation. The planned explicit method name is
+The active explicit positive-real `gamma(x)` method uses certified `loggamma`
+exponentiation. The explicit method name is
 `gamma(x, mode="certified", method="stirling_exp", dps=...)` for finite real
-`x >= 20`. The planned certificate scope is
+`x >= 20`. The certificate scope is
 `gamma_positive_real_stirling_exp`, with certificate level
 `custom_asymptotic_bound` and audit status `theorem_documented`.
 
-This is not implemented yet, no release claim is active yet, and no default
-dispatch behavior changes in this planning note. The future method must use a
-rigorous positive-real `loggamma` enclosure and Arb exponentiation, and the
-returned `gamma` enclosure must account for both finite-expression Arb radius
-and the propagated explicit loggamma tail bound.
+This is an active explicit method only; no default dispatch behavior changes.
+The method uses a rigorous positive-real `loggamma` enclosure and Arb
+exponentiation, and the returned `gamma` enclosure accounts for both
+finite-expression Arb radius and the propagated explicit loggamma tail bound.
 
-The planned method excludes complex `gamma`, real `x < 20`, real `x <= 0`,
+The method excludes complex `gamma`, real `x < 20`, real `x <= 0`,
 reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, and beta
 asymptotics. See [`gamma_stirling_exp.md`](gamma_stirling_exp.md).
 
@@ -90,8 +96,8 @@ The line includes:
 - [`loggamma_certified_auto_decision.md`](loggamma_certified_auto_decision.md),
   which records decision support and evidence-gathering notes for any later
   consideration of default certified `loggamma` method selection;
-- [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records a planned
-  inactive positive-real `gamma` method candidate and its exclusions; and
+- [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records the active
+  explicit positive-real `gamma` method and its exclusions; and
 - [`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), which records the
   prerelease plan for packaging the explicit `certified_auto` preselection
   optimization with no default-dispatch change.
@@ -132,7 +138,11 @@ Validation should confirm that:
   positive-real `loggamma` only for real `x >= 20`;
 - explicit `method="certified_auto"` may select direct Arb or a positive-real
   Stirling method, while preserving the selected backend's certificate scope;
+- explicit `method="stirling_exp"` certifies `gamma` only for finite real
+  `x >= 20`;
 - default certified `loggamma` and explicit `method="arb"` continue to use the
+  existing direct Arb path;
+- default certified `gamma` and explicit `method="arb"` continue to use the
   existing direct Arb path;
 - unsupported domains and unsupported modes fail cleanly rather than falling
   back to mpmath in certified mode;

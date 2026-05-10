@@ -1,13 +1,13 @@
 # Certified Scope for 0.3.0
 
 This document records the v0.3.0 certified-scope direction. It keeps the
-current 0.2.0 public wrapper list, adds an active custom-certified-method row
-for explicit positive-real `loggamma`, and records one planned inactive gamma
-method row for later implementation work.
+current 0.2.0 public wrapper list and adds active custom-certified-method rows
+for explicit positive-real `loggamma` and explicit positive-real `gamma`.
 
 The published 0.2.0 surface remains recorded in
 [`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). This document does not
-broaden package-wide, loggamma-wide, or parabolic-cylinder certification claims.
+broaden package-wide, gamma-family-wide, loggamma-wide, or
+parabolic-cylinder certification claims.
 
 ## Release Status Matrix
 
@@ -21,7 +21,7 @@ broaden package-wide, loggamma-wide, or parabolic-cylinder certification claims.
 | MCP server | `certsf.mcp_server` tools for the current wrappers | experimental tool interface |
 | Method registry v2 | existing Python wrappers with optional `method=...` selection | infrastructure active; default selection unchanged |
 | Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
-| Planned custom gamma method | positive-real `gamma` via certified `loggamma` exponentiation | planned only, not active until implementation lands; future explicit `method="stirling_exp"` only; planned domain real `x >= 20`; no default dispatch change |
+| Custom gamma method | positive-real `gamma` via certified `loggamma` exponentiation | active explicit method `method="stirling_exp"` only; alpha-certified custom asymptotic bound for finite real `x >= 20`; no default dispatch change |
 
 ## Current Function List
 
@@ -82,25 +82,26 @@ This row does not add a public wrapper, does not replace direct Arb primitive
 certification, and does not claim support for complex `loggamma`, branch-cut
 behavior, `x < 20`, `x <= 0`, or gamma-ratio asymptotics.
 
-## Planned Gamma Method Row
+## Custom Gamma Method Row
 
-The planned custom gamma row is inactive. It records a future candidate method
-for the existing `gamma` wrapper:
+The custom gamma row is active only for the existing `gamma` wrapper and the
+explicit method:
 
-- future selector: explicit `mode="certified", method="stirling_exp"`;
+- selector: explicit `mode="certified", method="stirling_exp"`;
 - target: positive-real `gamma(x)`;
-- planned domain: finite real `x >= 20`;
-- planned reduction: obtain a certified positive-real `loggamma` enclosure and
-  exponentiate it using Arb ball arithmetic;
-- planned certificate scope: `gamma_positive_real_stirling_exp`;
-- planned certificate level: `custom_asymptotic_bound`;
-- planned audit status: `theorem_documented`;
+- domain: finite real `x >= 20`;
+- reduction: obtain a certified positive-real `loggamma` enclosure, widen it
+  by the explicit Stirling/loggamma tail bound, and exponentiate it using Arb
+  ball arithmetic;
+- certificate scope: `gamma_positive_real_stirling_exp`;
+- certificate level: `custom_asymptotic_bound`;
+- audit status: `theorem_documented`;
+- runtime method field: `stirling_exp_gamma`;
 - default status: not automatic default selection.
 
-This planned row is documentation only. It does not add a registry entry, does
-not activate custom-certified `gamma`, and does not change direct Arb as the
-default certified `gamma` path. It excludes complex `gamma`, real `x < 20`,
-real `x <= 0`, reflection-formula paths, near-pole behavior, gamma-ratio
+This active explicit method does not change direct Arb as the default
+certified `gamma` path. It excludes complex `gamma`, real `x < 20`, real
+`x <= 0`, reflection-formula paths, near-pole behavior, gamma-ratio
 asymptotics, beta asymptotics, and parabolic-cylinder promotion.
 
 ## Scope Boundaries
