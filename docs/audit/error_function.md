@@ -166,8 +166,8 @@ available. The fallback uses `certificate_scope="arb_erfcinv_via_erfinv"`,
 `domain="real_x_in_open_interval_0_2"`, and `formula="erfinv(1-x)"`.
 
 Release hygiene:
-`pypi-smoke.yml` defaults to `0.3.0a3` after the published
-`v0.3.0-alpha.3` prerelease and post-release smoke verification. The smoke
+`pypi-smoke.yml` defaults to `0.3.0a4` after the published
+`v0.3.0-alpha.4` prerelease and post-release smoke verification. The smoke
 workflow still covers `erf`, `erfc`,
 `erfcinv`, `erfcx`, `erfi`, `erfinv`, and `dawson` in base and certified
 Python API smoke calls, plus certified `special_erf`, `special_erfc`,

@@ -126,7 +126,7 @@ DOC_EXPECTATIONS = {
         "Certified mode rejects `x = -1`, `x = 1`, real `x < -1`, real `x > 1`, and",
         "`x = 0`, `x = 2`, real `x < 0`, real `x > 2`, and complex inputs",
         "never fall back to mpmath while",
-        "`pypi-smoke.yml` defaults to `0.3.0a3`",
+        "`pypi-smoke.yml` defaults to `0.3.0a4`",
         "No public-wrapper, backend-formula, package-version, gamma-family, existing",
     ),
     "docs/dawson.md": (
@@ -151,7 +151,7 @@ DOC_EXPECTATIONS = {
         "`special_erfcinv`",
         "Faddeeva wrapper",
         "No custom asymptotic or Taylor certification path",
-        "`pypi-smoke.yml` defaults to `0.3.0a3`",
+        "`pypi-smoke.yml` defaults to `0.3.0a4`",
         "certified `special_erf`",
         "`special_erfcinv`, `special_erfcx`, `special_erfi`, `special_erfinv`, and",
         "`special_dawson` calls in the MCP-certified smoke job",
@@ -471,8 +471,8 @@ def test_external_reference_fixture_covers_error_function_surface():
 def test_pypi_smoke_covers_error_function_release_surface():
     text = _read(".github/workflows/pypi-smoke.yml")
 
-    assert 'default: "0.3.0a3"' in text
-    assert "inputs.version || '0.3.0a3'" in text
+    assert 'default: "0.3.0a4"' in text
+    assert "inputs.version || '0.3.0a4'" in text
     assert 'erf("1.0", mode="fast"' in text
     assert 'erfc("1.0", mode="fast"' in text
     assert 'erfcinv("0.5", mode="fast"' in text
@@ -531,8 +531,8 @@ def test_release_policy_and_pypi_smoke_final_guardrails_remain_current():
     smoke = _read(".github/workflows/pypi-smoke.yml")
     policy = _read("docs/release_policy.md")
 
-    assert 'default: "0.3.0a3"' in smoke
-    assert "inputs.version || '0.3.0a3'" in smoke
+    assert 'default: "0.3.0a4"' in smoke
+    assert "inputs.version || '0.3.0a4'" in smoke
     assert "Routine feature alpha releases may skip TestPyPI" in policy
     assert "The `publish-testpypi` workflow must remain `workflow_dispatch` only." in policy
 

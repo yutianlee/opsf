@@ -139,6 +139,25 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - [ ] `python benchmarks/summarize_loggamma_auto.py docs/benchmark_samples/loggamma_certified_auto_sample.jsonl`
   runs.
 
+Post-release verification note:
+
+- Git tag `v0.3.0-alpha.4` points at
+  `8f23c6df32a065fc5e9aa8e702dc68fcefe2d094`.
+- GitHub release `v0.3.0-alpha.4` is marked prerelease and is not a draft.
+- TestPyPI staging was skipped under `release_policy.md` because this was a
+  routine feature alpha without packaging, dependency, or workflow-risk changes.
+- Real PyPI publish run `25661919365` passed and PyPI confirms
+  `certsf 0.3.0a4`.
+- Final `pypi-smoke` run `25663130452` passed against `0.3.0a4` across base,
+  certified, and MCP-certified install paths on Python 3.10, 3.11, and 3.12.
+- PyPI edge-cache propagation failures: none observed for `0.3.0a4`.
+- Wheel SHA256:
+  `e67e37b5c038ce048755d9471b5b008ebf461003cee64ecd2733b91dd7befc9f`
+- sdist SHA256:
+  `a49cf1b3c71047b3669216b2250a8f4d212d10e43d9f57208649d3203775d1e7`
+- Full evidence is recorded in
+  [`post_release_verification.md`](post_release_verification.md).
+
 ## v0.3.0-alpha.3 Checklist
 
 - [ ] `pyproject.toml` version is `0.3.0a3`.
