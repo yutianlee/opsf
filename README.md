@@ -11,6 +11,8 @@ error bounds, and diagnostics explaining how the result was produced.
 The certification scope lives in [`docs/certification.md`](docs/certification.md);
 the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
+the 0.3 custom-method audit lives in
+[`docs/v0_3_custom_method_audit.md`](docs/v0_3_custom_method_audit.md);
 the active 0.3.0 development scope lives in
 [`docs/certified_scope_0_3_0.md`](docs/certified_scope_0_3_0.md), and the
 published 0.2.0 support matrix lives in
@@ -266,7 +268,9 @@ positive-real `loggamma` Arb enclosure. It records
 `method="stirling_exp_gamma"`. It does not certify complex `gamma`,
 reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, or beta
 asymptotics, and it is not selected by default. See
-[`docs/gamma_stirling_exp.md`](docs/gamma_stirling_exp.md).
+[`docs/gamma_stirling_exp.md`](docs/gamma_stirling_exp.md) and the
+0.3 custom-method audit in
+[`docs/v0_3_custom_method_audit.md`](docs/v0_3_custom_method_audit.md).
 
 ```python
 from certsf import beta
@@ -472,6 +476,9 @@ The repository also includes:
 - `docs/release_claims.md` for conservative alpha release claim wording.
 - `docs/certification_audit.md` for scope-level certification evidence and
   remaining audit gates.
+- `docs/v0_3_custom_method_audit.md` for the explicit 0.3 custom-method audit
+  covering `loggamma` Stirling methods, `certified_auto`, and
+  `gamma(method="stirling_exp")`.
 - `docs/audit/` for family-level certification checklists.
 - `docs/gamma_ratio.md` for gamma-ratio pole policy and certified-backend
   rationale.
@@ -537,16 +544,17 @@ The repository also includes:
 - `examples/gamma_certified.py`, `examples/airy_components.py`,
   `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
   `examples/mcp_payload.py` for payload-first release examples.
-- `benchmarks/bench_gamma.py`, `benchmarks/bench_loggamma_methods.py`,
-  `benchmarks/analyze_loggamma_auto.py`,
+- `benchmarks/bench_gamma.py`, `benchmarks/bench_gamma_methods.py`,
+  `benchmarks/bench_loggamma_methods.py`, `benchmarks/analyze_loggamma_auto.py`,
   `benchmarks/summarize_loggamma_auto.py`, `benchmarks/bench_airy.py`,
   `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
-  JSON-lines timing smoke benchmarks. The loggamma benchmarks compare direct
-  Arb, explicit Stirling, explicit shifted Stirling, explicit certified-auto
-  selection, high-precision mpmath, and fast SciPy paths without making a
-  default-method performance claim. The explicit certified-auto selector uses
-  preselection diagnostics to avoid unnecessary custom candidate evaluations,
-  but it remains decision support only; `method="certified_auto"` remains
-  explicit and no default-dispatch change is made. A compact sample summary is
-  checked in at
+  JSON-lines timing smoke benchmarks. The gamma/loggamma custom-method
+  benchmarks compare direct Arb, explicit custom methods, high-precision
+  mpmath, and fast SciPy paths without making a default-method performance
+  claim. The explicit certified-auto selector uses preselection diagnostics to
+  avoid unnecessary custom candidate evaluations, but it remains decision
+  support only; `method="certified_auto"` remains explicit and no
+  default-dispatch change is made. Direct Arb remains the default certified
+  `gamma` and `loggamma` path. A compact loggamma sample summary is checked in
+  at
   `docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`.

@@ -20,6 +20,8 @@ alpha certified surface remains recorded in
 [`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). The frozen 0.1.0
 certified surface remains archived in
 [`certified_scope_0_1_0.md`](certified_scope_0_1_0.md).
+The explicit 0.3 custom-method audit is recorded in
+[`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md).
 
 ## 0.3.0 Development Certified Scope
 
@@ -189,7 +191,10 @@ coefficient-table exactness, shifted recurrence policy, and preservation of
 direct Arb default selection.
 Gamma Stirling-exp tests cover positive-real samples, Arb-reference
 containment, rejected inputs, MCP parity, and preservation of direct Arb
-default selection.
+default selection. The custom-method audit in
+[`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md) summarizes the
+four active explicit paths and keeps their default-dispatch and exclusion
+boundaries visible.
 
 Certificate scope:
 `direct_arb_primitive` for `gamma`, `loggamma`, and `rgamma`; the narrow

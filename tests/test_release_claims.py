@@ -91,6 +91,7 @@ RELEASE_SURFACES = (
     "docs/gamma_stirling_exp.md",
     "docs/loggamma_certified_auto_decision.md",
     "docs/stirling_loggamma.md",
+    "docs/v0_3_custom_method_audit.md",
     RELEASE_CLAIM_DOC,
 )
 RELEASE_COPY_SURFACES = tuple(path for path in RELEASE_SURFACES if path != RELEASE_CLAIM_DOC)
@@ -118,6 +119,7 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcomplete certified special functions\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) certified\b",
     r"\bparabolic-cylinder (family|functions?) (is|are) broadly certified\b",
+    r"\bbroad parabolic-cylinder certification\b",
     r"\bfully certified parabolic-cylinder\b",
     r"\bproduction[- ]certified parabolic-cylinder\b",
     r"\bcomplete certified parabolic-cylinder support\b",
@@ -272,8 +274,18 @@ def test_release_surfaces_do_not_use_overbroad_certification_claims():
 def test_forbidden_stirling_claim_patterns_match_lowercase_phrases():
     phrases = (
         "automatic stirling default",
+        "automatic default gamma selection",
+        "fully certified loggamma",
+        "global loggamma certification",
+        "global gamma certification",
         "complex stirling certification",
         "complex gamma stirling certification",
+        "reflection formula is certified",
+        "certified reflection formula",
+        "certified gamma-ratio asymptotics",
+        "certified beta asymptotics",
+        "complete certified asymptotic support",
+        "broad parabolic-cylinder certification",
     )
 
     for phrase in phrases:
