@@ -76,3 +76,23 @@ def test_gamma_stirling_exp_surfaces_are_linked():
     assert "gamma_stirling_exp.md" in release
     assert "explicit positive-real `gamma(x)` certificate" in changelog
     assert "method=\"stirling_exp\"" in changelog
+
+
+def test_pypi_smoke_covers_gamma_stirling_exp_method():
+    text = _read(".github/workflows/pypi-smoke.yml")
+
+    for fragment in (
+        'gamma("20", mode="certified", method="stirling_exp", dps=50)',
+        'gamma("20", mode="certified", method="stirling_exp", dps=100)',
+        'special_gamma("20", mode="certified", method="stirling_exp", dps=50)',
+        'result.method == "stirling_exp_gamma"',
+        'gamma_stirling_payload["method"] == "stirling_exp_gamma"',
+        '"selected_method"] == "stirling_exp"',
+        '"certificate_scope"] == "gamma_positive_real_stirling_exp"',
+        '"loggamma_method_used"] in {"stirling", "stirling_shifted"}',
+        '"loggamma_abs_error_bound" in result.diagnostics',
+        '"exp_radius" in result.diagnostics',
+        '"propagated_error_bound" in result.diagnostics',
+        'result.backend != "mpmath"',
+    ):
+        assert fragment in text
