@@ -1,5 +1,7 @@
 import json
+from importlib import import_module
 from pathlib import Path
+from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,6 +62,9 @@ def test_gamma_methods_benchmark_schema_is_present():
     text = path.read_text(encoding="utf-8")
 
     assert path.is_file()
+    assert "pass_dps" not in text
+    assert 'call_kwargs["dps"] = dps' in text
+    assert "gamma(x, **call_kwargs)" in text
     assert 'method": "stirling_exp"' in text
     for field in (
         '"function"',
@@ -83,6 +88,39 @@ def test_gamma_methods_benchmark_schema_is_present():
         '"error"',
     ):
         assert field in text
+
+
+def test_gamma_methods_benchmark_passes_requested_dps_for_every_case(monkeypatch):
+    benchmark = import_module("benchmarks.bench_gamma_methods")
+    calls: list[dict[str, Any]] = []
+
+    class DummyResult:
+        function = "gamma"
+        method = "dummy_method"
+        backend = "dummy_backend"
+        certified = True
+        abs_error_bound = None
+        rel_error_bound = None
+        terms_used = None
+        diagnostics: dict[str, Any] = {}
+
+    def fake_gamma(x: str, **kwargs: Any) -> DummyResult:
+        calls.append({"x": x, **kwargs})
+        return DummyResult()
+
+    monkeypatch.setattr(benchmark, "gamma", fake_gamma)
+
+    for mode, method_requested, kwargs in benchmark.METHOD_CASES:
+        record = benchmark.run_case(
+            x="20",
+            dps=100,
+            mode=mode,
+            method_requested=method_requested,
+            kwargs=kwargs,
+        )
+
+        assert record["dps"] == 100
+        assert calls[-1]["dps"] == 100
 
 
 def test_gamma_methods_benchmark_sample_is_compact_and_real():
