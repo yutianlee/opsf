@@ -82,4 +82,4 @@ python benchmarks/bench_loggamma_methods.py
 
 Release-claim guardrails must continue to forbid broad `loggamma`, complex
 Stirling, automatic selection of Stirling methods, gamma-ratio asymptotic, and
-broad parabolic-cylinder certification claims.
+expanded parabolic-cylinder certification claims.

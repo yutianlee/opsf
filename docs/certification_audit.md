@@ -48,6 +48,7 @@ The certificate levels mean:
 Family-level checklists:
 
 - [`audit/gamma.md`](audit/gamma.md)
+- [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md)
 - [`audit/error_function.md`](audit/error_function.md)
 - [`audit/airy.md`](audit/airy.md)
 - [`audit/bessel.md`](audit/bessel.md)

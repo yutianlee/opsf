@@ -112,6 +112,8 @@ Release-facing support matrices must keep these status phrases:
 - Do not say "global gamma certification", "complex gamma Stirling
   certification", "custom certified gamma is active", or "automatic default
   gamma selection".
+- Do not say "certified beta asymptotics", "reflection formula is certified",
+  "certified reflection formula", or "broad parabolic-cylinder certification".
 - Do not describe the parabolic-cylinder family as certified without the
   experimental formula-layer qualifier.
 - Do not imply that MCP expands the mathematical support surface.

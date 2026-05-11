@@ -101,6 +101,9 @@ The line includes:
   consideration of default certified `loggamma` method selection;
 - [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records the active
   explicit positive-real `gamma` method and its exclusions;
+- [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md), which
+  summarizes all active 0.3 custom methods, their diagnostics, preserved
+  default-dispatch behavior, and exclusions;
 - [`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), which records the
   prerelease plan for packaging the explicit positive-real `gamma`
   `method="stirling_exp"` with no default-dispatch change; and
@@ -117,6 +120,15 @@ Stirling, explicit shifted Stirling, explicit certified-auto selection,
 high-precision mpmath, and fast SciPy over representative positive real inputs.
 It is evidence-gathering infrastructure only; custom methods and the selector
 remain explicit and are not claimed as the faster or default method.
+
+The manual benchmark
+[`benchmarks/bench_gamma_methods.py`](../benchmarks/bench_gamma_methods.py)
+emits JSON-lines timing and diagnostic records for direct Arb certified
+`gamma`, explicit `method="stirling_exp"`, high-precision mpmath, and fast
+SciPy over representative positive real inputs. It is evidence gathering only:
+`method="stirling_exp"` remains explicit, direct Arb remains the default
+certified `gamma` path, and this document does not claim performance
+superiority.
 
 The decision-support analyzer
 [`benchmarks/analyze_loggamma_auto.py`](../benchmarks/analyze_loggamma_auto.py)
