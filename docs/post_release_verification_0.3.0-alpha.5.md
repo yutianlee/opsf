@@ -1,8 +1,8 @@
 # v0.3.0-alpha.5 Post-release Verification
 
 This file records real release evidence for `v0.3.0-alpha.5` / `certsf
-0.3.0a5`. It is documentation-only evidence and does not update runtime code,
-public wrappers, default dispatch, or the scheduled `pypi-smoke` default.
+0.3.0a5` and the follow-up smoke-pin update. It does not change runtime code,
+public wrappers, or default dispatch.
 
 ## Published Artifact
 
@@ -86,9 +86,10 @@ real PyPI. The MCP wrapper passed:
   - `pypi-smoke / 3.11 mcp-certified`
   - `pypi-smoke / 3.12 mcp-certified`
 
-The workflow default remains pinned to `0.3.0a4` in this verification PR. A
-separate follow-up smoke-pin PR should update the scheduled/manual default and
-add alpha.5 `rgamma(method="stirling_recip")` smoke coverage.
+The post-release verification PR left the workflow default pinned to `0.3.0a4`.
+After that PR merged, the smoke-pin follow-up updated the scheduled/manual
+default to `0.3.0a5` and added alpha.5 `rgamma(method="stirling_recip")`
+Python API and MCP smoke coverage.
 
 ## Scope Confirmation
 
