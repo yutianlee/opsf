@@ -2,7 +2,7 @@
 
 The 0.x alpha line should make conservative certification claims. Release
 copy, package metadata, README text, examples, and GitHub release notes must
-help users distinguish four different things:
+help users distinguish these cases:
 
 - plain numerical values from SciPy or mpmath;
 - direct Arb primitive enclosures with alpha certification evidence; and
@@ -10,6 +10,8 @@ help users distinguish four different things:
   asymptotic tail bound; and
 - the narrow explicit positive-real `gamma` method via certified `loggamma`
   exponentiation; and
+- planned inactive future custom-method notes that do not create active release
+  claims; and
 - experimental formula-backed Arb enclosures with open formula audit work.
 
 ## Required Short Summary
@@ -70,6 +72,16 @@ Release-facing support matrices must keep these status phrases:
 - Do not claim global `gamma` certification, complex-gamma Stirling support,
   reflection-formula support, gamma-ratio asymptotics, beta asymptotics, or
   automatic default `gamma` selection for the `stirling_exp` method.
+- When mentioning future reciprocal-gamma work, use only narrow planned
+  wording: planned explicit positive-real `rgamma`
+  `method="stirling_recip"` for finite real `x >= 20`, using certified
+  `loggamma` exponentiation. Say that it is not active, not registered, and
+  does not change default dispatch.
+- Do not claim active custom-certified `rgamma`, global `rgamma`
+  certification, complex reciprocal gamma certification, reflection-formula
+  support, near-pole behavior support, gamma-ratio asymptotics, beta
+  asymptotics, or automatic default `rgamma` selection for the planned
+  `stirling_recip` method.
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`
   fallback must be visible in diagnostics.
@@ -112,6 +124,9 @@ Release-facing support matrices must keep these status phrases:
 - Do not say "global gamma certification", "complex gamma Stirling
   certification", "custom certified gamma is active", or "automatic default
   gamma selection".
+- Do not say "active custom-certified rgamma", "global rgamma certification",
+  "complex reciprocal gamma certification", "near-pole certification", or
+  "automatic default rgamma selection".
 - Do not say "certified beta asymptotics", "reflection formula is certified",
   "certified reflection formula", or "broad parabolic-cylinder certification".
 - Do not describe the parabolic-cylinder family as certified without the
