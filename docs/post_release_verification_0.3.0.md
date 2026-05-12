@@ -154,6 +154,50 @@ literals. It preserves the base, certified, and MCP-certified matrices and the
 explicit Python API and MCP smoke coverage for
 `rgamma(method="stirling_recip")`.
 
+## Post-smoke-pin Verification
+
+After the smoke-pin follow-up merged, the updated `pypi-smoke` workflow was
+manually run from `main` using the workflow default version.
+
+- Manual `pypi-smoke` workflow run: `25725950223`
+- Workflow URL:
+  <https://github.com/yutianlee/certsf/actions/runs/25725950223>
+- Branch/ref: `main`
+- Head commit: `f204b1727012bf7f3069426171791333dcafadc8`
+- Version input/default: workflow default `0.3.0`; no explicit override was
+  supplied.
+- Conclusion: success.
+- Passing jobs:
+  - `pypi-smoke / 3.10 base`
+  - `pypi-smoke / 3.11 base`
+  - `pypi-smoke / 3.12 base`
+  - `pypi-smoke / 3.10 [certified]`
+  - `pypi-smoke / 3.11 [certified]`
+  - `pypi-smoke / 3.12 [certified]`
+  - `pypi-smoke / 3.10 mcp-certified`
+  - `pypi-smoke / 3.11 mcp-certified`
+  - `pypi-smoke / 3.12 mcp-certified`
+
+Log inspection confirmed that the updated workflow installed the final package
+selectors:
+
+- `certsf==0.3.0`
+- `certsf[certified]==0.3.0`
+- `certsf[mcp,certified]==0.3.0`
+
+Log inspection also confirmed that the certified Python API smoke block ran:
+
+- `rgamma("20", mode="certified", method="stirling_recip", dps=50)`
+- `rgamma("20", mode="certified", method="stirling_recip", dps=100)`
+
+The MCP smoke block ran:
+
+- `special_rgamma("20", mode="certified", method="stirling_recip", dps=50)`
+- `special_rgamma("20", mode="certified", method="stirling_recip", dps=100)`
+
+Both paths produced certified `stirling_recip_rgamma` payloads with
+`certificate_scope="rgamma_positive_real_stirling_recip"`.
+
 ## Scope Confirmation
 
 No files under `src/` changed for this verification. No runtime implementation,
