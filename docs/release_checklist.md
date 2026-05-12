@@ -101,8 +101,9 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - [ ] `CHANGELOG.md` records `0.3.0`.
 - [ ] `docs/release-0.3.0.md` is reviewed.
 - [ ] Publish workflow defaults point at `v0.3.0`.
-- [ ] PyPI smoke workflow remains pinned to `0.3.0a5` until `certsf 0.3.0`
-  is published and smoke verification passes.
+- [ ] PyPI smoke workflow remained pinned to `0.3.0a5` until `certsf 0.3.0`
+  was published and smoke verification passed.
+- [ ] Post-release smoke-pin follow-up advances `pypi-smoke.yml` to `0.3.0`.
 - [ ] GitHub release for `v0.3.0` is a normal release, not a prerelease.
 - [ ] TestPyPI staging is required or strongly recommended under
   `release_policy.md` because this is the first non-prerelease release of the

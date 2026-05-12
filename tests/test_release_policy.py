@@ -71,8 +71,8 @@ def test_alpha5_release_plan_records_explicit_rgamma_scope_and_smoke_pin():
     assert "`method=None` and calls with `method=\"auto\"` remain unchanged" in text
     assert "TestPyPI\nstaging is skipped unless that risk appears during validation" in text
     assert "If a smoke-pin update lands before PyPI publication succeeds" in text
-    assert 'default: "0.3.0a5"' in smoke_text
-    assert "inputs.version || '0.3.0a5'" in smoke_text
+    assert 'default: "0.3.0"' in smoke_text
+    assert "inputs.version || '0.3.0'" in smoke_text
 
 
 def test_final_release_plan_records_v030_scope_and_testpypi_staging():
@@ -105,12 +105,12 @@ def test_final_release_plan_records_v030_scope_and_testpypi_staging():
     assert "`CITATION.cff` version is `0.3.0`" in checklist
     assert "`CHANGELOG.md` records `0.3.0`" in checklist
     assert "Publish workflow defaults point at `v0.3.0`" in checklist
-    assert "PyPI smoke workflow remains pinned to `0.3.0a5`" in checklist
+    assert "Post-release smoke-pin follow-up advances `pypi-smoke.yml` to `0.3.0`" in checklist
     assert "GitHub release for `v0.3.0` is a normal release, not a prerelease." in checklist
     assert "TestPyPI staging is required or strongly recommended" in checklist
-    assert 'default: "0.3.0a5"' in smoke_text
-    assert "inputs.version || '0.3.0a5'" in smoke_text
-    assert 'default: "0.3.0"' not in smoke_text
+    assert 'default: "0.3.0"' in smoke_text
+    assert "inputs.version || '0.3.0'" in smoke_text
+    assert 'default: "0.3.0a5"' not in smoke_text
     assert 'default: "v0.3.0"' in publish_text
     assert 'default: "v0.3.0"' in testpypi_text
     assert "release:" not in testpypi_text
