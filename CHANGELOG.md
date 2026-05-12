@@ -2,8 +2,12 @@
 
 ## Unreleased
 
-- Added explicit positive-real `rgamma(x)` custom certificate via certified
-  `loggamma` exponentiation with
+- No unreleased changes yet.
+
+## 0.3.0-alpha.5 - 2026-05-12
+
+- Packages the explicit positive-real `rgamma(x)` custom certificate via
+  certified `loggamma` exponentiation with
   `mode="certified", method="stirling_recip"` for finite real `x >= 20`.
 - Keeps default certified `rgamma`, `method=None`, and `method="auto"` on the
   direct Arb path.
