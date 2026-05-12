@@ -6,7 +6,7 @@ on:
       version:
         description: "Published certsf version to test"
         required: true
-        default: "0.3.0a4"
+        default: "0.3.0a5"
   schedule:
     - cron: "0 3 * * 1"
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.3.0a4' }}"
+          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.3.0a5' }}"
 
       - name: Smoke test import and calls
         run: |
@@ -113,6 +113,8 @@ jobs:
           auto_arb_result = loggamma("3.2", mode="certified", method="certified_auto", dps=50)
           gamma_stirling_exp_result = gamma("20", mode="certified", method="stirling_exp", dps=50)
           gamma_stirling_exp_high_result = gamma("20", mode="certified", method="stirling_exp", dps=100)
+          rgamma_stirling_recip_result = rgamma("20", mode="certified", method="stirling_recip", dps=50)
+          rgamma_stirling_recip_high_result = rgamma("20", mode="certified", method="stirling_recip", dps=100)
 
           assert_custom_loggamma(
               stirling_result,
@@ -193,6 +195,23 @@ jobs:
           for result in (gamma_stirling_exp_result, gamma_stirling_exp_high_result):
               assert_gamma_stirling_exp(result)
           assert gamma_stirling_exp_high_result.diagnostics["loggamma_method_used"] == "stirling_shifted"
+
+          def assert_rgamma_stirling_recip(result):
+              payload = result.to_mcp_dict()
+              print(payload)
+              assert result.certified
+              assert result.function == "rgamma"
+              assert result.method == "stirling_recip_rgamma"
+              assert result.backend == "certsf+python-flint"
+              assert result.diagnostics["selected_method"] == "stirling_recip"
+              assert result.diagnostics["certificate_scope"] == "rgamma_positive_real_stirling_recip"
+              assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
+              assert result.diagnostics["audit_status"] == "theorem_documented"
+              assert result.diagnostics["loggamma_method_used"] in {"stirling", "stirling_shifted"}
+              assert result.abs_error_bound is not None
+
+          for result in (rgamma_stirling_recip_result, rgamma_stirling_recip_high_result):
+              assert_rgamma_stirling_recip(result)
           PY
 
   mcp-smoke:
@@ -211,7 +230,7 @@ jobs:
       - name: Install MCP extra from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.3.0a4' }}"
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.3.0a5' }}"
 
       - name: MCP smoke test
         run: |
@@ -247,6 +266,8 @@ jobs:
           shifted_result = special_loggamma("20", mode="certified", method="stirling_shifted", dps=50)
           auto_payload = special_loggamma("20", mode="certified", method="certified_auto", dps=100)
           gamma_stirling_payload = special_gamma("20", mode="certified", method="stirling_exp", dps=50)
+          rgamma_stirling_payload = special_rgamma("20", mode="certified", method="stirling_recip", dps=50)
+          rgamma_stirling_high_payload = special_rgamma("20", mode="certified", method="stirling_recip", dps=100)
 
           print(certsf_path)
           print(build_server)
@@ -268,6 +289,8 @@ jobs:
           print(shifted_result)
           print(auto_payload)
           print(gamma_stirling_payload)
+          print(rgamma_stirling_payload)
+          print(rgamma_stirling_high_payload)
           assert callable(build_server)
           assert isinstance(result, dict)
           assert isinstance(loggamma_result, dict)
@@ -287,6 +310,8 @@ jobs:
           assert isinstance(shifted_result, dict)
           assert isinstance(auto_payload, dict)
           assert isinstance(gamma_stirling_payload, dict)
+          assert isinstance(rgamma_stirling_payload, dict)
+          assert isinstance(rgamma_stirling_high_payload, dict)
           assert result["function"] == "gamma"
           assert loggamma_result["function"] == "loggamma"
           assert rgamma_result["function"] == "rgamma"
@@ -305,6 +330,8 @@ jobs:
           assert shifted_result["function"] == "loggamma"
           assert auto_payload["function"] == "loggamma"
           assert gamma_stirling_payload["function"] == "gamma"
+          assert rgamma_stirling_payload["function"] == "rgamma"
+          assert rgamma_stirling_high_payload["function"] == "rgamma"
           assert erf_result["certified"]
           assert erfc_result["certified"]
           assert erfcinv_result["certified"]
@@ -316,6 +343,8 @@ jobs:
           assert shifted_result["certified"]
           assert auto_payload["certified"]
           assert gamma_stirling_payload["certified"]
+          assert rgamma_stirling_payload["certified"]
+          assert rgamma_stirling_high_payload["certified"]
           assert stirling_result["method"] == "stirling_loggamma"
           assert shifted_result["method"] == "stirling_shifted_loggamma"
           assert stirling_result["diagnostics"]["certificate_scope"] == "stirling_loggamma_positive_real"
@@ -327,6 +356,15 @@ jobs:
           assert gamma_stirling_payload["diagnostics"]["selected_method"] == "stirling_exp"
           assert gamma_stirling_payload["diagnostics"]["certificate_scope"] == "gamma_positive_real_stirling_exp"
           assert gamma_stirling_payload["diagnostics"]["loggamma_method_used"] in {"stirling", "stirling_shifted"}
+          for payload in (rgamma_stirling_payload, rgamma_stirling_high_payload):
+              assert payload["method"] == "stirling_recip_rgamma"
+              assert payload["backend"] == "certsf+python-flint"
+              assert payload["diagnostics"]["selected_method"] == "stirling_recip"
+              assert payload["diagnostics"]["certificate_scope"] == "rgamma_positive_real_stirling_recip"
+              assert payload["diagnostics"]["certificate_level"] == "custom_asymptotic_bound"
+              assert payload["diagnostics"]["audit_status"] == "theorem_documented"
+              assert payload["diagnostics"]["loggamma_method_used"] in {"stirling", "stirling_shifted"}
+              assert payload["abs_error_bound"] is not None
           assert auto_payload["backend"] != "mpmath"
           assert auto_payload["diagnostics"]["auto_selector"] == "certified_auto"
           assert auto_payload["diagnostics"]["auto_selected_method"] in {"arb", "stirling", "stirling_shifted"}

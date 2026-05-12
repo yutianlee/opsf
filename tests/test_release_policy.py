@@ -69,8 +69,37 @@ def test_alpha5_release_plan_records_explicit_rgamma_scope_and_smoke_pin():
     assert "Default certified `rgamma` remains the direct Arb path." in text
     assert "`method=None` and calls with `method=\"auto\"` remain unchanged" in text
     assert "TestPyPI\nstaging is skipped unless that risk appears during validation" in text
-    assert 'default: "0.3.0a4"' in smoke_text
-    assert "0.3.0a5" not in smoke_text
+    assert 'default: "0.3.0a5"' in smoke_text
+    assert "inputs.version || '0.3.0a5'" in smoke_text
+
+
+def test_pypi_smoke_covers_explicit_rgamma_stirling_recip_method():
+    smoke_text = _read(".github/workflows/pypi-smoke.yml")
+
+    for fragment in (
+        'rgamma("20", mode="certified", method="stirling_recip", dps=50)',
+        'rgamma("20", mode="certified", method="stirling_recip", dps=100)',
+        'special_rgamma("20", mode="certified", method="stirling_recip", dps=50)',
+        'special_rgamma("20", mode="certified", method="stirling_recip", dps=100)',
+        'result.function == "rgamma"',
+        'result.method == "stirling_recip_rgamma"',
+        'result.backend == "certsf+python-flint"',
+        'result.diagnostics["selected_method"] == "stirling_recip"',
+        'result.diagnostics["certificate_scope"] == "rgamma_positive_real_stirling_recip"',
+        'result.diagnostics["certificate_level"] == "custom_asymptotic_bound"',
+        'result.diagnostics["audit_status"] == "theorem_documented"',
+        'result.diagnostics["loggamma_method_used"] in {"stirling", "stirling_shifted"}',
+        "result.abs_error_bound is not None",
+        'payload["method"] == "stirling_recip_rgamma"',
+        'payload["backend"] == "certsf+python-flint"',
+        'payload["diagnostics"]["selected_method"] == "stirling_recip"',
+        'payload["diagnostics"]["certificate_scope"] == "rgamma_positive_real_stirling_recip"',
+        'payload["diagnostics"]["certificate_level"] == "custom_asymptotic_bound"',
+        'payload["diagnostics"]["audit_status"] == "theorem_documented"',
+        'payload["diagnostics"]["loggamma_method_used"] in {"stirling", "stirling_shifted"}',
+        'payload["abs_error_bound"] is not None',
+    ):
+        assert fragment in smoke_text
 
 
 def _read(path: str) -> str:
