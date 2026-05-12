@@ -83,6 +83,7 @@ RELEASE_SURFACES = (
     "docs/release-0.3.0-alpha.3.md",
     "docs/release-0.3.0-alpha.2.md",
     "docs/release-0.3.0-alpha.1.md",
+    "docs/v0.3.0_final_readiness_audit.md",
     "docs/release_checklist.md",
     "docs/certification.md",
     "docs/certification_audit.md",

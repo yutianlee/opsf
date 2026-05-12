@@ -20,6 +20,7 @@ def test_release_policy_documents_real_pypi_and_testpypi_roles():
 
     for trigger in (
         "first release of a new minor line",
+        "first non-prerelease release of a minor line",
         "final release candidates",
         "`pyproject.toml` or build-backend changes",
         "extras or dependency changes",
@@ -53,8 +54,8 @@ def test_publish_testpypi_workflow_requires_manual_confirmation():
     assert "Refusing to publish to TestPyPI without confirm=publish-testpypi." in text
     assert "actions/upload-artifact@v6" in text
     assert "actions/download-artifact@v6" in text
-    assert 'default: "v0.3.0-alpha.5"' in text
-    assert 'default: "v0.3.0-alpha.5"' in publish_text
+    assert 'default: "v0.3.0"' in text
+    assert 'default: "v0.3.0"' in publish_text
 
 
 def test_alpha5_release_plan_records_explicit_rgamma_scope_and_smoke_pin():
@@ -72,6 +73,47 @@ def test_alpha5_release_plan_records_explicit_rgamma_scope_and_smoke_pin():
     assert "If a smoke-pin update lands before PyPI publication succeeds" in text
     assert 'default: "0.3.0a5"' in smoke_text
     assert "inputs.version || '0.3.0a5'" in smoke_text
+
+
+def test_final_release_plan_records_v030_scope_and_testpypi_staging():
+    text = _read("docs/release-0.3.0.md")
+    checklist = _read("docs/release_checklist.md")
+    smoke_text = _read(".github/workflows/pypi-smoke.yml")
+    publish_text = _read(".github/workflows/publish-pypi.yml")
+    testpypi_text = _read(".github/workflows/publish-testpypi.yml")
+
+    for fragment in (
+        "first non-prerelease release of the 0.3 line",
+        "already verified `v0.3.0-alpha.1` through `v0.3.0-alpha.5` scope",
+        "keeps the 0.2 public wrapper surface",
+        'method="stirling"',
+        'method="stirling_shifted"',
+        'method="certified_auto"',
+        'method="stirling_exp"',
+        'method="stirling_recip"',
+        "Default certified `loggamma`",
+        "Default certified `gamma`",
+        "Default certified `rgamma`",
+        "parabolic-cylinder formula layer beyond `experimental_formula`",
+        "TestPyPI staging is required or strongly recommended",
+        "`ref=v0.3.0` and `confirm=publish-testpypi`",
+    ):
+        assert fragment in text
+
+    assert "## v0.3.0 Checklist" in checklist
+    assert "`pyproject.toml` version is `0.3.0`" in checklist
+    assert "`CITATION.cff` version is `0.3.0`" in checklist
+    assert "`CHANGELOG.md` records `0.3.0`" in checklist
+    assert "Publish workflow defaults point at `v0.3.0`" in checklist
+    assert "PyPI smoke workflow remains pinned to `0.3.0a5`" in checklist
+    assert "GitHub release for `v0.3.0` is a normal release, not a prerelease." in checklist
+    assert "TestPyPI staging is required or strongly recommended" in checklist
+    assert 'default: "0.3.0a5"' in smoke_text
+    assert "inputs.version || '0.3.0a5'" in smoke_text
+    assert 'default: "0.3.0"' not in smoke_text
+    assert 'default: "v0.3.0"' in publish_text
+    assert 'default: "v0.3.0"' in testpypi_text
+    assert "release:" not in testpypi_text
 
 
 def test_pypi_smoke_covers_explicit_rgamma_stirling_recip_method():
