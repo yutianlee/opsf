@@ -1,10 +1,10 @@
-# Planned Positive-Real `rgamma` via Certified Loggamma Exponentiation
+# Positive-Real `rgamma` via Certified Loggamma Exponentiation
 
-This document records a planning-only future method for positive-real
-reciprocal gamma. It is not active, is not registered, does not change default
-dispatch, and does not add a public wrapper.
+This document records the active explicit method for positive-real reciprocal
+gamma. It does not change default dispatch, does not add a public wrapper, and
+is not automatic default selection.
 
-The future explicit method name is:
+The active explicit method is:
 
 ```python
 rgamma(x, mode="certified", method="stirling_recip", dps=...)
@@ -24,51 +24,52 @@ The preferred reduction is:
 rgamma(x) = exp(-loggamma(x))
 ```
 
-Equivalently for diagnostics, the planned formula string is
+Equivalently for diagnostics, the formula string is
 `formula="rgamma=exp(-loggamma)"`.
 
-The planned domain is finite real `x >= 20`. This means finite real x >= 20
+The active domain is finite real `x >= 20`. This means finite real x >= 20
 only.
 
 ## Dependency
 
-The planned method depends on the existing certified positive-real `loggamma`
-Arb-ball enclosure. The reciprocal-gamma value should be obtained by
-exponentiating the negated certified `loggamma` enclosure. This is preferable
-to computing `gamma(x)` and then inverting it, because `gamma(x)` can be very
-large.
+The method depends on the existing certified positive-real `loggamma` Arb-ball
+enclosure. The reciprocal-gamma value is obtained by exponentiating the negated
+certified `loggamma` enclosure. This is preferable to computing `gamma(x)` and
+then inverting it, because `gamma(x)` can be very large.
 
-## Planned Certificate Metadata
+## Certificate Metadata
 
-The planned certificate metadata is:
+The certificate metadata is:
 
 - `certificate_scope="rgamma_positive_real_stirling_recip"`
 - `certificate_level="custom_asymptotic_bound"`
 - `audit_status="theorem_documented"`
 - `selected_method="stirling_recip"`
 
-The planned runtime result method is `stirling_recip_rgamma`, and the planned
-backend is `certsf+python-flint`.
+The runtime result method is `stirling_recip_rgamma`, and the backend is
+`certsf+python-flint`.
 
-These are planning notes only. No runtime implementation or registry entry is
-active in this PR.
+This active method is explicit only. It is registered only for certified
+`rgamma`; it is not selected by `method=None`, `method="auto"`, or default
+certified dispatch.
 
-## Planned Error-Bound Contract
+## Error-Bound Contract
 
-The future `stirling_recip` method should preserve both sources of
-uncertainty from the dependent `loggamma` computation:
+The `stirling_recip` method preserves both sources of uncertainty from the
+dependent `loggamma` computation:
 
 - the Arb radius from evaluating the finite positive-real `loggamma`
   expression and exponentiating the negated ball; and
 - the explicit positive-real Stirling/loggamma tail bound propagated through
   the `exp(-L)` map.
 
-The returned reciprocal-gamma enclosure should include the finite-expression
-Arb radius and the propagated loggamma-tail contribution.
+The returned reciprocal-gamma enclosure includes the finite-expression Arb
+radius and the propagated loggamma-tail contribution because the loggamma ball
+is widened by the explicit tail bound before `exp(-L)` is evaluated.
 
-## Planned Diagnostics
+## Diagnostics
 
-A successful future result is expected to include diagnostics equivalent to:
+A successful result includes diagnostics equivalent to:
 
 - `selected_method="stirling_recip"`
 - `certificate_scope="rgamma_positive_real_stirling_recip"`
@@ -87,7 +88,7 @@ shift, shifted argument, coefficient source, and internal precision.
 
 ## Exclusions
 
-The plan excludes:
+The method excludes:
 
 - real `x < 20`;
 - real `x <= 0`;
@@ -102,10 +103,10 @@ The plan excludes:
 
 No complex rgamma path is in scope. No reflection formula path is in scope.
 No near-pole behavior is in scope. No gamma-ratio asymptotics are in scope.
-No beta asymptotics are in scope. No default dispatch change is planned.
+No beta asymptotics are in scope. No default dispatch change is made.
 Parabolic-cylinder wrappers remain `experimental_formula`.
 
-This plan does not change `method=None`, `method="auto"`, or default certified
-`rgamma` behavior. It does not broaden package-wide, gamma-family-wide,
+This method does not change `method=None`, `method="auto"`, or default
+certified `rgamma` behavior. It does not broaden package-wide, gamma-family-wide,
 reciprocal-gamma, gamma-ratio, beta, complex-domain, reflection-formula,
 near-pole, or parabolic-cylinder certification claims.

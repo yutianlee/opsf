@@ -2,7 +2,8 @@
 
 `v0.3.0` is the first `certsf` line with custom certified asymptotic methods.
 It keeps the 0.2 public special-function wrapper surface and adds explicit
-positive-real `loggamma` and `gamma` methods behind method registry v2.
+positive-real `loggamma`, `gamma`, and `rgamma` methods behind method registry
+v2.
 
 The implementation PRs did not change package version metadata, did not change
 default method selection, and did not alter existing certified results for
@@ -40,16 +41,21 @@ The v0.3.0 line includes:
 - explicit `gamma(x, mode="certified", method="stirling_exp")` for finite real
   `x >= 20`, using a certified positive-real `loggamma` Arb enclosure and Arb
   exponentiation;
+- explicit `rgamma(x, mode="certified", method="stirling_recip")` for finite
+  real `x >= 20`, using a certified positive-real `loggamma` Arb enclosure and
+  Arb exponentiation of the negated enclosure;
 - `certificate_scope="stirling_loggamma_positive_real"`;
 - `certificate_scope="gamma_positive_real_stirling_exp"`;
+- `certificate_scope="rgamma_positive_real_stirling_recip"`;
 - `certificate_level="custom_asymptotic_bound"`; and
 - `audit_status="theorem_documented"`.
 
-The Stirling, shifted Stirling, certified-auto selector, and Stirling-exp
-gamma method are additional registered methods for existing public wrappers.
-They are not new public special-function wrappers and are not automatic
-default selection. Default certified `loggamma` and default certified `gamma`
-remain the existing direct Arb paths.
+The Stirling, shifted Stirling, certified-auto selector, Stirling-exp gamma
+method, and Stirling-recip rgamma method are additional registered methods for
+existing public wrappers. They are not new public special-function wrappers
+and are not automatic default selection. Default certified `loggamma`, default
+certified `gamma`, and default certified `rgamma` remain the existing direct
+Arb paths.
 
 ## Non-Goals
 
@@ -66,20 +72,27 @@ The v0.3.0 line does not make a broad complete-certification claim for the
 package, for all `loggamma` inputs, or for every special-function family. The
 only custom-certified alpha scopes are the positive-real Stirling `loggamma`
 methods documented in [`stirling_loggamma.md`](stirling_loggamma.md) and the
-positive-real `gamma` method documented in
-[`gamma_stirling_exp.md`](gamma_stirling_exp.md).
+positive-real `gamma` and `rgamma` methods documented in
+[`gamma_stirling_exp.md`](gamma_stirling_exp.md) and
+[`rgamma_stirling_recip.md`](rgamma_stirling_recip.md).
 
-## Future Work
+## Positive-Real `rgamma` via Loggamma Exponentiation
 
-The next candidate custom method is positive-real `rgamma` via
-`exp(-loggamma)`, using the existing certified positive-real `loggamma`
-Arb-ball enclosure. The planned explicit method name is
-`method="stirling_recip"` for finite real `x >= 20`.
+The active explicit positive-real `rgamma(x)` method uses certified `loggamma`
+exponentiation. The explicit method name is
+`rgamma(x, mode="certified", method="stirling_recip", dps=...)` for finite
+real `x >= 20`. The certificate scope is
+`rgamma_positive_real_stirling_recip`, with certificate level
+`custom_asymptotic_bound` and audit status `theorem_documented`.
 
-This reciprocal-gamma method is not implemented yet.
-No release claim is active yet.
-No default dispatch change is made or planned by the documentation-only
-planning PR. See
+This is an active explicit method only; no default dispatch behavior changes.
+The method uses a rigorous positive-real `loggamma` enclosure and Arb
+exponentiation of the negated enclosure. It avoids computing `gamma(x)` and
+then inverting it.
+
+The method excludes complex `rgamma`, real `x < 20`, real `x <= 0`,
+non-finite input, reflection-formula paths, near-pole behavior, gamma-ratio
+asymptotics, and beta asymptotics. See
 [`rgamma_stirling_recip.md`](rgamma_stirling_recip.md).
 
 ## Positive-Real `gamma` via Loggamma Exponentiation
@@ -115,7 +128,7 @@ The line includes:
 - [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records the active
   explicit positive-real `gamma` method and its exclusions;
 - [`rgamma_stirling_recip.md`](rgamma_stirling_recip.md), which records the
-  planned inactive positive-real `rgamma` method and its exclusions;
+  active explicit positive-real `rgamma` method and its exclusions;
 - [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md), which
   summarizes all active 0.3 custom methods, their diagnostics, preserved
   default-dispatch behavior, and exclusions;
@@ -143,6 +156,15 @@ emits JSON-lines timing and diagnostic records for direct Arb certified
 SciPy over representative positive real inputs. It is evidence gathering only:
 `method="stirling_exp"` remains explicit, direct Arb remains the default
 certified `gamma` path, and this document does not claim performance
+superiority.
+
+The manual benchmark
+[`benchmarks/bench_rgamma_methods.py`](../benchmarks/bench_rgamma_methods.py)
+emits JSON-lines timing and diagnostic records for direct Arb certified
+`rgamma`, explicit `method="stirling_recip"`, high-precision mpmath, and fast
+SciPy over representative positive real inputs. It is evidence gathering only:
+`method="stirling_recip"` remains explicit, direct Arb remains the default
+certified `rgamma` path, and this document does not claim performance
 superiority.
 
 The decision-support analyzer
@@ -173,9 +195,13 @@ Validation should confirm that:
   Stirling method, while preserving the selected backend's certificate scope;
 - explicit `method="stirling_exp"` certifies `gamma` only for finite real
   `x >= 20`;
+- explicit `method="stirling_recip"` certifies `rgamma` only for finite real
+  `x >= 20`;
 - default certified `loggamma` and explicit `method="arb"` continue to use the
   existing direct Arb path;
 - default certified `gamma` and explicit `method="arb"` continue to use the
+  existing direct Arb path;
+- default certified `rgamma` and explicit `method="arb"` continue to use the
   existing direct Arb path;
 - unsupported domains and unsupported modes fail cleanly rather than falling
   back to mpmath in certified mode;
