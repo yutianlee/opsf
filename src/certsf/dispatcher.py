@@ -12,6 +12,7 @@ from .backends import arb_backend, mpmath_backend, scipy_backend
 from .methods import (
     certified_auto_loggamma,
     gamma_stirling_exp,
+    loggamma_ratio_stirling_diff,
     rgamma_stirling_recip,
     stirling_loggamma,
     stirling_loggamma_shifted,
@@ -107,6 +108,7 @@ def _certificate_metadata_for_scope(certificate_scope: str) -> tuple[str, str]:
     if certificate_scope in {
         "stirling_loggamma_positive_real",
         "gamma_positive_real_stirling_exp",
+        "loggamma_ratio_positive_real_stirling_diff",
         "rgamma_positive_real_stirling_recip",
     }:
         return "custom_asymptotic_bound", "theorem_documented"
@@ -746,6 +748,29 @@ METHOD_REGISTRY["rgamma"]["certified"] = (
             "Explicit method='stirling_recip' only; real x >= 20; not automatic default selection; "
             "complex rgamma, reflection formulas, near-pole behavior, gamma-ratio asymptotics, "
             "and beta asymptotics excluded"
+        ),
+    ),
+)
+METHOD_REGISTRY["loggamma_ratio"]["certified"] = (
+    REGISTRY["loggamma_ratio"]["certified"],
+    _spec(
+        "loggamma_ratio",
+        "certified",
+        "certsf+python-flint",
+        loggamma_ratio_stirling_diff,
+        certified=True,
+        domain=(
+            "Finite real a >= 20 and finite real b >= 20; explicit positive-real loggamma-ratio "
+            "via certified loggamma difference"
+        ),
+        certificate_scope="loggamma_ratio_positive_real_stirling_diff",
+        method_id="stirling_diff",
+        priority=200,
+        applicability_note=(
+            "Explicit method='stirling_diff' only; finite real a >= 20 and b >= 20; "
+            "not automatic default selection; complex gamma-ratio Stirling certification, "
+            "reflection formulas, near-pole behavior, simultaneous-pole limiting values, "
+            "gamma_ratio asymptotics, and beta asymptotics excluded"
         ),
     ),
 )
