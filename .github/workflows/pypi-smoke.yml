@@ -6,7 +6,7 @@ on:
       version:
         description: "Published certsf version to test"
         required: true
-        default: "0.3.0a5"
+        default: "0.3.0"
   schedule:
     - cron: "0 3 * * 1"
 
@@ -28,7 +28,7 @@ jobs:
       - name: Install from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.3.0a5' }}"
+          python -m pip install --pre "certsf${{ matrix.extras }}==${{ inputs.version || '0.3.0' }}"
 
       - name: Smoke test import and calls
         run: |
@@ -230,7 +230,7 @@ jobs:
       - name: Install MCP extra from PyPI
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.3.0a5' }}"
+          python -m pip install --pre "certsf[mcp,certified]==${{ inputs.version || '0.3.0' }}"
 
       - name: MCP smoke test
         run: |

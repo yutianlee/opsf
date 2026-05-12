@@ -139,9 +139,20 @@ All nine smoke jobs passed:
 - `pypi-smoke / 3.11 mcp-certified`
 - `pypi-smoke / 3.12 mcp-certified`
 
-The `pypi-smoke.yml` workflow remains pinned to `0.3.0a5` after this
-verification. Advancing that default to `0.3.0` is reserved for a separate
-post-release smoke-pin PR.
+At the time this verification was recorded, the `pypi-smoke.yml` workflow
+remained pinned to `0.3.0a5`. Advancing that default to `0.3.0` was reserved
+for a separate post-release smoke-pin PR.
+
+## Post-release Smoke-pin Follow-up
+
+After successful real PyPI publication and the passing manual `pypi-smoke` run
+`25715711137` with `version=0.3.0`, the smoke-pin follow-up advances
+`pypi-smoke.yml` from `0.3.0a5` to `0.3.0`.
+
+The follow-up changes only the workflow dispatch default and fallback install
+literals. It preserves the base, certified, and MCP-certified matrices and the
+explicit Python API and MCP smoke coverage for
+`rgamma(method="stirling_recip")`.
 
 ## Scope Confirmation
 

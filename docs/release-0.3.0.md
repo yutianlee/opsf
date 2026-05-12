@@ -134,10 +134,11 @@ enough to catch packaging and metadata issues.
 TestPyPI staging is required or strongly recommended for this final release.
 Use `ref=v0.3.0` and `confirm=publish-testpypi` for that staging run.
 
-Do not update `pypi-smoke.yml` to `0.3.0` in the final release-planning PR.
-It must remain pinned to the latest verified published version, `0.3.0a5`,
-until `certsf 0.3.0` is published to real PyPI and the manual `pypi-smoke`
-run against `0.3.0` passes. After that, use a separate smoke-pin PR.
+The final release-planning PR did not update `pypi-smoke.yml` to `0.3.0`.
+It remained pinned to the latest verified published prerelease, `0.3.0a5`,
+until `certsf 0.3.0` was published to real PyPI and the manual `pypi-smoke`
+run against `0.3.0` passed. The post-release smoke-pin follow-up then advances
+that default to `0.3.0`.
 
 ## Documentation
 
@@ -238,8 +239,8 @@ Validation should confirm that:
   back to mpmath in certified mode;
 - release metadata changes are limited to the dedicated final release-planning
   PR;
-- `pypi-smoke.yml` remains pinned to `0.3.0a5` until final real PyPI smoke
-  passes; and
+- the post-release smoke-pin follow-up advances `pypi-smoke.yml` to `0.3.0`
+  only after final real PyPI smoke passes; and
 - no parabolic-cylinder, Faddeeva, `wofz`, or plasma-dispersion support claim is
   added.
 
