@@ -13,7 +13,7 @@ the scope-by-scope audit lives in
 [`docs/certification_audit.md`](docs/certification_audit.md);
 the 0.3 custom-method audit lives in
 [`docs/v0_3_custom_method_audit.md`](docs/v0_3_custom_method_audit.md);
-the active 0.3.0 development scope lives in
+the active 0.3.0 certified scope lives in
 [`docs/certified_scope_0_3_0.md`](docs/certified_scope_0_3_0.md), and the
 published 0.2.0 support matrix lives in
 [`docs/certified_scope_0_2_0.md`](docs/certified_scope_0_2_0.md). The frozen
@@ -520,6 +520,9 @@ The repository also includes:
 - `docs/certified_scope_0_3_0.md` for the active 0.3.0 development scope.
 - `docs/certified_scope_0_2_0.md` for the published 0.2.0 certified support
   matrix.
+- `docs/v0.3.0_final_readiness_audit.md` for the v0.3.0 final-readiness
+  audit and final-release sequence.
+- `docs/release-0.3.0.md` for v0.3.0 final release planning notes.
 - `docs/release-0.3.0-alpha.5.md` for v0.3.0-alpha.5 release planning, which
   packages only the explicit positive-real `rgamma`
   `method="stirling_recip"` while keeping default dispatch unchanged.
@@ -532,7 +535,6 @@ The repository also includes:
   unchanged.
 - `docs/release-0.3.0-alpha.2.md` for v0.3.0-alpha.2 release planning.
 - `docs/release-0.3.0-alpha.1.md` for v0.3.0-alpha.1 release planning.
-- `docs/release-0.3.0.md` for v0.3.0 planning and implementation notes.
 - `docs/release-0.2.0.md` for v0.2.0 final release planning notes.
 - `docs/certified_scope_0_1_0.md` for the frozen 0.1.0 certified support
   matrix.

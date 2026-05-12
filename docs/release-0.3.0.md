@@ -1,25 +1,26 @@
-# certsf 0.3.0 Planning
+# certsf 0.3.0 Final Release
 
-`v0.3.0` is the first `certsf` line with custom certified asymptotic methods.
-It keeps the 0.2 public special-function wrapper surface and adds explicit
-positive-real `loggamma`, `gamma`, and `rgamma` methods behind method registry
-v2.
+`v0.3.0` is the first non-prerelease release of the 0.3 line. It packages the
+already verified `v0.3.0-alpha.1` through `v0.3.0-alpha.5` scope. It keeps the
+0.2 public wrapper surface.
 
-The implementation PRs did not change package version metadata, did not change
-default method selection, and did not alter existing certified results for
-calls that omit `method=...` or pass `method="auto"`. The first release
-metadata bump for this line was planned in
-[`release-0.3.0-alpha.1.md`](release-0.3.0-alpha.1.md). The second alpha,
-[`release-0.3.0-alpha.2.md`](release-0.3.0-alpha.2.md), packages the explicit
-`method="certified_auto"` selector. The third alpha,
-[`release-0.3.0-alpha.3.md`](release-0.3.0-alpha.3.md), packages the
-preselection optimization for that explicit selector. The fourth alpha,
-[`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), packages the explicit
-positive-real `gamma` method `method="stirling_exp"` with no default-dispatch
-change. The fifth alpha,
-[`release-0.3.0-alpha.5.md`](release-0.3.0-alpha.5.md), packages the explicit
-positive-real `rgamma` method `method="stirling_recip"` with no
-default-dispatch change.
+This release is for explicit custom certified positive-real methods on
+existing wrappers. It does not make a broad package-wide certification claim,
+does not change default method selection, and does not promote the
+parabolic-cylinder formula layer beyond `experimental_formula`.
+This release keeps the 0.2 public wrapper surface.
+
+The final-readiness audit is recorded in
+[`v0.3.0_final_readiness_audit.md`](v0.3.0_final_readiness_audit.md). That
+audit concluded that `v0.3.0` final is release-ready subject to final release
+checklist execution.
+
+## Release Target
+
+- Python package version: `0.3.0`.
+- Git tag: `v0.3.0`.
+- GitHub release type: normal release, not prerelease.
+- PyPI version after release: `certsf 0.3.0`.
 
 ## Active Scope
 
@@ -60,7 +61,13 @@ and are not automatic default selection. Default certified `loggamma`, default
 certified `gamma`, and default certified `rgamma` remain the existing direct
 Arb paths.
 
+Default certified `loggamma` remains direct Arb. Default certified `gamma`
+remains direct Arb. Default certified `rgamma` remains direct Arb.
+
 ## Non-Goals
+
+The v0.3.0 final release must not broaden certification claims beyond the
+documented 0.3 scope.
 
 The v0.3.0 line does not target parabolic-cylinder promotion. The
 parabolic-cylinder family remains an `experimental_formula` surface unless a
@@ -68,12 +75,13 @@ separate proof, implementation, tests, and documentation change explicitly
 broadens that scope.
 
 The v0.3.0 line does not add Faddeeva, `wofz`, or plasma-dispersion wrappers.
-It also does not add complex Stirling, gamma-ratio asymptotics, or beta
-asymptotics.
+It also does not add complex Stirling, complex `gamma` or `rgamma` Stirling
+certification, reflection-formula certification, near-pole behavior support,
+gamma-ratio asymptotics, or beta asymptotics.
 
-The v0.3.0 line does not make a broad complete-certification claim for the
-package, for all `loggamma` inputs, or for every special-function family. The
-only custom-certified alpha scopes are the positive-real Stirling `loggamma`
+The v0.3.0 line does not make a broad complete-package claim for all
+`loggamma`, `gamma`, `rgamma`, or every special-function family. The only
+custom asymptotic-bound scopes are the positive-real Stirling `loggamma`
 methods documented in [`stirling_loggamma.md`](stirling_loggamma.md) and the
 positive-real `gamma` and `rgamma` methods documented in
 [`gamma_stirling_exp.md`](gamma_stirling_exp.md) and
@@ -116,12 +124,27 @@ The method excludes complex `gamma`, real `x < 20`, real `x <= 0`,
 reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, and beta
 asymptotics. See [`gamma_stirling_exp.md`](gamma_stirling_exp.md).
 
+## TestPyPI and PyPI Smoke Plan
+
+Under [`release_policy.md`](release_policy.md), TestPyPI staging is required
+or strongly recommended for the first non-prerelease release of the 0.3 line.
+Before the real PyPI release, manually run `publish-testpypi` with
+`ref=v0.3.0` and `confirm=publish-testpypi`, then verify the staged package
+enough to catch packaging and metadata issues.
+TestPyPI staging is required or strongly recommended for this final release.
+Use `ref=v0.3.0` and `confirm=publish-testpypi` for that staging run.
+
+Do not update `pypi-smoke.yml` to `0.3.0` in the final release-planning PR.
+It must remain pinned to the latest verified published version, `0.3.0a5`,
+until `certsf 0.3.0` is published to real PyPI and the manual `pypi-smoke`
+run against `0.3.0` passes. After that, use a separate smoke-pin PR.
+
 ## Documentation
 
 The line includes:
 
 - [`certified_scope_0_3_0.md`](certified_scope_0_3_0.md), which records the
-  0.3.0 development support matrix and the narrow active custom-method row;
+  0.3.0 support matrix and the narrow active custom-method rows;
 - [`stirling_loggamma.md`](stirling_loggamma.md), which records the formula,
   domain, diagnostics, certificate metadata, tail-bound contract, and
   exclusions for the first custom asymptotic method;
@@ -135,6 +158,8 @@ The line includes:
 - [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md), which
   summarizes all active 0.3 custom methods, their diagnostics, preserved
   default-dispatch behavior, and exclusions;
+- [`v0.3.0_final_readiness_audit.md`](v0.3.0_final_readiness_audit.md), which
+  records the final readiness decision and release-sequence implications;
 - [`release-0.3.0-alpha.5.md`](release-0.3.0-alpha.5.md), which records the
   prerelease plan for packaging the explicit positive-real `rgamma`
   `method="stirling_recip"` with no default-dispatch change;
@@ -189,7 +214,7 @@ is stored at
 [`docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`](benchmark_samples/loggamma_certified_auto_sample_summary.json).
 The current recommendation remains conservative: direct Arb stays the default
 certified `loggamma` method, `method="certified_auto"` stays explicit, and no
-default-dispatch change is made in this evidence PR.
+default-dispatch change is made in this release.
 
 ## Validation Expectations
 
@@ -211,7 +236,38 @@ Validation should confirm that:
   existing direct Arb path;
 - unsupported domains and unsupported modes fail cleanly rather than falling
   back to mpmath in certified mode;
-- release metadata changes are limited to the dedicated alpha release-planning
+- release metadata changes are limited to the dedicated final release-planning
   PR;
+- `pypi-smoke.yml` remains pinned to `0.3.0a5` until final real PyPI smoke
+  passes; and
 - no parabolic-cylinder, Faddeeva, `wofz`, or plasma-dispersion support claim is
   added.
+
+## Final Release Checklist
+
+Before publishing:
+
+```powershell
+python scripts/check_release_version.py v0.3.0
+python -m ruff check .
+python -m mypy
+python -m pyright src
+python -m pytest
+python -m build
+python -m twine check dist/*
+```
+
+After this final release-planning PR merges, the release operator should:
+
+1. Tag the final `main` commit as `v0.3.0`.
+2. Stage to TestPyPI with `publish-testpypi.yml` using `ref=v0.3.0` and
+   `confirm=publish-testpypi`.
+3. Verify the TestPyPI package.
+4. Create a normal GitHub release for `v0.3.0`.
+5. Confirm the protected `publish-pypi` workflow publishes `certsf 0.3.0`.
+6. Verify real PyPI clean installs for base, certified, and MCP/certified
+   extras.
+7. Run manual `pypi-smoke` with `version=0.3.0`.
+8. Record post-release evidence in a follow-up PR.
+9. Only after the real PyPI smoke passes, open a separate smoke-pin PR to
+   advance `pypi-smoke.yml` to `0.3.0`.

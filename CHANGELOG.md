@@ -4,6 +4,27 @@
 
 - No unreleased changes yet.
 
+## 0.3.0 - 2026-05-12
+
+- Finalizes the verified 0.3 line while keeping the 0.2 public wrapper
+  surface.
+- Adds explicit custom certified positive-real methods for existing wrappers:
+  `loggamma(method="stirling")`, `loggamma(method="stirling_shifted")`,
+  `loggamma(method="certified_auto")`, `gamma(method="stirling_exp")`, and
+  `rgamma(method="stirling_recip")`.
+- Includes the explicit positive-real `gamma(x)` certificate via certified
+  `loggamma` exponentiation and the explicit positive-real `rgamma(x)` custom
+  certificate via certified `loggamma` exponentiation, both limited to finite
+  real `x >= 20`.
+- Keeps default certified `loggamma`, `gamma`, and `rgamma` on the direct Arb
+  paths.
+- Keeps `method=None` and `method="auto"` unchanged; custom methods remain
+  explicit only.
+- Keeps parabolic-cylinder wrappers at `experimental_formula`.
+- Does not add complex Stirling, reflection formula certification, near-pole
+  behavior support, gamma-ratio asymptotics, beta asymptotics, or new public
+  wrappers.
+
 ## 0.3.0-alpha.5 - 2026-05-12
 
 - Packages the explicit positive-real `rgamma(x)` custom certificate via
