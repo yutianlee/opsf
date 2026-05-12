@@ -12,6 +12,7 @@ CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
     '| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via '
     'explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select '
     'those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified '
+    'loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified '
     'loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |'
 )
 HISTORICAL_0_1_0_RELEASE_STATUS_ROWS = (
@@ -120,6 +121,7 @@ FORBIDDEN_CLAIM_PATTERNS = (
     r"\bcomplex rgamma certification\b",
     r"\bcertified complex rgamma\b",
     r"\bautomatic default rgamma selection\b",
+    r"\bnear-pole certification\b",
     r"\breflection formula is certified\b",
     r"\bcertified reflection formula\b",
     r"\bautomatic default gamma selection\b",
@@ -292,6 +294,7 @@ def test_forbidden_stirling_claim_patterns_match_lowercase_phrases():
         "complex gamma stirling certification",
         "complex reciprocal gamma certification",
         "active custom-certified rgamma",
+        "near-pole certification",
         "reflection formula is certified",
         "certified reflection formula",
         "certified gamma-ratio asymptotics",

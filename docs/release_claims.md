@@ -10,8 +10,8 @@ help users distinguish these cases:
   asymptotic tail bound; and
 - the narrow explicit positive-real `gamma` method via certified `loggamma`
   exponentiation; and
-- planned inactive future custom-method notes that do not create active release
-  claims; and
+- the narrow explicit positive-real `rgamma` method via certified `loggamma`
+  exponentiation; and
 - experimental formula-backed Arb enclosures with open formula audit work.
 
 ## Required Short Summary
@@ -37,7 +37,7 @@ Release-facing support matrices must keep these status phrases:
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
 
 ## Wording Rules
 
@@ -72,15 +72,14 @@ Release-facing support matrices must keep these status phrases:
 - Do not claim global `gamma` certification, complex-gamma Stirling support,
   reflection-formula support, gamma-ratio asymptotics, beta asymptotics, or
   automatic default `gamma` selection for the `stirling_exp` method.
-- When mentioning future reciprocal-gamma work, use only narrow planned
-  wording: planned explicit positive-real `rgamma`
-  `method="stirling_recip"` for finite real `x >= 20`, using certified
-  `loggamma` exponentiation. Say that it is not active, not registered, and
-  does not change default dispatch.
+- Say that active explicit positive-real `rgamma`
+  `method="stirling_recip"` via certified `loggamma` exponentiation is an
+  active explicit method only. The domain is finite real `x >= 20`, and direct
+  Arb remains the default certified `rgamma` path.
 - Do not claim active custom-certified `rgamma`, global `rgamma`
   certification, complex reciprocal gamma certification, reflection-formula
   support, near-pole behavior support, gamma-ratio asymptotics, beta
-  asymptotics, or automatic default `rgamma` selection for the planned
+  asymptotics, or automatic default `rgamma` selection for the explicit
   `stirling_recip` method.
 - Say that `erf` and `erfc` are certified only where Arb returns finite
   enclosures; direct Arb `erfc` is preferred, and any allowed `1 - erf`

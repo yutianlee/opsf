@@ -67,6 +67,9 @@ STIRLING_LOGGAMMA_CLAIM = (
     "certified positive-real Stirling loggamma enclosure with explicit asymptotic tail bound"
 )
 GAMMA_STIRLING_EXP_CLAIM = "certified positive-real gamma enclosure via certified loggamma exponentiation"
+RGAMMA_STIRLING_RECIP_CLAIM = (
+    "certified positive-real reciprocal gamma enclosure via certified loggamma exponentiation"
+)
 
 
 @pytest.mark.parametrize(
@@ -162,6 +165,18 @@ def test_gamma_stirling_exp_certified_result_exposes_custom_asymptotic_claim():
     assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
     assert result.diagnostics["audit_status"] == "theorem_documented"
     assert result.diagnostics["certification_claim"] == GAMMA_STIRLING_EXP_CLAIM
+
+
+def test_rgamma_stirling_recip_certified_result_exposes_custom_asymptotic_claim():
+    pytest.importorskip("flint")
+
+    result = certsf.rgamma("20", dps=50, mode="certified", method="stirling_recip")
+
+    assert result.certified is True
+    assert result.diagnostics["certificate_scope"] == "rgamma_positive_real_stirling_recip"
+    assert result.diagnostics["certificate_level"] == "custom_asymptotic_bound"
+    assert result.diagnostics["audit_status"] == "theorem_documented"
+    assert result.diagnostics["certification_claim"] == RGAMMA_STIRLING_RECIP_CLAIM
 
 
 @pytest.mark.parametrize(

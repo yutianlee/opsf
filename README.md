@@ -97,7 +97,7 @@ Every wrapper returns an `SFResult` with these fields:
 - `function`: canonical function name.
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
   `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`, or
-  `stirling_exp_gamma`.
+  `stirling_exp_gamma`, or `stirling_recip_rgamma`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -145,13 +145,18 @@ For `gamma`, explicit `mode="certified", method="stirling_exp"` selects an
 alpha-certified positive-real method for finite real `x >= 20` by
 exponentiating a certified positive-real `loggamma` enclosure. It is explicit
 only and does not change default certified `gamma`.
+For `rgamma`, explicit `mode="certified", method="stirling_recip"` selects an
+alpha-certified positive-real method for finite real `x >= 20` by
+exponentiating the negated certified positive-real `loggamma` enclosure. It is
+explicit only and does not change default certified `rgamma`.
 
 ## Supported Functions
 
 The 0.3 development line keeps the 0.2 public wrapper surface and adds
-explicit custom certified asymptotic methods for `loggamma` and positive-real
-`gamma`. Default certified `loggamma` and default certified `gamma` still use
-direct Arb. The package remains alpha-quality in scientific scope.
+explicit custom certified asymptotic methods for `loggamma`, positive-real
+`gamma`, and positive-real `rgamma`. Default certified `loggamma`, default
+certified `gamma`, and default certified `rgamma` still use direct Arb. The
+package remains alpha-quality in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -161,7 +166,7 @@ direct Arb. The package remains alpha-quality in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
 
 ```python
 from certsf import (
@@ -269,6 +274,17 @@ positive-real `loggamma` Arb enclosure. It records
 reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, or beta
 asymptotics, and it is not selected by default. See
 [`docs/gamma_stirling_exp.md`](docs/gamma_stirling_exp.md) and the
+0.3 custom-method audit in
+[`docs/v0_3_custom_method_audit.md`](docs/v0_3_custom_method_audit.md).
+
+Explicit `rgamma(x, mode="certified", method="stirling_recip")` evaluates
+positive-real reciprocal gamma for finite real `x >= 20` by exponentiating the
+negated certified positive-real `loggamma` Arb enclosure. It records
+`certificate_scope="rgamma_positive_real_stirling_recip"` and returns
+`method="stirling_recip_rgamma"`. It does not certify complex `rgamma`,
+reflection-formula paths, near-pole behavior, gamma-ratio asymptotics, or beta
+asymptotics, and it is not selected by default. See
+[`docs/rgamma_stirling_recip.md`](docs/rgamma_stirling_recip.md) and the
 0.3 custom-method audit in
 [`docs/v0_3_custom_method_audit.md`](docs/v0_3_custom_method_audit.md).
 
@@ -478,7 +494,7 @@ The repository also includes:
   remaining audit gates.
 - `docs/v0_3_custom_method_audit.md` for the explicit 0.3 custom-method audit
   covering `loggamma` Stirling methods, `certified_auto`, and
-  `gamma(method="stirling_exp")`.
+  `gamma(method="stirling_exp")` and `rgamma(method="stirling_recip")`.
 - `docs/audit/` for family-level certification checklists.
 - `docs/gamma_ratio.md` for gamma-ratio pole policy and certified-backend
   rationale.
@@ -490,6 +506,8 @@ The repository also includes:
 - `docs/stirling_loggamma.md` for the explicit positive-real Stirling
   `loggamma` method.
 - `docs/gamma_stirling_exp.md` for the explicit positive-real `gamma`
+  method via certified `loggamma` exponentiation.
+- `docs/rgamma_stirling_recip.md` for the explicit positive-real `rgamma`
   method via certified `loggamma` exponentiation.
 - `docs/loggamma_certified_auto_decision.md` for decision-support and
   evidence-gathering notes on whether explicit `method="certified_auto"` should
@@ -545,16 +563,17 @@ The repository also includes:
   `examples/bessel_complex.py`, `examples/pcf_experimental.py`, and
   `examples/mcp_payload.py` for payload-first release examples.
 - `benchmarks/bench_gamma.py`, `benchmarks/bench_gamma_methods.py`,
-  `benchmarks/bench_loggamma_methods.py`, `benchmarks/analyze_loggamma_auto.py`,
-  `benchmarks/summarize_loggamma_auto.py`, `benchmarks/bench_airy.py`,
-  `benchmarks/bench_bessel.py`, and `benchmarks/bench_pcf.py` for lightweight
-  JSON-lines timing smoke benchmarks. The gamma/loggamma custom-method
+  `benchmarks/bench_rgamma_methods.py`, `benchmarks/bench_loggamma_methods.py`,
+  `benchmarks/analyze_loggamma_auto.py`, `benchmarks/summarize_loggamma_auto.py`,
+  `benchmarks/bench_airy.py`, `benchmarks/bench_bessel.py`, and
+  `benchmarks/bench_pcf.py` for lightweight JSON-lines timing smoke
+  benchmarks. The gamma/rgamma/loggamma custom-method
   benchmarks compare direct Arb, explicit custom methods, high-precision
   mpmath, and fast SciPy paths without making a default-method performance
   claim. The explicit certified-auto selector uses preselection diagnostics to
   avoid unnecessary custom candidate evaluations, but it remains decision
   support only; `method="certified_auto"` remains explicit and no
   default-dispatch change is made. Direct Arb remains the default certified
-  `gamma` and `loggamma` path. A compact loggamma sample summary is checked in
-  at
+  `gamma`, `rgamma`, and `loggamma` path. A compact loggamma sample summary is
+  checked in at
   `docs/benchmark_samples/loggamma_certified_auto_sample_summary.json`.

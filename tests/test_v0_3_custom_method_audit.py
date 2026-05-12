@@ -17,12 +17,16 @@ def test_v0_3_custom_method_audit_exists_and_records_all_paths():
         'loggamma(method="stirling_shifted")',
         'loggamma(method="certified_auto")',
         'gamma(method="stirling_exp")',
+        'rgamma(method="stirling_recip")',
         'certificate_scope="stirling_loggamma_positive_real"',
         'certificate_scope="gamma_positive_real_stirling_exp"',
-        "Default certified `loggamma` and default certified `gamma` remain direct Arb",
+        'certificate_scope="rgamma_positive_real_stirling_recip"',
+        "Default certified `loggamma`, default certified `gamma`, and default certified",
         "complex `loggamma`",
         "complex `gamma`",
+        "complex `rgamma`",
         "reflection formula certification",
+        "near-pole behavior",
         "gamma-ratio asymptotics",
         "beta asymptotics",
         "Parabolic-cylinder wrappers remain `experimental_formula`",
@@ -53,6 +57,7 @@ def test_v0_3_custom_method_audit_records_expected_diagnostics():
         "loggamma_abs_error_bound",
         "exp_radius",
         "propagated_error_bound",
+        'selected_method="stirling_recip"',
     ):
         assert fragment in text
 

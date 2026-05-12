@@ -2,9 +2,14 @@
 
 ## Unreleased
 
-- Planned positive-real `rgamma(x)` custom certificate via certified
-  `loggamma` exponentiation.
-- Documentation only; no runtime behavior.
+- Added explicit positive-real `rgamma(x)` custom certificate via certified
+  `loggamma` exponentiation with
+  `mode="certified", method="stirling_recip"` for finite real `x >= 20`.
+- Keeps default certified `rgamma`, `method=None`, and `method="auto"` on the
+  direct Arb path.
+- Does not add complex reciprocal gamma, reflection formula certification,
+  near-pole behavior support, gamma-ratio asymptotics, beta asymptotics,
+  parabolic-cylinder promotion, or new public wrappers.
 
 ## 0.3.0-alpha.4 - 2026-05-10
 

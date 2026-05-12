@@ -36,6 +36,21 @@ def test_special_gamma_stirling_exp_method_returns_certified_mcp_payload():
     assert payload["diagnostics"]["certificate_scope"] == "gamma_positive_real_stirling_exp"
 
 
+def test_special_rgamma_stirling_recip_method_returns_certified_mcp_payload():
+    pytest.importorskip("flint")
+
+    payload = mcp_server.special_rgamma("20", dps=50, mode="certified", method="stirling_recip")
+
+    assert isinstance(payload, dict)
+    assert json.loads(json.dumps(payload)) == payload
+    assert payload["function"] == "rgamma"
+    assert payload["certified"] is True
+    assert payload["method"] == "stirling_recip_rgamma"
+    assert payload["backend"] == "certsf+python-flint"
+    assert payload["diagnostics"]["selected_method"] == "stirling_recip"
+    assert payload["diagnostics"]["certificate_scope"] == "rgamma_positive_real_stirling_recip"
+
+
 def test_special_gamma_ratio_returns_json_object_payload():
     payload = mcp_server.special_gamma_ratio("3.2", "1.2", dps=50, mode="high_precision")
 

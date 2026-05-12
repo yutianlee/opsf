@@ -78,6 +78,20 @@ def test_gamma_stirling_exp_method_spec_records_custom_asymptotic_metadata():
     assert "reflection formulas" in method.applicability_note
 
 
+def test_rgamma_stirling_recip_method_spec_records_custom_asymptotic_metadata():
+    method = METHOD_REGISTRY["rgamma"]["certified"][1]
+
+    assert method.method_id == "stirling_recip"
+    assert method.certificate_scope == "rgamma_positive_real_stirling_recip"
+    assert method.certificate_level == "custom_asymptotic_bound"
+    assert method.audit_status == "theorem_documented"
+    assert method.backend == "certsf+python-flint"
+    assert "x >= 20" in method.domain
+    assert "not automatic default selection" in method.applicability_note
+    assert "reflection formulas" in method.applicability_note
+    assert "near-pole behavior" in method.applicability_note
+
+
 def test_loggamma_stirling_method_spec_records_custom_asymptotic_metadata():
     method = METHOD_REGISTRY["loggamma"]["certified"][1]
 
@@ -157,10 +171,21 @@ def test_stirling_exp_method_is_active_only_for_explicit_certified_gamma():
     assert METHOD_REGISTRY["gamma"]["certified"][0] == REGISTRY["gamma"]["certified"]
 
 
+def test_stirling_recip_method_is_active_only_for_explicit_certified_rgamma():
+    active_rgamma_methods = [
+        method for method in available_methods() if method.function == "rgamma" and method.mode == "certified"
+    ]
+    stirling_recip_methods = [method for method in available_methods() if method.method_id == "stirling_recip"]
+
+    assert [method.method_id for method in active_rgamma_methods] == ["arb", "stirling_recip"]
+    assert stirling_recip_methods == [METHOD_REGISTRY["rgamma"]["certified"][1]]
+    assert METHOD_REGISTRY["rgamma"]["certified"][0] == REGISTRY["rgamma"]["certified"]
+
+
 def test_available_methods_exposes_auditable_method_specs_in_dispatch_order():
     methods = available_methods()
 
-    assert len(methods) == len(available_functions()) * 3 + 4
+    assert len(methods) == len(available_functions()) * 3 + 5
     assert methods[0] == REGISTRY["gamma"]["fast"]
     assert methods[1] == REGISTRY["gamma"]["high_precision"]
     assert methods[2] == REGISTRY["gamma"]["certified"]

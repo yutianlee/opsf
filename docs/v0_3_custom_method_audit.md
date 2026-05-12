@@ -5,9 +5,9 @@ This audit records the active custom methods in the 0.3 line after
 existing public wrappers. They do not add public wrappers, do not change
 default dispatch, and do not broaden package-wide certification claims.
 
-Default certified `loggamma` and default certified `gamma` remain direct Arb
-primitive paths. Calls that omit `method=...` or pass `method="auto"` continue
-to use the existing default dispatch.
+Default certified `loggamma`, default certified `gamma`, and default certified
+`rgamma` remain direct Arb primitive paths. Calls that omit `method=...` or
+pass `method="auto"` continue to use the existing default dispatch.
 
 ## Summary Matrix
 
@@ -17,28 +17,39 @@ to use the existing default dispatch.
 | `loggamma` | `method="stirling_shifted"` | finite real `x >= 20` | `stirling_loggamma_positive_real` | no |
 | `loggamma` | `method="certified_auto"` | selector over direct Arb and positive-real Stirling methods | selected method's scope | no |
 | `gamma` | `method="stirling_exp"` | finite real `x >= 20` | `gamma_positive_real_stirling_exp` | no |
+| `rgamma` | `method="stirling_recip"` | finite real `x >= 20` | `rgamma_positive_real_stirling_recip` | no |
 
-## Future Work: Planned `rgamma(method="stirling_recip")`
+## `rgamma(method="stirling_recip")`
 
-The planned positive-real `rgamma` method is future work only. It is not active,
-is not registered, and must not be included in the active summary matrix until
-an implementation PR lands with proof, tests, diagnostics, and release wording.
+- Function: `rgamma`.
+- Call shape:
+  `rgamma(x, mode="certified", method="stirling_recip", dps=...)`.
+- Domain: finite real `x >= 20`.
+- Runtime method: `stirling_recip_rgamma`.
+- Certificate scope:
+  `certificate_scope="rgamma_positive_real_stirling_recip"`.
+- Certificate level: `certificate_level="custom_asymptotic_bound"`.
+- Audit status: `audit_status="theorem_documented"`.
+- Default dispatch: no.
 
-The active 0.3 custom methods remain the four currently active paths:
-`loggamma(method="stirling")`, `loggamma(method="stirling_shifted")`,
-`loggamma(method="certified_auto")`, and `gamma(method="stirling_exp")`.
+This method obtains a certified positive-real `loggamma` Arb enclosure, widens
+that enclosure by the explicit loggamma tail bound, and evaluates Arb `exp` on
+the negated widened ball. Successful diagnostics identify
+`formula="rgamma=exp(-loggamma)"` and expose the underlying
+`loggamma_method_used`.
 
-The planned future call shape is
-`rgamma(x, mode="certified", method="stirling_recip", dps=...)` for finite
-real `x >= 20`, with the planned reduction `rgamma(x) = exp(-loggamma(x))`,
-planned certificate scope `rgamma_positive_real_stirling_recip`, planned
-certificate level `custom_asymptotic_bound`, planned audit status
-`theorem_documented`, and planned runtime method `stirling_recip_rgamma`.
+Expected diagnostics include:
 
-This future work excludes complex `rgamma`, real `x < 20`, real `x <= 0`,
-non-finite input, reflection-formula paths, near-pole behavior, gamma-ratio
+- `selected_method="stirling_recip"`
+- `loggamma_method_used`
+- `loggamma_abs_error_bound`
+- `exp_radius`
+- `propagated_error_bound`
+
+Exclusions: complex `rgamma`, reflection formula certification, near-pole
+behavior, real `x < 20`, real `x <= 0`, non-finite input, gamma-ratio
 asymptotics, beta asymptotics, parabolic-cylinder promotion, and default
-dispatch changes.
+`rgamma` method selection.
 
 ## `loggamma(method="stirling")`
 
@@ -149,17 +160,18 @@ Expected diagnostics include:
 - `propagated_error_bound`
 
 Exclusions: complex `gamma`, complex `gamma` via Stirling, reflection formula
-certification, near-pole certification, real `x < 20`, real `x <= 0`,
+certification, near-pole behavior, real `x < 20`, real `x <= 0`,
 non-finite input, gamma-ratio asymptotics, beta asymptotics, and default
 `gamma` method selection.
 
 ## Release-Claim Boundaries
 
 The 0.3 custom methods are narrow alpha-certified custom asymptotic-bound
-paths. They do not imply package-wide certification for `loggamma` or `gamma`,
-complex-domain Stirling certificates, a complex `gamma` Stirling certificate,
-reflection formula certification, gamma-ratio asymptotic certification, beta
-asymptotic certification, complete asymptotic coverage, or broader
-parabolic-cylinder status.
+paths. They do not imply package-wide certification for `loggamma`, `gamma`,
+or `rgamma`, complex-domain Stirling certificates, a complex `gamma` or
+complex `rgamma` Stirling certificate, reflection formula certification,
+near-pole behavior support, gamma-ratio asymptotic certification, beta asymptotic
+certification, complete asymptotic coverage, or broader parabolic-cylinder
+status.
 
 Parabolic-cylinder wrappers remain `experimental_formula`.
