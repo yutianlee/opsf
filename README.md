@@ -522,6 +522,8 @@ The repository also includes:
   matrix.
 - `docs/v0.3.0_final_readiness_audit.md` for the v0.3.0 final-readiness
   audit and final-release sequence.
+- `docs/release-0.4.0.md` for v0.4.0 positive-real gamma-ratio development
+  planning.
 - `docs/release-0.3.0.md` for v0.3.0 final release planning notes.
 - `docs/release-0.3.0-alpha.5.md` for v0.3.0-alpha.5 release planning, which
   packages only the explicit positive-real `rgamma`
