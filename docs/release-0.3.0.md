@@ -16,7 +16,10 @@ metadata bump for this line was planned in
 preselection optimization for that explicit selector. The fourth alpha,
 [`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), packages the explicit
 positive-real `gamma` method `method="stirling_exp"` with no default-dispatch
-change.
+change. The fifth alpha,
+[`release-0.3.0-alpha.5.md`](release-0.3.0-alpha.5.md), packages the explicit
+positive-real `rgamma` method `method="stirling_recip"` with no
+default-dispatch change.
 
 ## Active Scope
 
@@ -132,6 +135,9 @@ The line includes:
 - [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md), which
   summarizes all active 0.3 custom methods, their diagnostics, preserved
   default-dispatch behavior, and exclusions;
+- [`release-0.3.0-alpha.5.md`](release-0.3.0-alpha.5.md), which records the
+  prerelease plan for packaging the explicit positive-real `rgamma`
+  `method="stirling_recip"` with no default-dispatch change;
 - [`release-0.3.0-alpha.4.md`](release-0.3.0-alpha.4.md), which records the
   prerelease plan for packaging the explicit positive-real `gamma`
   `method="stirling_exp"` with no default-dispatch change; and

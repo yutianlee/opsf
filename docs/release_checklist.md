@@ -47,7 +47,7 @@ python -m mypy
 python -m pyright src
 python -m pytest
 python -m pytest tests/test_release_claims.py
-python scripts/check_release_version.py v0.3.0-alpha.4
+python scripts/check_release_version.py v0.3.0-alpha.5
 python -m build
 python -m twine check dist/*
 python examples/basic_usage.py
@@ -74,6 +74,7 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
 - Real PyPI publishing runs from GitHub release/prerelease publication events
   through `publish-pypi`.
 - Publishing workflows must pass the tag/version parity check before building:
+  `v0.3.0-alpha.5` maps to `0.3.0a5`,
   `v0.3.0-alpha.4` maps to `0.3.0a4`,
   `v0.3.0-alpha.3` maps to `0.3.0a3`,
   `v0.3.0-alpha.2` maps to `0.3.0a2`,
@@ -90,6 +91,56 @@ For the final 0.1.0 tag, use `v0.1.0` and Python package version `0.1.0`.
   `v0.2.0-alpha.2` maps to `0.2.0a2`,
   `v0.2.0-alpha.1` maps to `0.2.0a1`,
   `v0.1.0-alpha.3` maps to `0.1.0a3`, and `v0.1.0` maps to `0.1.0`.
+
+## v0.3.0-alpha.5 Checklist
+
+- [ ] `pyproject.toml` version is `0.3.0a5`.
+- [ ] `CITATION.cff` version is `0.3.0-alpha.5`.
+- [ ] `CITATION.cff` date-released is `2026-05-12`.
+- [ ] `CHANGELOG.md` records the explicit positive-real `rgamma`
+  `method="stirling_recip"` alpha.
+- [ ] `docs/release-0.3.0-alpha.5.md` is reviewed.
+- [ ] Publish workflow defaults point at `v0.3.0-alpha.5`.
+- [ ] PyPI smoke workflow remains pinned to `0.3.0a4` until `0.3.0a5` is
+  published and smoke verification passes.
+- [ ] GitHub release for `v0.3.0-alpha.5` is marked prerelease.
+- [ ] TestPyPI staging is skipped unless release validation identifies
+  packaging or workflow risk under `release_policy.md`.
+- [ ] Publish the real PyPI prerelease through the protected `publish-pypi`
+  workflow from the GitHub prerelease.
+- [ ] Run `pypi-smoke` against `0.3.0a5` after real PyPI publication.
+- [ ] No `src/` runtime implementation changes are included in the
+  release-planning PR.
+- [ ] No public-wrapper changes are included.
+- [ ] Release copy says this alpha packages the explicit positive-real
+  `rgamma` `method="stirling_recip"` for finite real `x >= 20`.
+- [ ] Release copy says `method="stirling_recip"` computes `rgamma(x)` by
+  exponentiating the negated certified positive-real `loggamma` Arb enclosure.
+- [ ] Release copy records
+  `certificate_scope="rgamma_positive_real_stirling_recip"` and runtime result
+  method `method="stirling_recip_rgamma"`.
+- [ ] Default certified `rgamma` remains the direct Arb path.
+- [ ] `method=None` and `method="auto"` remain unchanged.
+- [ ] `method="stirling_recip"` is explicit only and is not automatic default
+  selection.
+- [ ] Complex `rgamma`, reflection formula certification, near-pole behavior
+  support, real `x < 20`, real `x <= 0`, gamma-ratio asymptotics, and beta
+  asymptotics are excluded.
+- [ ] Parabolic-cylinder wrappers remain `experimental_formula`.
+- [ ] Release copy does not broaden certification claims.
+- [ ] `python scripts/check_release_version.py v0.3.0-alpha.5` passes.
+- [ ] `python -m ruff check .` passes.
+- [ ] `python -m mypy` passes.
+- [ ] `python -m pyright src` passes.
+- [ ] `python -m pytest` passes.
+- [ ] `python -m build` passes.
+- [ ] `python -m twine check dist/*` passes.
+- [ ] `python benchmarks/bench_gamma_methods.py` runs.
+- [ ] `python benchmarks/bench_rgamma_methods.py` runs.
+- [ ] `python benchmarks/bench_loggamma_methods.py` runs.
+- [ ] `python benchmarks/analyze_loggamma_auto.py` runs.
+- [ ] `python benchmarks/summarize_loggamma_auto.py docs/benchmark_samples/loggamma_certified_auto_sample.jsonl`
+  runs.
 
 ## v0.3.0-alpha.4 Checklist
 

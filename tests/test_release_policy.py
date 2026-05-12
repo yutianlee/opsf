@@ -53,8 +53,24 @@ def test_publish_testpypi_workflow_requires_manual_confirmation():
     assert "Refusing to publish to TestPyPI without confirm=publish-testpypi." in text
     assert "actions/upload-artifact@v6" in text
     assert "actions/download-artifact@v6" in text
-    assert 'default: "v0.3.0-alpha.4"' in text
-    assert 'default: "v0.3.0-alpha.4"' in publish_text
+    assert 'default: "v0.3.0-alpha.5"' in text
+    assert 'default: "v0.3.0-alpha.5"' in publish_text
+
+
+def test_alpha5_release_plan_records_explicit_rgamma_scope_and_smoke_pin():
+    text = _read("docs/release-0.3.0-alpha.5.md")
+    smoke_text = _read(".github/workflows/pypi-smoke.yml")
+
+    assert "fifth alpha in the 0.3 line" in text
+    assert 'method="stirling_recip"' in text
+    assert "finite real `x >= 20`" in text
+    assert 'certificate_scope="rgamma_positive_real_stirling_recip"' in text
+    assert 'method="stirling_recip_rgamma"' in text
+    assert "Default certified `rgamma` remains the direct Arb path." in text
+    assert "`method=None` and calls with `method=\"auto\"` remain unchanged" in text
+    assert "TestPyPI\nstaging is skipped unless that risk appears during validation" in text
+    assert 'default: "0.3.0a4"' in smoke_text
+    assert "0.3.0a5" not in smoke_text
 
 
 def _read(path: str) -> str:

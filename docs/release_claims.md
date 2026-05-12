@@ -124,7 +124,8 @@ Release-facing support matrices must keep these status phrases:
   certification", "custom certified gamma is active", or "automatic default
   gamma selection".
 - Do not say "active custom-certified rgamma", "global rgamma certification",
-  "complex reciprocal gamma certification", "near-pole certification", or
+  "complex reciprocal gamma certification", "complex rgamma certification",
+  "certified complex rgamma", "near-pole certification", or
   "automatic default rgamma selection".
 - Do not say "certified beta asymptotics", "reflection formula is certified",
   "certified reflection formula", or "broad parabolic-cylinder certification".
