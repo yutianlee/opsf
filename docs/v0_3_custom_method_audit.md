@@ -18,6 +18,28 @@ to use the existing default dispatch.
 | `loggamma` | `method="certified_auto"` | selector over direct Arb and positive-real Stirling methods | selected method's scope | no |
 | `gamma` | `method="stirling_exp"` | finite real `x >= 20` | `gamma_positive_real_stirling_exp` | no |
 
+## Future Work: Planned `rgamma(method="stirling_recip")`
+
+The planned positive-real `rgamma` method is future work only. It is not active,
+is not registered, and must not be included in the active summary matrix until
+an implementation PR lands with proof, tests, diagnostics, and release wording.
+
+The active 0.3 custom methods remain the four currently active paths:
+`loggamma(method="stirling")`, `loggamma(method="stirling_shifted")`,
+`loggamma(method="certified_auto")`, and `gamma(method="stirling_exp")`.
+
+The planned future call shape is
+`rgamma(x, mode="certified", method="stirling_recip", dps=...)` for finite
+real `x >= 20`, with the planned reduction `rgamma(x) = exp(-loggamma(x))`,
+planned certificate scope `rgamma_positive_real_stirling_recip`, planned
+certificate level `custom_asymptotic_bound`, planned audit status
+`theorem_documented`, and planned runtime method `stirling_recip_rgamma`.
+
+This future work excludes complex `rgamma`, real `x < 20`, real `x <= 0`,
+non-finite input, reflection-formula paths, near-pole behavior, gamma-ratio
+asymptotics, beta asymptotics, parabolic-cylinder promotion, and default
+dispatch changes.
+
 ## `loggamma(method="stirling")`
 
 - Function: `loggamma`.

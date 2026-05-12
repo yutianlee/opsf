@@ -1,8 +1,9 @@
 # Certified Scope for 0.3.0
 
 This document records the v0.3.0 certified-scope direction. It keeps the
-current 0.2.0 public wrapper list and adds active custom-certified-method rows
-for explicit positive-real `loggamma` and explicit positive-real `gamma`.
+current 0.2.0 public wrapper list, adds active custom-certified-method rows
+for explicit positive-real `loggamma` and explicit positive-real `gamma`, and
+records a planned inactive row for a future positive-real `rgamma` method.
 
 The published 0.2.0 surface remains recorded in
 [`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). This document does not
@@ -22,6 +23,7 @@ parabolic-cylinder certification claims.
 | Method registry v2 | existing Python wrappers with optional `method=...` selection | infrastructure active; default selection unchanged |
 | Custom Taylor/asymptotic methods | `loggamma` positive-real Stirling asymptotic | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; real `x >= 20` for custom methods; not automatic default selection |
 | Custom gamma method | positive-real `gamma` via certified `loggamma` exponentiation | active explicit method `method="stirling_exp"` only; alpha-certified custom asymptotic bound for finite real `x >= 20`; no default dispatch change |
+| Planned custom rgamma method | positive-real `rgamma` via certified `loggamma` exponentiation | planned only, not active until implementation lands; explicit `method="stirling_recip"` only; finite real `x >= 20`; no default dispatch change |
 
 ## Current Function List
 
@@ -104,6 +106,28 @@ certified `gamma` path. It excludes complex `gamma`, real `x < 20`, real
 `x <= 0`, reflection-formula paths, near-pole behavior, gamma-ratio
 asymptotics, beta asymptotics, and parabolic-cylinder promotion.
 
+## Planned Custom Rgamma Method Row
+
+The planned reciprocal-gamma row is inactive. It records only future work for
+the existing `rgamma` wrapper and the explicit future method:
+
+- selector: explicit `mode="certified", method="stirling_recip"`;
+- target: positive-real `rgamma(x) = 1/Gamma(x)`;
+- preferred reduction: `rgamma(x) = exp(-loggamma(x))`;
+- dependency: existing certified positive-real `loggamma` Arb-ball enclosure;
+- domain: finite real `x >= 20`;
+- planned certificate scope: `rgamma_positive_real_stirling_recip`;
+- planned certificate level: `custom_asymptotic_bound`;
+- planned audit status: `theorem_documented`;
+- planned runtime method field: `stirling_recip_rgamma`;
+- default status: no default dispatch change.
+
+This row is not active until implementation, proof checks, runtime tests, and
+release documentation land together. It excludes complex `rgamma`, real
+`x < 20`, real `x <= 0`, non-finite input, reflection-formula paths, near-pole
+behavior, gamma-ratio asymptotics, beta asymptotics, default dispatch, and
+parabolic-cylinder promotion.
+
 ## Scope Boundaries
 
 - Default certified `loggamma` remains direct Arb.
@@ -111,6 +135,7 @@ asymptotics, beta asymptotics, and parabolic-cylinder promotion.
 - `method="auto"` remains equivalent to the previous automatic selection path.
 - Explicit `method="certified_auto"` is a selector only and does not change
   default dispatch.
+- Planned `rgamma(method="stirling_recip")` is inactive and not registered.
 - Parabolic-cylinder wrappers remain `experimental_formula`.
 - No Faddeeva, `wofz`, or plasma-dispersion wrappers are included.
 - No broad package-wide, family-wide, or all-input `loggamma` certification

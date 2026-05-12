@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- No unreleased changes yet.
+- Planned positive-real `rgamma(x)` custom certificate via certified
+  `loggamma` exponentiation.
+- Documentation only; no runtime behavior.
 
 ## 0.3.0-alpha.4 - 2026-05-10
 

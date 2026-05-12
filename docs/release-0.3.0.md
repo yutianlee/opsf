@@ -69,6 +69,19 @@ methods documented in [`stirling_loggamma.md`](stirling_loggamma.md) and the
 positive-real `gamma` method documented in
 [`gamma_stirling_exp.md`](gamma_stirling_exp.md).
 
+## Future Work
+
+The next candidate custom method is positive-real `rgamma` via
+`exp(-loggamma)`, using the existing certified positive-real `loggamma`
+Arb-ball enclosure. The planned explicit method name is
+`method="stirling_recip"` for finite real `x >= 20`.
+
+This reciprocal-gamma method is not implemented yet.
+No release claim is active yet.
+No default dispatch change is made or planned by the documentation-only
+planning PR. See
+[`rgamma_stirling_recip.md`](rgamma_stirling_recip.md).
+
 ## Positive-Real `gamma` via Loggamma Exponentiation
 
 The active explicit positive-real `gamma(x)` method uses certified `loggamma`
@@ -101,6 +114,8 @@ The line includes:
   consideration of default certified `loggamma` method selection;
 - [`gamma_stirling_exp.md`](gamma_stirling_exp.md), which records the active
   explicit positive-real `gamma` method and its exclusions;
+- [`rgamma_stirling_recip.md`](rgamma_stirling_recip.md), which records the
+  planned inactive positive-real `rgamma` method and its exclusions;
 - [`v0_3_custom_method_audit.md`](v0_3_custom_method_audit.md), which
   summarizes all active 0.3 custom methods, their diagnostics, preserved
   default-dispatch behavior, and exclusions;
