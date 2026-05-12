@@ -57,6 +57,9 @@ publication plus `pypi-smoke` is sufficient.
 
 The `pypi-smoke` workflow remains pinned to the last verified prerelease,
 `0.3.0a4`, until `certsf 0.3.0a5` is published and smoke verification passes.
+If a smoke-pin update lands before PyPI publication succeeds, revert the pin to
+the latest published version and retry the update after real PyPI plus
+`pypi-smoke` verification passes.
 
 ## Validation
 
