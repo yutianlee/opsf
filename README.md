@@ -96,8 +96,9 @@ Every wrapper returns an `SFResult` with these fields:
 - `certified`: `True` only when a rigorous enclosure was produced.
 - `function`: canonical function name.
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
-  `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`, or
-  `stirling_exp_gamma`, or `stirling_recip_rgamma`.
+  `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`,
+  `stirling_diff_loggamma_ratio`, `stirling_exp_gamma`, or
+  `stirling_recip_rgamma`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -149,14 +150,20 @@ For `rgamma`, explicit `mode="certified", method="stirling_recip"` selects an
 alpha-certified positive-real method for finite real `x >= 20` by
 exponentiating the negated certified positive-real `loggamma` enclosure. It is
 explicit only and does not change default certified `rgamma`.
+For `loggamma_ratio`, explicit
+`mode="certified", method="stirling_diff"` selects an alpha-certified
+positive-real method for finite real `a >= 20` and `b >= 20` by subtracting two
+certified positive-real `loggamma` enclosures. It is explicit only and does
+not change default certified `loggamma_ratio`.
 
 ## Supported Functions
 
-The 0.3 development line keeps the 0.2 public wrapper surface and adds
-explicit custom certified asymptotic methods for `loggamma`, positive-real
-`gamma`, and positive-real `rgamma`. Default certified `loggamma`, default
-certified `gamma`, and default certified `rgamma` still use direct Arb. The
-package remains alpha-quality in scientific scope.
+The development line keeps the 0.2 public wrapper surface and adds explicit
+custom certified asymptotic methods for `loggamma`, positive-real
+`loggamma_ratio`, positive-real `gamma`, and positive-real `rgamma`. Default
+certified `loggamma`, default certified `loggamma_ratio`, default certified
+`gamma`, and default certified `rgamma` still use direct Arb. The package
+remains alpha-quality in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -166,7 +173,7 @@ package remains alpha-quality in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for custom methods; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio; not automatic default selection |
 
 ```python
 from certsf import (
@@ -244,6 +251,18 @@ Certified `loggamma_ratio(a, b)` evaluates Arb `lgamma(a) - lgamma(b)` with
 argument returns a clean non-certified failure. For complex values, the result
 is the difference of principal `loggamma` values, not necessarily the principal
 logarithm of `gamma_ratio(a, b)`. See
+[`docs/loggamma_ratio.md`](docs/loggamma_ratio.md).
+
+Explicit
+`loggamma_ratio(a, b, mode="certified", method="stirling_diff")` evaluates a
+positive-real Stirling-difference enclosure for finite real `a >= 20` and
+`b >= 20` by subtracting two certified positive-real `loggamma` enclosures. It
+records
+`certificate_scope="loggamma_ratio_positive_real_stirling_diff"` and returns
+`method="stirling_diff_loggamma_ratio"`. It does not certify complex
+gamma-ratio Stirling paths, reflection-formula paths, near-pole behavior,
+simultaneous-pole limiting values, `gamma_ratio` asymptotics, or beta
+asymptotics, and it is not selected by default. See
 [`docs/loggamma_ratio.md`](docs/loggamma_ratio.md).
 
 Explicit `loggamma(x, mode="certified", method="stirling")` evaluates the
