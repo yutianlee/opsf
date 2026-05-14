@@ -98,7 +98,8 @@ Every wrapper returns an `SFResult` with these fields:
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
   `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`,
   `stirling_diff_loggamma_ratio`, `stirling_exp_gamma`, or
-  `stirling_recip_rgamma`, or `stirling_ratio_gamma_ratio`.
+  `stirling_recip_rgamma`, `stirling_ratio_gamma_ratio`, or
+  `stirling_beta_beta`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -160,15 +161,20 @@ For `gamma_ratio`, explicit
 positive-real method for finite real `a >= 20` and `b >= 20` by exponentiating
 a certified positive-real `loggamma_ratio` enclosure. It is explicit only and
 does not change default certified `gamma_ratio`.
+For `beta`, explicit `mode="certified", method="stirling_beta"` selects an
+alpha-certified positive-real method for finite real `a >= 20` and `b >= 20`
+by exponentiating a certified positive-real `loggamma` combination. It is
+explicit only and does not change default certified `beta`.
 
 ## Supported Functions
 
 The development line keeps the 0.2 public wrapper surface and adds explicit
 custom certified asymptotic methods for `loggamma`, positive-real
-`loggamma_ratio`, positive-real `gamma_ratio`, positive-real `gamma`, and
-positive-real `rgamma`. Default certified `loggamma`, default certified
-`loggamma_ratio`, default certified `gamma_ratio`, default certified `gamma`,
-and default certified `rgamma` still use direct Arb. The package remains
+`loggamma_ratio`, positive-real `gamma_ratio`, positive-real `beta`,
+positive-real `gamma`, and positive-real `rgamma`. Default certified
+`loggamma`, default certified `loggamma_ratio`, default certified
+`gamma_ratio`, default certified `beta`, default certified `gamma`, and
+default certified `rgamma` still use direct Arb. The package remains
 alpha-quality in scientific scope.
 
 | Area | Release status |
@@ -179,7 +185,7 @@ alpha-quality in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma_ratio method `method="stirling_ratio"` via exponentiated certified loggamma_ratio; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio and gamma_ratio; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma_ratio method `method="stirling_ratio"` via exponentiated certified loggamma_ratio; active explicit positive-real beta method `method="stirling_beta"` via exponentiated certified loggamma combination; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio, gamma_ratio, and beta; not automatic default selection |
 
 ```python
 from certsf import (
@@ -338,6 +344,15 @@ clean non-certified failures. A pole in `Gamma(a+b)` certifies to zero only when
 both numerator gamma factors are finite and Arb returns the zero product. The
 wrapper does not claim limiting values at simultaneous singularities. See
 [`docs/beta.md`](docs/beta.md).
+
+Explicit `beta(a, b, mode="certified", method="stirling_beta")` evaluates a
+positive-real enclosure for finite real `a >= 20` and `b >= 20` by
+exponentiating a certified positive-real
+`loggamma(a)+loggamma(b)-loggamma(a+b)` enclosure. It records
+`certificate_scope="beta_positive_real_stirling_beta"` and returns
+`method="stirling_beta_beta"`. It does not certify complex beta Stirling paths,
+reflection-formula paths, near-pole behavior, simultaneous-pole limiting
+values, or default-dispatch promotion. See [`docs/beta.md`](docs/beta.md).
 
 ```python
 from certsf import pochhammer
@@ -535,8 +550,8 @@ The repository also includes:
   rationale, and the explicit positive-real `method="stirling_ratio"` path.
 - `docs/loggamma_ratio.md` for loggamma-ratio branch convention and pole
   policy.
-- `docs/beta.md` for beta-function pole policy and certified-backend
-  rationale.
+- `docs/beta.md` for beta-function pole policy, certified-backend rationale,
+  and the explicit positive-real `method="stirling_beta"` path.
 - `docs/pochhammer.md` for Pochhammer/rising-factorial certified-domain policy.
 - `docs/stirling_loggamma.md` for the explicit positive-real Stirling
   `loggamma` method.
@@ -557,8 +572,8 @@ The repository also includes:
   matrix.
 - `docs/v0.3.0_final_readiness_audit.md` for the v0.3.0 final-readiness
   audit and final-release sequence.
-- `docs/release-0.4.0.md` for v0.4.0 positive-real gamma-ratio development
-  planning.
+- `docs/release-0.4.0.md` for v0.4.0 positive-real gamma-ratio and beta
+  development planning.
 - `docs/release-0.3.0.md` for v0.3.0 final release planning notes.
 - `docs/release-0.3.0-alpha.5.md` for v0.3.0-alpha.5 release planning, which
   packages only the explicit positive-real `rgamma`
