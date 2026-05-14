@@ -10,10 +10,11 @@ CURRENT_CUSTOM_ASYMPTOTIC_ROW = (
     'explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select '
     'those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via '
     'certified loggamma difference; active explicit positive-real gamma_ratio method `method="stirling_ratio"` via '
-    'exponentiated certified loggamma_ratio; active explicit positive-real gamma method `method="stirling_exp"` via '
-    'certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via '
+    'exponentiated certified loggamma_ratio; active explicit positive-real beta method `method="stirling_beta"` via '
+    'exponentiated certified loggamma combination; active explicit positive-real gamma method `method="stirling_exp"` '
+    'via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via '
     'certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, '
-    '`b >= 20` for loggamma_ratio and gamma_ratio; not automatic default selection |'
+    '`b >= 20` for loggamma_ratio, gamma_ratio, and beta; not automatic default selection |'
 )
 
 FROZEN_0_1_0_FUNCTIONS = (

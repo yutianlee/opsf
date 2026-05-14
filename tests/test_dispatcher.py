@@ -123,6 +123,22 @@ def test_gamma_ratio_stirling_ratio_method_spec_records_custom_asymptotic_metada
     assert "beta asymptotics" in method.applicability_note
 
 
+def test_beta_stirling_beta_method_spec_records_custom_asymptotic_metadata():
+    method = METHOD_REGISTRY["beta"]["certified"][1]
+
+    assert method.method_id == "stirling_beta"
+    assert method.certificate_scope == "beta_positive_real_stirling_beta"
+    assert method.certificate_level == "custom_asymptotic_bound"
+    assert method.audit_status == "theorem_documented"
+    assert method.backend == "certsf+python-flint"
+    assert "a >= 20" in method.domain
+    assert "b >= 20" in method.domain
+    assert "not automatic default selection" in method.applicability_note
+    assert "reflection formulas" in method.applicability_note
+    assert "near-pole behavior" in method.applicability_note
+    assert "simultaneous-pole limiting values" in method.applicability_note
+
+
 def test_loggamma_stirling_method_spec_records_custom_asymptotic_metadata():
     method = METHOD_REGISTRY["loggamma"]["certified"][1]
 
@@ -239,10 +255,21 @@ def test_stirling_ratio_method_is_active_only_for_explicit_certified_gamma_ratio
     assert METHOD_REGISTRY["gamma_ratio"]["certified"][0] == REGISTRY["gamma_ratio"]["certified"]
 
 
+def test_stirling_beta_method_is_active_only_for_explicit_certified_beta():
+    active_beta_methods = [
+        method for method in available_methods() if method.function == "beta" and method.mode == "certified"
+    ]
+    stirling_beta_methods = [method for method in available_methods() if method.method_id == "stirling_beta"]
+
+    assert [method.method_id for method in active_beta_methods] == ["arb", "stirling_beta"]
+    assert stirling_beta_methods == [METHOD_REGISTRY["beta"]["certified"][1]]
+    assert METHOD_REGISTRY["beta"]["certified"][0] == REGISTRY["beta"]["certified"]
+
+
 def test_available_methods_exposes_auditable_method_specs_in_dispatch_order():
     methods = available_methods()
 
-    assert len(methods) == len(available_functions()) * 3 + 7
+    assert len(methods) == len(available_functions()) * 3 + 8
     assert methods[0] == REGISTRY["gamma"]["fast"]
     assert methods[1] == REGISTRY["gamma"]["high_precision"]
     assert methods[2] == REGISTRY["gamma"]["certified"]

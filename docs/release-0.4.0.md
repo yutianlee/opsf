@@ -6,8 +6,8 @@ authorize a release, bump the package version, change default runtime
 behavior, or broaden certification claims beyond implemented and documented
 explicit methods.
 
-The target direction is explicit certified positive-real gamma-ratio methods
-built from the existing certified positive-real `loggamma` machinery.
+The target direction is explicit certified positive-real gamma-ratio and beta
+methods built from the existing certified positive-real `loggamma` machinery.
 
 ## Active Scopes
 
@@ -42,28 +42,25 @@ It uses certificate scope:
 
 - `gamma_ratio_positive_real_stirling_ratio`
 
-## Later Proposed Scope
-
-Later work may also consider an explicit certified positive-real `beta`
-method:
+The final active implementation target in this plan is the explicit certified
+positive-real `beta` method:
 
 ```python
 beta(a, b, mode="certified", method="stirling_beta", dps=...)
 ```
 
-That method should use
-`exp(loggamma(a) + loggamma(b) - loggamma(a + b))` after the required
-positive-real loggamma certificates and cancellation/error accounting are
-documented.
+The domain is finite real `a >= 20` and finite real `b >= 20`. The method uses
+`exp(loggamma(a) + loggamma(b) - loggamma(a + b))` with the existing
+positive-real `loggamma` certificates and explicit cancellation/error
+accounting.
 
-## Later Certificate Scope
-
-This scope name remains a planning target only:
+It uses certificate scope:
 
 - `beta_positive_real_stirling_beta`
 
-It must not be treated as an active runtime scope until a later implementation
-PR supplies proof notes, tests, diagnostics, and documentation.
+## Later Certificate Scope
+
+No additional certificate scope is active in this planning document.
 
 ## Dispatch Guardrails
 
@@ -81,9 +78,10 @@ default-dispatch promotion.
 
 ## Exclusions
 
-The v0.4.0 positive-real gamma-ratio plan excludes:
+The v0.4.0 positive-real gamma-ratio and beta plan excludes:
 
 - no complex gamma-ratio Stirling certification;
+- no complex beta Stirling certification;
 - no reflection-formula certification;
 - no near-pole behavior;
 - no simultaneous-pole limiting values;
@@ -92,4 +90,4 @@ The v0.4.0 positive-real gamma-ratio plan excludes:
 - no broad package-wide certification claim.
 
 This plan does not add public wrappers, change workflow files, alter release
-policy, or implement `beta(method="stirling_beta")`.
+policy, or promote any explicit method into default dispatch.

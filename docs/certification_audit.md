@@ -71,6 +71,7 @@ certificate level or promote
 | `loggamma_ratio_positive_real_stirling_diff` | `loggamma_ratio` via explicit `method="stirling_diff"` | `custom_asymptotic_bound` | Certified positive-real `loggamma` Arb enclosures for finite real `a >= 20` and `b >= 20`, each widened by its explicit Stirling tail bound, followed by Arb ball subtraction; direct Arb containment; zero-difference enclosure; MCP parity; default-Arb preservation | Complex inputs, including zero-imaginary strings; `a < 20`; `b < 20`; non-finite input; reflection formulas; near-pole behavior; simultaneous-pole limiting values; `gamma_ratio` asymptotics; beta asymptotics; default selection |
 | `gamma_ratio_positive_real_stirling_ratio` | `gamma_ratio` via explicit `method="stirling_ratio"` | `custom_asymptotic_bound` | Certified positive-real `loggamma_ratio` Arb enclosure for finite real `a >= 20` and `b >= 20`, followed by Arb exponentiation; direct Arb containment; unit-ratio enclosure; MCP parity; default-Arb preservation | Complex inputs, including zero-imaginary strings; `a < 20`; `b < 20`; non-finite input; reflection formulas; near-pole behavior; simultaneous-pole limiting values; beta asymptotics; default selection |
 | `direct_arb_beta` | `beta` | `direct_arb_primitive` | Arb `Gamma(a) * Gamma(b) * rgamma(a+b)` product; denominator-pole zero tests; numerator-pole clean-failure tests; symmetry and recurrence identity checks | Non-finite `Gamma(a)` or `Gamma(b)` targets; simultaneous pole interactions and limiting-value claims |
+| `beta_positive_real_stirling_beta` | `beta` via explicit `method="stirling_beta"` | `custom_asymptotic_bound` | Certified positive-real `loggamma(a)+loggamma(b)-loggamma(a+b)` Arb enclosure for finite real `a >= 20` and `b >= 20`, followed by Arb exponentiation; direct Arb containment; symmetry overlap; MCP parity; default-Arb preservation | Complex inputs, including zero-imaginary strings; `a < 20`; `b < 20`; non-finite input; reflection formulas; near-pole behavior; simultaneous-pole limiting values; default selection |
 | `direct_arb_pochhammer_product` | `pochhammer` | `direct_arb_finite_product` | Arb finite product `prod_{k=0}^{n-1}(a+k)`; special-value tests; zero-factor test; recurrence identity check; integer-domain rejection tests | Non-integer `n`; negative `n`; analytic continuation in `n`; simultaneous-pole limiting values; product paths above the documented term ceiling |
 | `stirling_loggamma_positive_real` | `loggamma` via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select this scope | `custom_asymptotic_bound` | Positive-real Stirling expansion with Bernoulli terms; Arb finite sum; shifted Arb recurrence for `stirling_shifted`; exact coefficient table through `B_300`; explicit first-omitted-term tail bound; direct Arb containment; MCP parity; default-Arb preservation; explicit selector diagnostics | Complex `z`; `x < 20`; `x <= 0`; non-finite input; principal-branch complex `loggamma`; gamma-ratio asymptotics; default selection |
 | `gamma_positive_real_stirling_exp` | `gamma` via explicit `method="stirling_exp"` | `custom_asymptotic_bound` | Certified positive-real `loggamma` Arb enclosure widened by the explicit Stirling tail bound, followed by Arb exponentiation; direct Arb containment; MCP parity; default-Arb preservation | Complex `gamma`; `x < 20`; `x <= 0`; non-finite input; reflection formulas; near-pole behavior; gamma-ratio asymptotics; beta asymptotics; default selection |
@@ -145,6 +146,12 @@ The explicit positive-real `gamma_ratio` method uses custom-asymptotic wording:
 
 ```text
 certified positive-real gamma-ratio enclosure via exponentiated certified loggamma-ratio
+```
+
+The explicit positive-real `beta` method uses custom-asymptotic wording:
+
+```text
+certified positive-real beta enclosure via exponentiated certified loggamma combination
 ```
 
 The explicit positive-real `gamma` method uses custom-asymptotic wording:

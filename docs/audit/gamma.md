@@ -40,6 +40,10 @@ subtraction ball carries the two tail contributions without adding them again.
 Explicit `gamma_ratio(a, b, method="stirling_ratio")` exponentiates the
 certified positive-real `loggamma_ratio(method="stirling_diff")` enclosure
 using Arb ball arithmetic.
+Explicit `beta(a, b, method="stirling_beta")` combines certified
+positive-real `loggamma(a)`, `loggamma(b)`, and `loggamma(a+b)` Arb
+enclosures, then exponentiates the combined log-beta ball using Arb ball
+arithmetic.
 
 Accepted domain:
 Real or complex inputs accepted by Arb for the corresponding primitive, when
@@ -63,6 +67,8 @@ Explicit `loggamma_ratio(method="stirling_diff")` accepts finite real
 `a >= 20` and finite real `b >= 20` only.
 Explicit `gamma_ratio(method="stirling_ratio")` accepts finite real
 `a >= 20` and finite real `b >= 20` only.
+Explicit `beta(method="stirling_beta")` accepts finite real `a >= 20` and
+finite real `b >= 20` only.
 
 Excluded domain:
 `gamma` and `loggamma` at poles; `gamma_ratio` when `a` is a gamma pole,
@@ -93,6 +99,10 @@ Explicit `gamma_ratio(method="stirling_ratio")` excludes complex inputs,
 including zero-imaginary strings, non-finite inputs, `a < 20`, `b < 20`,
 reflection-formula paths, near-pole behavior, simultaneous-pole limiting
 values, beta asymptotics, and default-dispatch promotion.
+Explicit `beta(method="stirling_beta")` excludes complex inputs, including
+zero-imaginary strings, non-finite inputs, `a < 20`, `b < 20`,
+reflection-formula paths, near-pole behavior, simultaneous-pole limiting
+values, and default-dispatch promotion.
 
 Branch convention:
 `loggamma` follows Arb's principal branch. `loggamma_ratio` is the difference
@@ -165,6 +175,10 @@ positive real inputs with `a >= 20` and `b >= 20`; it is not selected
 automatically and does not certify complex gamma-ratio paths, reflection
 formulas, near-pole behavior, simultaneous-pole limiting values, or beta
 asymptotics.
+Explicit `beta(method="stirling_beta")` is restricted to finite positive real
+inputs with `a >= 20` and `b >= 20`; it is not selected automatically and does
+not certify complex beta paths, reflection formulas, near-pole behavior, or
+simultaneous-pole limiting values.
 
 Certification status:
 `certificate_level="direct_arb_primitive"`. Certified `gamma`, `loggamma`, and
@@ -200,5 +214,9 @@ Explicit `loggamma_ratio(method="stirling_diff")` results use
 `audit_status="theorem_documented"`.
 Explicit `gamma_ratio(method="stirling_ratio")` results use
 `certificate_scope="gamma_ratio_positive_real_stirling_ratio"`,
+`certificate_level="custom_asymptotic_bound"`, and
+`audit_status="theorem_documented"`.
+Explicit `beta(method="stirling_beta")` results use
+`certificate_scope="beta_positive_real_stirling_beta"`,
 `certificate_level="custom_asymptotic_bound"`, and
 `audit_status="theorem_documented"`.
