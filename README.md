@@ -576,6 +576,8 @@ The repository also includes:
   development planning.
 - `docs/v0.4.0_method_closeout.md` for the v0.4.0 explicit-method
   implementation closeout and release boundary.
+- `docs/v0.4.0_release_readiness_preflight.md` for the v0.4.0
+  release-readiness preflight and release authorization boundary.
 - `docs/release-0.3.0.md` for v0.3.0 final release planning notes.
 - `docs/release-0.3.0-alpha.5.md` for v0.3.0-alpha.5 release planning, which
   packages only the explicit positive-real `rgamma`

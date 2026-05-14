@@ -8,6 +8,8 @@ explicit methods.
 
 The positive-real method implementation closeout is recorded in
 [`v0.4.0_method_closeout.md`](v0.4.0_method_closeout.md).
+The release-readiness preflight is recorded in
+[`v0.4.0_release_readiness_preflight.md`](v0.4.0_release_readiness_preflight.md).
 
 The target direction is explicit certified positive-real gamma-ratio and beta
 methods built from the existing certified positive-real `loggamma` machinery.
