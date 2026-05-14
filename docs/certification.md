@@ -15,8 +15,9 @@ The scope-by-scope audit is maintained in
 [`certification_audit.md`](certification_audit.md). Family-level audit
 checklists live under [`audit/`](audit/).
 The active 0.4.0 development plan is recorded in
-[`release-0.4.0.md`](release-0.4.0.md). The completed 0.3.0 development scope
-is recorded in
+[`release-0.4.0.md`](release-0.4.0.md), with method closeout recorded in
+[`v0.4.0_method_closeout.md`](v0.4.0_method_closeout.md). The completed 0.3.0
+development scope is recorded in
 [`certified_scope_0_3_0.md`](certified_scope_0_3_0.md). The published 0.2.0
 alpha certified surface remains recorded in
 [`certified_scope_0_2_0.md`](certified_scope_0_2_0.md). The frozen 0.1.0
