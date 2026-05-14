@@ -574,6 +574,8 @@ The repository also includes:
   audit and final-release sequence.
 - `docs/release-0.4.0.md` for v0.4.0 positive-real gamma-ratio and beta
   development planning.
+- `docs/v0.4.0_method_closeout.md` for the v0.4.0 explicit-method
+  implementation closeout and release boundary.
 - `docs/release-0.3.0.md` for v0.3.0 final release planning notes.
 - `docs/release-0.3.0-alpha.5.md` for v0.3.0-alpha.5 release planning, which
   packages only the explicit positive-real `rgamma`

@@ -6,6 +6,9 @@ authorize a release, bump the package version, change default runtime
 behavior, or broaden certification claims beyond implemented and documented
 explicit methods.
 
+The positive-real method implementation closeout is recorded in
+[`v0.4.0_method_closeout.md`](v0.4.0_method_closeout.md).
+
 The target direction is explicit certified positive-real gamma-ratio and beta
 methods built from the existing certified positive-real `loggamma` machinery.
 
