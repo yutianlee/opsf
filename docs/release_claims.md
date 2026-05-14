@@ -39,7 +39,7 @@ Release-facing support matrices must keep these status phrases:
 | Bessel family | alpha-certified where direct Arb primitive works; real-valued order only |
 | Parabolic-cylinder family | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma_ratio method `method="stirling_ratio"` via exponentiated certified loggamma_ratio; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio and gamma_ratio; not automatic default selection |
 
 ## Wording Rules
 
@@ -75,6 +75,14 @@ Release-facing support matrices must keep these status phrases:
   near-pole behavior support, simultaneous-pole limiting values,
   `gamma_ratio` asymptotics, beta asymptotics, or automatic default
   `loggamma_ratio` selection for the explicit `stirling_diff` method.
+- Say that `gamma_ratio(a, b, mode="certified", method="stirling_ratio")`
+  via exponentiated certified `loggamma_ratio` is an active explicit method
+  only. The domain is finite real `a >= 20` and `b >= 20`, and direct Arb
+  remains the default certified `gamma_ratio` path.
+- Do not claim complex gamma-ratio Stirling paths, reflection-formula support,
+  near-pole behavior support, simultaneous-pole limiting values, beta
+  asymptotics, or automatic default `gamma_ratio` selection for the explicit
+  `stirling_ratio` method.
 - Say that `gamma(x, mode="certified", method="stirling_exp")` via certified
   `loggamma` exponentiation is an active explicit method only. The domain is
   finite real `x >= 20`, and direct Arb remains the default certified `gamma`
