@@ -11,6 +11,7 @@ from certsf.result import SFResult
 from .backends import arb_backend, mpmath_backend, scipy_backend
 from .methods import (
     certified_auto_loggamma,
+    gamma_ratio_stirling_ratio,
     gamma_stirling_exp,
     loggamma_ratio_stirling_diff,
     rgamma_stirling_recip,
@@ -108,6 +109,7 @@ def _certificate_metadata_for_scope(certificate_scope: str) -> tuple[str, str]:
     if certificate_scope in {
         "stirling_loggamma_positive_real",
         "gamma_positive_real_stirling_exp",
+        "gamma_ratio_positive_real_stirling_ratio",
         "loggamma_ratio_positive_real_stirling_diff",
         "rgamma_positive_real_stirling_recip",
     }:
@@ -747,6 +749,29 @@ METHOD_REGISTRY["rgamma"]["certified"] = (
         applicability_note=(
             "Explicit method='stirling_recip' only; real x >= 20; not automatic default selection; "
             "complex rgamma, reflection formulas, near-pole behavior, gamma-ratio asymptotics, "
+            "and beta asymptotics excluded"
+        ),
+    ),
+)
+METHOD_REGISTRY["gamma_ratio"]["certified"] = (
+    REGISTRY["gamma_ratio"]["certified"],
+    _spec(
+        "gamma_ratio",
+        "certified",
+        "certsf+python-flint",
+        gamma_ratio_stirling_ratio,
+        certified=True,
+        domain=(
+            "Finite real a >= 20 and finite real b >= 20; explicit positive-real gamma-ratio "
+            "via exponentiated certified loggamma-ratio"
+        ),
+        certificate_scope="gamma_ratio_positive_real_stirling_ratio",
+        method_id="stirling_ratio",
+        priority=200,
+        applicability_note=(
+            "Explicit method='stirling_ratio' only; finite real a >= 20 and b >= 20; "
+            "not automatic default selection; complex gamma-ratio Stirling certification, "
+            "reflection formulas, near-pole behavior, simultaneous-pole limiting values, "
             "and beta asymptotics excluded"
         ),
     ),

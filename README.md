@@ -98,7 +98,7 @@ Every wrapper returns an `SFResult` with these fields:
 - `method`: implementation method, such as `scipy.special`, `mpmath`,
   `arb_ball`, `stirling_loggamma`, `stirling_shifted_loggamma`,
   `stirling_diff_loggamma_ratio`, `stirling_exp_gamma`, or
-  `stirling_recip_rgamma`.
+  `stirling_recip_rgamma`, or `stirling_ratio_gamma_ratio`.
 - `backend`: backend package name.
 - `requested_dps`: requested decimal precision.
 - `working_dps`: internal decimal precision estimate.
@@ -155,15 +155,21 @@ For `loggamma_ratio`, explicit
 positive-real method for finite real `a >= 20` and `b >= 20` by subtracting two
 certified positive-real `loggamma` enclosures. It is explicit only and does
 not change default certified `loggamma_ratio`.
+For `gamma_ratio`, explicit
+`mode="certified", method="stirling_ratio"` selects an alpha-certified
+positive-real method for finite real `a >= 20` and `b >= 20` by exponentiating
+a certified positive-real `loggamma_ratio` enclosure. It is explicit only and
+does not change default certified `gamma_ratio`.
 
 ## Supported Functions
 
 The development line keeps the 0.2 public wrapper surface and adds explicit
 custom certified asymptotic methods for `loggamma`, positive-real
-`loggamma_ratio`, positive-real `gamma`, and positive-real `rgamma`. Default
-certified `loggamma`, default certified `loggamma_ratio`, default certified
-`gamma`, and default certified `rgamma` still use direct Arb. The package
-remains alpha-quality in scientific scope.
+`loggamma_ratio`, positive-real `gamma_ratio`, positive-real `gamma`, and
+positive-real `rgamma`. Default certified `loggamma`, default certified
+`loggamma_ratio`, default certified `gamma_ratio`, default certified `gamma`,
+and default certified `rgamma` still use direct Arb. The package remains
+alpha-quality in scientific scope.
 
 | Area | Release status |
 | --- | --- |
@@ -173,7 +179,7 @@ remains alpha-quality in scientific scope.
 | `besselj`, `bessely`, `besseli`, `besselk` | alpha-certified where direct Arb primitive works; real-valued order only |
 | `pcfd`, `pcfu`, `pcfv`, `pcfw`, `pbdv` | experimental certified formula layer |
 | MCP server | experimental tool interface |
-| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio; not automatic default selection |
+| Custom Taylor/asymptotic methods | alpha-certified custom asymptotic bound for positive-real loggamma via explicit `method="stirling"` or `method="stirling_shifted"`; explicit `method="certified_auto"` may select those methods or direct Arb; active explicit positive-real loggamma_ratio method `method="stirling_diff"` via certified loggamma difference; active explicit positive-real gamma_ratio method `method="stirling_ratio"` via exponentiated certified loggamma_ratio; active explicit positive-real gamma method `method="stirling_exp"` via certified loggamma exponentiation; active explicit positive-real rgamma method `method="stirling_recip"` via certified loggamma exponentiation; real `x >= 20` for one-argument custom methods and real `a >= 20`, `b >= 20` for loggamma_ratio and gamma_ratio; not automatic default selection |
 
 ```python
 from certsf import (
@@ -235,6 +241,16 @@ Certified `gamma_ratio(a, b)` evaluates `Gamma(a) * rgamma(b)`. This lets
 denominator poles certify to exact zero when `Gamma(a)` is finite, while
 numerator poles and simultaneous numerator/denominator poles return clean
 non-certified failures with pole diagnostics. See
+[`docs/gamma_ratio.md`](docs/gamma_ratio.md).
+
+Explicit
+`gamma_ratio(a, b, mode="certified", method="stirling_ratio")` evaluates a
+positive-real enclosure for finite real `a >= 20` and `b >= 20` by
+exponentiating a certified positive-real `loggamma_ratio` enclosure. It records
+`certificate_scope="gamma_ratio_positive_real_stirling_ratio"` and returns
+`method="stirling_ratio_gamma_ratio"`. It does not certify complex gamma-ratio
+Stirling paths, reflection-formula paths, near-pole behavior, simultaneous-pole
+limiting values, beta asymptotics, or default-dispatch promotion. See
 [`docs/gamma_ratio.md`](docs/gamma_ratio.md).
 
 ```python
@@ -515,8 +531,8 @@ The repository also includes:
   covering `loggamma` Stirling methods, `certified_auto`, and
   `gamma(method="stirling_exp")` and `rgamma(method="stirling_recip")`.
 - `docs/audit/` for family-level certification checklists.
-- `docs/gamma_ratio.md` for gamma-ratio pole policy and certified-backend
-  rationale.
+- `docs/gamma_ratio.md` for gamma-ratio pole policy, certified-backend
+  rationale, and the explicit positive-real `method="stirling_ratio"` path.
 - `docs/loggamma_ratio.md` for loggamma-ratio branch convention and pole
   policy.
 - `docs/beta.md` for beta-function pole policy and certified-backend

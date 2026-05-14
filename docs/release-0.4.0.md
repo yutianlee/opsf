@@ -9,10 +9,10 @@ explicit methods.
 The target direction is explicit certified positive-real gamma-ratio methods
 built from the existing certified positive-real `loggamma` machinery.
 
-## Active First Scope
+## Active Scopes
 
-The first active implementation target is the explicit certified positive-real
-`loggamma_ratio` method:
+The first active implementation target was the explicit certified
+positive-real `loggamma_ratio` method:
 
 ```python
 loggamma_ratio(a, b, mode="certified", method="stirling_diff", dps=...)
@@ -27,16 +27,22 @@ It uses certificate scope:
 
 - `loggamma_ratio_positive_real_stirling_diff`
 
-## Later Proposed Scope
-
-Later work may add an explicit certified positive-real `gamma_ratio` method:
+The next active implementation target is the explicit certified positive-real
+`gamma_ratio` method:
 
 ```python
 gamma_ratio(a, b, mode="certified", method="stirling_ratio", dps=...)
 ```
 
-That method should use `exp(loggamma_ratio(a, b))` after the
-`loggamma_ratio` certificate is in place.
+The domain is finite real `a >= 20` and finite real `b >= 20`. The method
+uses `exp(loggamma_ratio(a, b))` after the explicit `loggamma_ratio`
+certificate is in place.
+
+It uses certificate scope:
+
+- `gamma_ratio_positive_real_stirling_ratio`
+
+## Later Proposed Scope
 
 Later work may also consider an explicit certified positive-real `beta`
 method:
@@ -50,15 +56,14 @@ That method should use
 positive-real loggamma certificates and cancellation/error accounting are
 documented.
 
-## Later Certificate Scopes
+## Later Certificate Scope
 
-These scope names remain planning targets only:
+This scope name remains a planning target only:
 
-- `gamma_ratio_positive_real_stirling_ratio`
 - `beta_positive_real_stirling_beta`
 
-They must not be treated as active runtime scopes until later implementation
-PRs supply proof notes, tests, diagnostics, and documentation.
+It must not be treated as an active runtime scope until a later implementation
+PR supplies proof notes, tests, diagnostics, and documentation.
 
 ## Dispatch Guardrails
 
@@ -87,5 +92,4 @@ The v0.4.0 positive-real gamma-ratio plan excludes:
 - no broad package-wide certification claim.
 
 This plan does not add public wrappers, change workflow files, alter release
-policy, implement `gamma_ratio(method="stirling_ratio")`, or implement
-`beta(method="stirling_beta")`.
+policy, or implement `beta(method="stirling_beta")`.
